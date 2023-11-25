@@ -740,7 +740,7 @@ void Cond_EndFile(void);
 /* dir.c; see also dir.h */
 
 /* Replacment for if(p == '/') */
-#define isAbs(p) ((p) <= 'Z' && (p) >= 'A')
+#define isAbs(p) (((p) <= 'Z' && (p) >= 'A')||((p) <= 'z' && (p) >= 'a'))
 
 MAKE_INLINE char * MAKE_ATTR_USE
 lastSlash(const char *pathname)
