@@ -1788,7 +1788,10 @@ QuoteShell(const char *str, bool quoteDollar, LazyBuf *buf)
 	LazyBuf_Init(buf, str);
 	for (p = str; *p != '\0'; p++) {
 		if (*p == '\n') {
-			LazyBuf_AddStr(buf, "\\\n");
+			const char *newline = Shell_GetNewline();
+			if (newline == NULL)
+				newline = "\\\n";
+			LazyBuf_AddStr(buf, newline);
 			continue;
 		}
 		if (ch_isspace(*p) || ch_is_shell_meta(*p))

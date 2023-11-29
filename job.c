@@ -179,6 +179,12 @@ typedef struct Shell {
 	const char *echoTmpl;	/* template to echo a command */
 
 	/*
+	 * A string literal that results in a newline character when it
+	 * occurs outside of any 'quote' or "quote" characters.
+	 */
+	const char *newline;
+
+	/*
 	 * Character used to execute multiple commands on one line,
 	 * regardless of whether the last command failed or not.
 	 */
@@ -267,6 +273,7 @@ static Shell shells[] = {
 		"%s\n", /* .runIgnTmpl */
 		"%s||exit !errorlevel!\n", /* .runChkTmpl */
 		"echo %s\n", /* .echoTmpl */
+		"&echo:", /* .newline */
 		'&', /* .separator */
 		'\0' /* .commentChar */
 	},
@@ -290,6 +297,7 @@ static Shell shells[] = {
 		"{exit $lastexitcode}exit 1)\n", /* .runChkTmpl */
 
 		"$(echo \"\"%s\"\")\n", /* .echoTmpl */
+		"`n", /*.newline */
 		';', /* .separator */
 		'#', /* .commentChar */
 	}
@@ -1597,6 +1605,16 @@ Shell_Init(void)
 	Var_SetWithFlags(SCOPE_CMDLINE, ".SHELL", shellPath, VAR_SET_READONLY);
 }
 
+/*
+ * Return the string literal that is used in the current command shell
+ * to produce a newline character.
+ */
+const char *
+Shell_GetNewline(void)
+{
+	return shell->newline;
+}
+
 void
 Job_SetPrefix(void)
 {
@@ -1804,6 +1822,8 @@ Job_ParseShell(char *line)
 				newShell.runIgnTmpl = arg + 7;
 			} else if (strncmp(arg, "errout=", 7) == 0) {
 				newShell.runChkTmpl = arg + 7;
+			} else if (strncmp(arg, "newline=", 8) == 0) {
+				newShell.newline = arg + 8;
 			} else if (strncmp(arg, "comment=", 8) == 0) {
 				newShell.commentChar = arg[8];
 			} else if (strncmp(arg, "separator=", 10) == 0) {

@@ -164,6 +164,7 @@ extern char *shellErrFlag;
 extern int jobTokensRunning;	/* tokens currently "out" */
 
 void Shell_Init(void);
+const char *Shell_GetNewline(void) MAKE_ATTR_USE;
 void Job_Touch(GNode *, bool);
 bool Job_CheckCommands(GNode *, void (*abortProc)(const char *, ...))
 	MAKE_ATTR_USE;
