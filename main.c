@@ -319,6 +319,8 @@ MainParseArgDebug(const char *argvalue)
 
 finish:
 	opts.debug = debug;
+
+	setvbuf(opts.debug_file, NULL, _IONBF, 0);
 }
 
 /* Is path relative or does it contain any relative component "." or ".."? */
