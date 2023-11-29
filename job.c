@@ -1654,7 +1654,7 @@ Job_Init(void)
 		caught_signals[i] = NSIG;
 
 	/*
-	 * Catch the four signals that POSIX specifies if they aren't ignored.
+  	 * Catch SIGINT and SIGTERM if they aren't ignored.
 	 * JobPassSig will take care of calling JobInterrupt if appropriate.
 	 */
 	AddSig(SIGINT, JobPassSig_int);
