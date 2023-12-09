@@ -82,10 +82,8 @@ MsgLoop(LPVOID ready)
 	*(bool *)ready = true;
 
 	while ((ret = GetMessageA(&msg, window, 0, 0)) != 0) {
-		if (ret == -1) {
-			printf("err\n");
-			exit(2);
-		}
+		if (ret == -1)
+			Punt("failed to get message: %s", strerr(GetLastError()));
 
 		DispatchMessageA(&msg);
 	}
