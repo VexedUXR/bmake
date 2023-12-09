@@ -310,9 +310,7 @@ static Shell shells[] = {
 static Shell *shell = &shells[DEFSHELL_INDEX];
 const char *shellPath = NULL;	/* full pathname of executable image */
 const char *shellName = NULL;	/* last component of shellPath */
-char *shellErrFlag = NULL;
 static char *shell_freeIt = NULL; /* Allocated memory for custom .SHELL */
-
 
 static Job *job_table;		/* The structures that describe them */
 static Job *job_table_end;	/* job_table + maxJobs */
@@ -320,19 +318,10 @@ static Job *job_table_end;	/* job_table + maxJobs */
 static char *targPrefix = NULL;	/* To identify a job change in the output. */
 static Job tokenWaitJob;	/* token wait pseudo-job */
 
-/*
- * Windows' signal() supports 6 signals.
- * We only use 2.
- */
-#define SIGMAX 2
-
-static int caught_signals[SIGMAX]; /* Set of signals we handle */
-static SignalProc signal_handlers[SIGMAX]; /* Signal handlers for the signals we handle */
-static int pending_signals[SIGMAX];
+static HANDLE job_mutex = NULL;
 
 static void CollectOutput(Job *, bool);
-static void MAKE_ATTR_DEAD JobInterrupt(bool, int);
-static void JobSigReset(void);
+static void MAKE_ATTR_DEAD JobInterrupt(bool);
 
 static void
 SwitchOutputTo(GNode *gn)
@@ -395,59 +384,6 @@ JobDeleteTarget(GNode *gn)
 }
 
 static void
-JobSigPending(int sig)
-{
-	int i;
-
-	/* If sig is already pending, dont add it again. */
-	for (i = 0; i < SIGMAX; i++) {
-		if (pending_signals[i] == NSIG)
-			break;
-		else if (pending_signals[i] == sig)
-			return;
-	}
-
-	pending_signals[i] = sig;
-}
-
-/*
- * JobSigLock/JobSigUnlock
- *
- * Signal lock routines to get exclusive access. Currently used to
- * protect `jobs' and `stoppedJobs' list manipulations.
- * 
- * Windows dosent have sigprocmask(), so we emulate the behaviour of
- * SIG_BLOCK by passing all signals to JobSigPending which puts the signal
- * in pending_signals where it can later be processed.
- */
-static void
-JobSigLock(void)
-{
-	for (int i = 0; i < SIGMAX; i++) {
-		if (caught_signals[i] != NSIG)
-			(void)signal(caught_signals[i], JobSigPending);
-		/* This discards any previous pending signals. */
-		pending_signals[i] = NSIG;
-	}
-}
-
-/* Process pending signals. */
-static void
-JobSigUnlock(void)
-{
-	for (int i = 0; i < SIGMAX; i++) {
-		if (caught_signals[i] != NSIG)
-			signal(caught_signals[i], signal_handlers[i]);
-		
-		if (pending_signals[i] != NSIG) {
-			int j = 0;
-			for (; caught_signals[j] != pending_signals[i]; j++);
-			signal_handlers[j](caught_signals[j]);
-		}
-	}
-}
-
-static void
 JobCreatePipe(Job *job)
 {
 	if (CreatePipe(&job->inPipe, &job->outPipe, NULL, 0) == 0)
@@ -465,43 +401,23 @@ JobCreatePipe(Job *job)
 		Punt("failed to set pipe attributes: %s", strerr(GetLastError()));
 }
 
-/* Pass the signal to each running job. */
-static void
-JobCondPassSig(int signo)
-{
-	Job *job;
-
-	DEBUG1(JOB, "JobCondPassSig(%d) called.\n", signo);
-
-	for (job = job_table; job < job_table_end; job++) {
-		if (job->status != JOB_ST_RUNNING)
-			continue;
-		DEBUG2(JOB, "JobCondPassSig passing signal %d to child %lu.\n",
-			signo, job->pid);
-		TerminateProcess(job->handle, signo);
-	}
-}
-
 /*
- * Pass a signal on to all jobs, then resend to ourselves.
- * We die by the same signal.
+ * Terminate all jobs, catching any output they
+ * may have produced, then exit.
  */
+
 MAKE_ATTR_DEAD static void
-JobPassSig_int(int signo)
+JobPassSig_int(void)
 {
 	/* Run .INTERRUPT target then exit */
-	JobInterrupt(true, signo);
+	JobInterrupt(true);
 }
 
-/*
- * Pass a signal on to all jobs, then resend to ourselves.
- * We die by the same signal.
- */
 MAKE_ATTR_DEAD static void
-JobPassSig_term(int signo)
+JobPassSig_term(void)
 {
 	/* Dont run .INTERRUPT target then exit */
-	JobInterrupt(false, signo);
+	JobInterrupt(false);
 }
 
 static Job *
@@ -1120,7 +1036,7 @@ JobExec(Job *job, char *args)
 		SwitchOutputTo(job->node);
 
 	/* No interruptions until this job is on the `jobs' list */
-	JobSigLock();
+	Job_WaitMutex();
 
 	/* Pre-emptively mark job running, pid still zero though */
 	job->status = JOB_ST_RUNNING;
@@ -1161,7 +1077,7 @@ JobExec(Job *job, char *args)
 			job->node->name, job->handle);
 		DumpJobs("job started");
 	}
-	JobSigUnlock();
+	Job_ReleaseMutex();
 }
 
 /* Create the argv needed to execute the shell for a given job. */
@@ -1629,18 +1545,28 @@ Job_SetPrefix(void)
 	/* TODO: handle errors */
 }
 
-static void
-AddSig(int sig, SignalProc handler)
+void
+Job_WaitMutex(void)
 {
-	int i = 0;
-
-	if (signal(sig, SIG_IGN) == SIG_IGN)
+	if (job_mutex == NULL)
 		return;
 
-	for (; caught_signals[i] != NSIG; i++);
-	caught_signals[i] = sig;
-	signal_handlers[i] = handler;
-	(void)signal(sig, handler);
+	switch (WaitForSingleObject(job_mutex, INFINITE)) {
+	case WAIT_ABANDONED:
+		Punt("got ownership of abandoned mutex");
+	case WAIT_FAILED:
+		Punt("failed to wait for mutex: %s", strerr(GetLastError()));
+	}
+}
+
+void
+Job_ReleaseMutex(void)
+{
+	if (job_mutex == NULL)
+		return;
+
+	if (ReleaseMutex(job_mutex) == 0)
+		Punt("failed to release mutex: %s", strerr(GetLastError()));
 }
 
 /* Initialize the process module. */
@@ -1656,27 +1582,11 @@ Job_Init(void)
 	aborting = ABORT_NONE;
 	job_errors = 0;
 
-	/*
-	 * There is a non-zero chance that we already have children.
-	 * eg after 'make -f- <<EOF'
-	 * Since their termination causes a 'Child (pid) not in table'
-	 * message, Collect the status of any that are already dead, and
-	 * suppress the error message if there are any undead ones.
-	 */
+	if ((job_mutex = CreateMutexA(NULL, FALSE, NULL)) == NULL)
+		Punt("failed to create mutex: %s", strerr(GetLastError()));
 
 	Shell_Init();
-
-	/* These are permanent entries and take slots 0 and 1 */
-
-	for (int i = 0; i < SIGMAX; i++)
-		caught_signals[i] = NSIG;
-
-	/*
-	 * Catch SIGINT and SIGTERM if they aren't ignored.
-	 * JobPassSig will take care of calling JobInterrupt if appropriate.
-	 */
-	AddSig(SIGINT, JobPassSig_int);
-	AddSig(SIGTERM, JobPassSig_term);
+	Msg_Init(JobPassSig_int, JobPassSig_term);
 
 	(void)Job_RunTarget(".BEGIN", NULL);
 	/*
@@ -1684,23 +1594,6 @@ Job_Init(void)
 	 * depends on it.  See also Targ_GetEndNode in Compat_MakeAll.
 	 */
 	(void)Targ_GetEndNode();
-}
-
-static void
-DelSig(int sig)
-{
-	for (int i = 0; i < SIGMAX; i++)
-		if (caught_signals[i] == sig) {
-			caught_signals[i] = NSIG;
-			return;
-		}
-}
-
-static void
-JobSigReset(void)
-{
-	DelSig(SIGINT);
-	DelSig(SIGTERM);
 }
 
 /* Find a shell in 'shells' given its name, or return NULL. */
@@ -1932,18 +1825,15 @@ Job_ParseShell(char *line)
  * Input:
  *	runINTERRUPT	Non-zero if commands for the .INTERRUPT target
  *			should be executed
- *	signo		signal received
  */
-static void
-JobInterrupt(bool runINTERRUPT, int signo)
+static void MAKE_ATTR_DEAD
+JobInterrupt(bool runINTERRUPT)
 {
 	Job *job;		/* job descriptor in that element */
 	GNode *interrupt;	/* the node describing the .INTERRUPT target */
 	GNode *gn;
 
 	aborting = ABORT_INTERRUPT;
-
-	JobSigLock();
 
 	for (job = job_table; job < job_table_end; job++) {
 		if (job->status != JOB_ST_RUNNING)
@@ -1956,11 +1846,10 @@ JobInterrupt(bool runINTERRUPT, int signo)
 			DEBUG1(JOB,
 				"JobInterrupt terminating child %p.\n",
 				job->handle);
-			TerminateProcess(job->handle, signo);
+			TerminateProcess(job->handle, 0);
+			CollectOutput(job, true);
 		}
 	}
-
-	JobSigUnlock();
 
 	if (runINTERRUPT && !opts.touch) {
 		interrupt = Targ_FindNode(".INTERRUPT");
@@ -1970,7 +1859,7 @@ JobInterrupt(bool runINTERRUPT, int signo)
 		}
 	}
 	Trace_Log(MAKEINTR, NULL);
-	exit(signo);		/* XXX: why signo? */
+	exit(2);
 }
 
 /*

@@ -85,9 +85,6 @@
 #undef SearchPath
 #undef ERROR
 
-#include <signal.h>
-typedef _crt_signal_t SignalProc;
-
 #ifdef USE_META
 # include "meta.h"
 #endif
@@ -133,7 +130,7 @@ typedef struct Job {
 	/* This is where the shell commands go. */
 	Buffer *cmdBuffer;
 
-	DWORD exit_status;	/* from wait4() in signal handler */
+	DWORD exit_status;
 
 	JobStatus status;
 
@@ -183,5 +180,7 @@ void Job_SetPrefix(void);
 bool Job_RunTarget(const char *, const char *);
 void Job_FlagsToString(const Job *, char *, size_t);
 FILE *Job_TempFile(const char *, char *, size_t) MAKE_ATTR_USE;
+void Job_WaitMutex(void);
+void Job_ReleaseMutex(void);
 
 #endif

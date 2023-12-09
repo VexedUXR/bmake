@@ -1004,6 +1004,10 @@ int str2Lst_Append(StringList *, char *);
 void GNode_FprintDetails(FILE *, const char *, const GNode *, const char *);
 bool MAKE_ATTR_USE GNode_ShouldExecute(GNode *gn);
 
+/* message.c */
+void Msg_Init(void (*)(void), void (*)(void));
+void Msg_End(void);
+
 size_t strlcpy(char *, const char *, size_t);
 
 /* See if the node was seen on the left-hand side of a dependency operator. */

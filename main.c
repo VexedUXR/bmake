@@ -89,7 +89,6 @@
  */
 
 #include <errno.h>
-#include <signal.h>
 #include <stdarg.h>
 #include <time.h>
 #include <process.h>
@@ -808,22 +807,6 @@ str2Lst_Append(StringList *lp, char *str)
 	return n;
 }
 
-#ifdef SIGINFO
-/*ARGSUSED*/
-static void
-siginfo(int signo MAKE_ATTR_UNUSED)
-{
-	char dir[MAXPATHLEN];
-	char str[2 * MAXPATHLEN];
-	int len;
-	if (getcwd(dir, sizeof dir) == NULL)
-		return;
-	len = snprintf(str, sizeof str, "%s: Working in: %s\n", progname, dir);
-	if (len > 0)
-		(void)write(STDERR_FILENO, str, (size_t)len);
-}
-#endif
-
 /* Allow makefiles some control over the mode we run in. */
 static void
 MakeMode(void)
@@ -1234,10 +1217,6 @@ main_Init(int argc, char **argv)
 	Str_Intern_Init();
 	HashTable_Init(&cached_realpaths);
 
-#ifdef SIGINFO
-	(void)bmake_signal(SIGINFO, siginfo);
-#endif
-
 	InitRandom();
 
 	progname = str_basename(argv[0]);
@@ -1500,6 +1479,7 @@ main_CleanUp(void)
 	Parse_End();
 	Dir_End();
 	Job_End();
+	Msg_End();
 	Trace_End();
 	Str_Intern_End();
 }

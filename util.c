@@ -8,7 +8,6 @@
 
 #include <errno.h>
 #include <time.h>
-#include <signal.h>
 
 #include "make.h"
 

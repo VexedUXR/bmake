@@ -165,6 +165,7 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="make.c" />
     <ClCompile Include="make_malloc.c" />
+    <ClCompile Include="message.c" />
     <ClCompile Include="meta.c" />
     <ClCompile Include="metachar.c" />
     <ClCompile Include="parse.c" />

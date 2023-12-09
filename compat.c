@@ -81,7 +81,6 @@
 #include <sys/stat.h>
 
 #include <errno.h>
-#include <signal.h>
 #include <malloc.h>
 
 #include "make.h"
@@ -93,8 +92,8 @@
 /*	"@(#)compat.c	8.2 (Berkeley) 3/19/94"	*/
 
 static GNode *curTarg = NULL;
-static HANDLE compatChild;
-static int compatSigno;
+static HANDLE compatChild = NULL;
+static bool signaled = false;
 
 /*
  * Delete the file of a failed, interrupted, or otherwise duffed target,
@@ -123,31 +122,43 @@ CompatDeleteTarget(GNode *gn)
  * left the logic alone for now. - dholland 20160826
  */
 static void
-CompatInterrupt(int signo)
+CompatInterrupt_int(void)
 {
+	/*
+	 * if Compat_Make is run, compatChild
+	 * loses its value
+	 */
+	HANDLE savedChild = compatChild;
+
 	CompatDeleteTarget(curTarg);
 
 	if (curTarg != NULL && !GNode_IsPrecious(curTarg)) {
 		/*
-		 * Run .INTERRUPT only if hit with interrupt signal
+		 * Run .INTERRUPT
 		 */
-		if (signo == SIGINT) {
-			GNode *gn = Targ_FindNode(".INTERRUPT");
-			if (gn != NULL) {
-				Compat_Make(gn, gn);
-			}
+		GNode *gn = Targ_FindNode(".INTERRUPT");
+		if (gn != NULL) {
+			Compat_Make(gn, gn);
 		}
 	}
 
-	/*
-	 * If there is a child running, pass the signal on.
-	 * We will exist after it has exited.
-	 */
-	compatSigno = signo;
+	signaled = true;
+	if (savedChild != NULL)
+		(void)TerminateProcess(savedChild, 0);
+	else
+		exit(2);
+}
+
+static void
+CompatInterrupt_term(void)
+{
+	CompatDeleteTarget(curTarg);
+
+	signaled = true;
 	if (compatChild != NULL)
 		(void)TerminateProcess(compatChild, 0);
 	else
-		_exit(2);
+		exit(2);
 }
 
 static void
@@ -364,8 +375,9 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 	compatChild = NULL;
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
-	if (compatSigno != 0)
-		_exit(2);
+
+	if (signaled)
+		exit(2);
 
 	return status == 0;
 }
@@ -647,15 +659,6 @@ MakeBeginNode(void)
 	}
 }
 
-static void
-InitSignals(void)
-{
-	if (signal(SIGINT, SIG_IGN) != SIG_IGN)
-		signal(SIGINT, CompatInterrupt);
-	if (signal(SIGTERM, SIG_IGN) != SIG_IGN)
-		signal(SIGTERM, CompatInterrupt);
-}
-
 void
 Compat_MakeAll(GNodeList *targs)
 {
@@ -664,7 +667,7 @@ Compat_MakeAll(GNodeList *targs)
 	if (shellName == NULL)
 		Shell_Init();
 
-	InitSignals();
+	Msg_Init(CompatInterrupt_int, CompatInterrupt_term);
 
 	/*
 	 * Create the .END node now, to keep the (debug) output of the

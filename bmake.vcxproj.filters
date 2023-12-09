@@ -87,6 +87,9 @@
     <ClCompile Include="metachar.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="message.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="buf.h">
