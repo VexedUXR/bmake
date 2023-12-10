@@ -98,9 +98,9 @@
  *	Var_Value	Return the unexpanded value of a variable, or NULL if
  *			the variable is undefined.
  *
- *	Var_Subst	Substitute all variable expressions in a string.
+ *	Var_Subst	Substitute all expressions in a string.
  *
- *	Var_Parse	Parse a variable expression such as ${VAR:Mpattern}.
+ *	Var_Parse	Parse an expression such as ${VAR:Mpattern}.
  *
  *	Var_Delete
  *			Delete a variable.
@@ -156,7 +156,7 @@
  * Environment variables are short-lived.  They are returned by VarFind, and
  * after using them, they must be freed using VarFreeShortLived.
  *
- * Undefined variables occur during evaluation of variable expressions such
+ * Undefined variables occur during evaluation of expressions such
  * as ${UNDEF:Ufallback} in Var_Parse and ApplyModifiers.
  */
 typedef struct Var {
@@ -211,8 +211,8 @@ typedef struct Var {
 	/*
 	 * At the point where this variable was exported, it contained an
 	 * unresolved reference to another variable.  Before any child
-	 * process is started, it needs to be exported again, in the hope
-	 * that the referenced variable can then be resolved.
+	 * process is started, it needs to be actually exported, resolving
+	 * the referenced variable just in time.
 	 */
 	bool reexport:1;
 } Var;
@@ -606,13 +606,8 @@ ExportVarEnv(Var *v)
 		return true;
 	}
 
-	if (v->inUse) {
-		/*
-		 * We recursed while exporting in a child.
-		 * This isn't going to end well, just skip it.
-		 */
-		return false;
-	}
+	if (v->inUse)
+		return false;	/* see EMPTY_SHELL in directive-export.mk */
 
 	/* XXX: name is injected without escaping it */
 	expr = str_concat3("${", name, "}");
@@ -697,9 +692,9 @@ Var_ReexportVars(void)
 	 * We allow the makefiles to update MAKELEVEL and ensure
 	 * children see a correctly incremented value.
 	 */
-	char tmp[21];
-	snprintf(tmp, sizeof tmp, "%d", makelevel + 1);
-	setenv(MAKE_LEVEL_ENV, tmp, 1);
+	char level_buf[21];
+	snprintf(level_buf, sizeof level_buf, "%d", makelevel + 1);
+	setenv(MAKE_LEVEL_ENV, level_buf, 1);
 
 	if (var_exportedVars == VAR_EXPORTED_NONE)
 		return;
@@ -1187,11 +1182,12 @@ Var_ExistsExpand(GNode *scope, const char *name)
 
 /*
  * Return the unexpanded value of the given variable in the given scope,
- * or the usual scopes.
+ * falling back to the command, global and environment scopes, in this order,
+ * but see the -e option.
  *
  * Input:
  *	scope		scope in which to search for it
- *	name		name to find, is not expanded any further
+ *	name		the name to find, is not expanded any further
  *
  * Results:
  *	The value if the variable exists, NULL if it doesn't.
@@ -1216,9 +1212,7 @@ Var_Value(GNode *scope, const char *name)
 	return FStr_InitOwn(value);
 }
 
-/*
- * set readOnly attribute of specified var if it exists
- */
+/* Set or clear the read-only attribute of the specified var if it exists. */
 void
 Var_ReadOnly(const char *name, bool bf)
 {
@@ -1333,7 +1327,7 @@ SepBuf_DoneData(SepBuf *buf)
 
 
 /*
- * This callback for ModifyWords gets a single word from a variable expression
+ * This callback for ModifyWords gets a single word from an expression
  * and typically adds a modification of this word to the buffer. It may also
  * do nothing or add several words.
  *
@@ -1921,9 +1915,9 @@ FormatTime(const char *fmt, time_t t, bool gmt)
  * parsing position is well-known in ApplyModifiers.)
  *
  * If parsing fails and the SysV modifier ${VAR:from=to} should not be used
- * as a fallback, either issue an error message using Error or Parse_Error
- * and then return AMR_CLEANUP, or return AMR_BAD for the default error
- * message.  Both of these return values will stop processing the variable
+ * as a fallback, issue an error message using Parse_Error (preferred over
+ * Error) and then return AMR_CLEANUP, or return AMR_BAD for the default error
+ * message.  Both of these return values will stop processing the
  * expression.  (XXX: As of 2020-08-23, evaluation of the whole string
  * continues nevertheless after skipping a few bytes, which essentially is
  * undefined behavior.  Not in the sense of C, but still the resulting string
@@ -1932,37 +1926,37 @@ FormatTime(const char *fmt, time_t t, bool gmt)
  * Evaluating the modifier
  *
  * After parsing, the modifier is evaluated.  The side effects from evaluating
- * nested variable expressions in the modifier text often already happen
+ * nested expressions in the modifier text often already happen
  * during parsing though.  For most modifiers this doesn't matter since their
  * only noticeable effect is that they update the value of the expression.
  * Some modifiers such as ':sh' or '::=' have noticeable side effects though.
  *
- * Evaluating the modifier usually takes the current value of the variable
+ * Evaluating the modifier usually takes the current value of the
  * expression from ch->expr->value, or the variable name from ch->var->name
- * and stores the result back in expr->value via Expr_SetValueOwn or
+ * and stores the result back in ch->expr->value via Expr_SetValueOwn or
  * Expr_SetValueRefer.
  *
  * If evaluating fails (as of 2020-08-23), an error message is printed using
- * Error.  This function has no side-effects, it really just prints the error
+ * Error.  This function has no side effects, it really just prints the error
  * message.  Processing the expression continues as if everything were ok.
- * XXX: This should be fixed by adding proper error handling to Var_Subst,
+ * TODO: This should be fixed by adding proper error handling to Var_Subst,
  * Var_Parse, ApplyModifiers and ModifyWords.
  *
  * Housekeeping
  *
  * Some modifiers such as :D and :U turn undefined expressions into defined
- * expressions (see Expr_Define).
+ * expressions using Expr_Define.
  *
  * Some modifiers need to free some memory.
  */
 
 typedef enum ExprDefined {
-	/* The variable expression is based on a regular, defined variable. */
+	/* The expression is based on a regular, defined variable. */
 	DEF_REGULAR,
-	/* The variable expression is based on an undefined variable. */
+	/* The expression is based on an undefined variable. */
 	DEF_UNDEF,
 	/*
-	 * The variable expression started as an undefined expression, but one
+	 * The expression started as an undefined expression, but one
 	 * of the modifiers (such as ':D' or ':U') has turned the expression
 	 * from undefined to defined.
 	 */
@@ -2022,10 +2016,10 @@ typedef struct ModChain {
 	char const_member startc;
 	/* '\0' or '}' or ')' */
 	char const_member endc;
-	/* Word separator in expansions (see the :ts modifier). */
+	/* Word separator when joining words (see the :ts modifier). */
 	char sep;
 	/*
-	 * True if some modifiers that otherwise split the variable value
+	 * Whether some modifiers that otherwise split the variable value
 	 * into words, like :S and :C, treat the variable value as a single
 	 * big word, possibly containing spaces.
 	 */
@@ -2132,8 +2126,8 @@ ParseModifierPartExpr(const char **pp, LazyBuf *part, const ModChain *ch,
  * In a part of a modifier, parse some text that looks like a subexpression.
  * If the text starts with '$(', any '(' and ')' must be balanced.
  * If the text starts with '${', any '{' and '}' must be balanced.
- * If the text starts with '$', that '$' is copied, it is not parsed as a
- * short-name variable expression.
+ * If the text starts with '$', that '$' is copied verbatim, it is not parsed
+ * as a short-name expression.
  */
 static void
 ParseModifierPartBalanced(const char **pp, LazyBuf *part)
@@ -2173,13 +2167,13 @@ ParseModifierPartSubst(
 	ModChain *ch,
 	LazyBuf *part,
 	/*
-	 * For the first part of the modifier ':S', set anchorEnd if the last
+	 * For the first part of the ':S' modifier, set anchorEnd if the last
 	 * character of the pattern is a $.
 	 */
 	PatternFlags *out_pflags,
 	/*
-	 * For the second part of the :S modifier, allow ampersands to be escaped
-	 * and replace unescaped ampersands with subst->lhs.
+	 * For the second part of the ':S' modifier, allow ampersands to be
+	 * escaped and replace unescaped ampersands with subst->lhs.
 	 */
 	struct ModifyWord_SubstArgs *subst
 )
@@ -2249,7 +2243,7 @@ ParseModifierPart(
 	const char **pp,
 	/* Parsing stops at this delimiter */
 	char delim,
-	/* Mode for evaluating nested variables. */
+	/* Mode for evaluating nested expressions. */
 	VarEvalMode emode,
 	ModChain *ch,
 	LazyBuf *part
@@ -2446,12 +2440,11 @@ ParseModifier_Defined(const char **pp, ModChain *ch, bool shouldEval,
 
 		/*
 		 * XXX: This code is similar to the one in Var_Parse. See if
-		 * the code can be merged. See also ApplyModifier_Match and
+		 * the code can be merged. See also ParseModifier_Match and
 		 * ParseModifierPart.
 		 */
 
-		/* Escaped delimiter or other special character */
-		/* See Buf_AddEscaped in for.c. */
+		 /* See Buf_AddEscaped in for.c for the counterpart. */
 		if (*p == '\\') {
 			char c = p[1];
 			if ((IsDelimiter(c, ch) && c != '\0') ||
@@ -2463,7 +2456,6 @@ ParseModifier_Defined(const char **pp, ModChain *ch, bool shouldEval,
 			}
 		}
 
-		/* Nested variable expression */
 		if (*p == '$') {
 			FStr val = Var_Parse(&p, ch->expr->scope,
 				shouldEval ? ch->expr->emode : VARE_PARSE_ONLY);
@@ -2474,7 +2466,6 @@ ParseModifier_Defined(const char **pp, ModChain *ch, bool shouldEval,
 			continue;
 		}
 
-		/* Ordinary text */
 		if (shouldEval)
 			LazyBuf_Add(buf, *p);
 		p++;
@@ -2612,11 +2603,11 @@ ApplyModifier_Path(const char **pp, ModChain *ch)
 	Expr_Define(expr);
 
 	gn = Targ_FindNode(expr->name);
-	if (gn == NULL || gn->type & OP_NOPATH) {
+	if (gn == NULL || gn->type & OP_NOPATH)
 		path = NULL;
-	} else if (gn->path != NULL) {
+	else if (gn->path != NULL)
 		path = bmake_strdup(gn->path);
-	} else {
+	else {
 		SearchPath *searchPath = Suff_FindPath(gn);
 		path = Dir_FindFile(expr->name, searchPath);
 	}
@@ -2887,22 +2878,25 @@ ApplyModifier_Mtime(const char **pp, ModChain *ch)
 	if (args.use_fallback) {
 		p++;
 		if (TryParseTime(&p, &args.fallback)) {
-		} else if (strncmp(p, "error", 5) == 0
-			&& IsDelimiter(p[5], ch)) {
+		} else if (strncmp(p, "error", 5) == 0) {
 			p += 5;
 			args.error = true;
-		} else {
-			Parse_Error(PARSE_FATAL,
-				"Invalid argument '%.*s' for modifier ':mtime'",
-				(int)strcspn(p, ":{}()"), p);
-			return AMR_CLEANUP;
 		}
+		else
+			goto invalid_argument;
+		if (!IsDelimiter(*p, ch))
+			goto invalid_argument;
 		*pp = p;
 	}
 	if (!ModChain_ShouldEval(ch))
-		return AMR_OK;
-	ModifyWords(ch, ModifyWord_Mtime, &args, ch->oneBigWord);
+		ModifyWords(ch, ModifyWord_Mtime, &args, ch->oneBigWord);
 	return args.rc;
+
+invalid_argument:
+	Parse_Error(PARSE_FATAL,
+		"Invalid argument '%.*s' for modifier ':mtime'",
+		(int)strcspn(*pp + 1, ":{}()"), *pp + 1);
+	return AMR_CLEANUP;
 }
 
 static void
@@ -3094,7 +3088,7 @@ ApplyModifier_ToSep(const char **pp, ModChain *ch)
 		goto ok;
 	}
 
-	/* ":ts<unrecognised><unrecognised>". */
+	/* ":ts<unrecognized><unrecognized>". */
 	if (sep[0] != '\\') {
 		(*pp)++;	/* just for backwards compatibility */
 		return AMR_BAD;
@@ -3124,7 +3118,7 @@ ApplyModifier_ToSep(const char **pp, ModChain *ch)
 			p++;
 		} else if (!ch_isdigit(sep[1])) {
 			(*pp)++;	/* just for backwards compatibility */
-			return AMR_BAD;	/* ":ts<backslash><unrecognised>". */
+			return AMR_BAD;	/* ":ts<backslash><unrecognized>". */
 		}
 
 		if (!TryParseChar(&p, base, &ch->sep)) {
@@ -3220,7 +3214,7 @@ ApplyModifier_To(const char **pp, ModChain *ch)
 		return AMR_OK;
 	}
 
-	/* Found ":t<unrecognised>:" or ":t<unrecognised><endc>". */
+	/* Found ":t<unrecognized>:" or ":t<unrecognized><endc>". */
 	*pp = mod + 1;		/* XXX: unnecessary but observable */
 	return AMR_BAD;
 }
@@ -3230,7 +3224,6 @@ static ApplyModifierResult
 ApplyModifier_Words(const char **pp, ModChain *ch)
 {
 	Expr *expr = ch->expr;
-	const char *estr;
 	int first, last;
 	const char *p;
 	LazyBuf estrBuf;
@@ -3240,7 +3233,7 @@ ApplyModifier_Words(const char **pp, ModChain *ch)
 	if (!ParseModifierPart(pp, ']', expr->emode, ch, &estrBuf))
 		return AMR_CLEANUP;
 	festr = LazyBuf_DoneGet(&estrBuf);
-	estr = festr.str;
+	p = festr.str;
 
 	if (!IsDelimiter(**pp, ch))
 		goto bad_modifier;		/* Found junk after ']' */
@@ -3248,13 +3241,13 @@ ApplyModifier_Words(const char **pp, ModChain *ch)
 	if (!ModChain_ShouldEval(ch))
 		goto ok;
 
-	if (estr[0] == '\0')
+	if (p[0] == '\0')
 		goto bad_modifier;			/* Found ":[]". */
 
-	if (estr[0] == '#' && estr[1] == '\0') {	/* Found ":[#]" */
-		if (ch->oneBigWord) {
+	if (strcmp(p, "#") == 0) {	/* Found ":[#]" */
+		if (ch->oneBigWord)
 			Expr_SetValueRefer(expr, "1");
-		} else {
+		else {
 			Buffer buf;
 
 			SubstringWords words = Expr_Words(expr);
@@ -3269,49 +3262,37 @@ ApplyModifier_Words(const char **pp, ModChain *ch)
 		goto ok;
 	}
 
-	if (estr[0] == '*' && estr[1] == '\0') {	/* Found ":[*]" */
+	if (strcmp(p, "*") == 0) {	/* Found ":[*]" */
 		ch->oneBigWord = true;
 		goto ok;
 	}
 
-	if (estr[0] == '@' && estr[1] == '\0') {	/* Found ":[@]" */
+	if (strcmp(p, "@") == 0) {	/* Found ":[@]" */
 		ch->oneBigWord = false;
 		goto ok;
 	}
 
-	/*
-	 * We expect estr to contain a single integer for :[N], or two
-	 * integers separated by ".." for :[start..end].
-	 */
-	p = estr;
+	/* Expect ":[N]" or ":[start..end]" */
 	if (!TryParseIntBase0(&p, &first))
-		goto bad_modifier;	/* Found junk instead of a number */
+		goto bad_modifier;
 
-	if (p[0] == '\0') {		/* Found only one integer in :[N] */
+	if (p[0] == '\0')		/* ":[N]" */
 		last = first;
-	} else if (p[0] == '.' && p[1] == '.' && p[2] != '\0') {
-		/* Expecting another integer after ".." */
+	else if (strncmp(p, "..", 2) == 0) {
 		p += 2;
 		if (!TryParseIntBase0(&p, &last) || *p != '\0')
-			goto bad_modifier; /* Found junk after ".." */
+			goto bad_modifier;
 	} else
-		goto bad_modifier;	/* Found junk instead of ".." */
+		goto bad_modifier;
 
-	/*
-	 * Now first and last are properly filled in, but we still have to
-	 * check for 0 as a special case.
-	 */
-	if (first == 0 && last == 0) {
-		/* ":[0]" or perhaps ":[0..0]" */
+	if (first == 0 && last == 0) {	/* ":[0]" or ":[0..0]" */
 		ch->oneBigWord = true;
 		goto ok;
 	}
 
-	/* ":[0..N]" or ":[N..0]" */
-	if (first == 0 || last == 0)
+	if (first == 0 || last == 0)	/* ":[0..N]" or ":[N..0]" */
 		goto bad_modifier;
 
-	/* Normal case: select the words described by first and last. */
 	Expr_SetValueOwn(expr,
 		VarSelectWords(Expr_Str(expr), first, last,
 		ch->sep, ch->oneBigWord));
@@ -3366,7 +3347,7 @@ SubNumAsc(const void *sa, const void *sb)
 
 	a = num_val(*((const Substring *)sa));
 	b = num_val(*((const Substring *)sb));
-	return (a > b) ? 1 : (b > a) ? -1 : 0;
+	return a > b ? 1 : b > a ? -1 : 0;
 }
 
 static int
@@ -3375,18 +3356,27 @@ SubNumDesc(const void *sa, const void *sb)
 	return SubNumAsc(sb, sa);
 }
 
-static int
-SubStrAsc(const void *sa, const void *sb)
-{
-	return strcmp(
-		((const Substring *)sa)->start, ((const Substring *)sb)->start);
-}
+ static int
+ Substring_Cmp(Substring a, Substring b)
+ {
+	 for (; a.start < a.end && b.start < b.end; a.start++, b.start++)
+		 if (a.start[0] != b.start[0])
+			 return (unsigned char)a.start[0]
+				- (unsigned char)b.start[0];
+	 return (int)((a.end - a.start) - (b.end - b.start));
+ }
 
-static int
-SubStrDesc(const void *sa, const void *sb)
-{
-	return SubStrAsc(sb, sa);
-}
+ static int
+ SubStrAsc(const void *sa, const void *sb)
+ {
+	 return Substring_Cmp(*(const Substring *)sa, *(const Substring *)sb);
+ }
+
+ static int
+ SubStrDesc(const void *sa, const void *sb)
+ {
+	 return SubStrAsc(sb, sa);
+ }
 
 static void
 ShuffleSubstrings(Substring *strs, size_t n)
@@ -3551,7 +3541,7 @@ ApplyModifier_Assign(const char **pp, ModChain *ch)
 		goto found_op;
 	if ((op[0] == '+' || op[0] == '?' || op[0] == '!') && op[1] == '=')
 		goto found_op;
-	return AMR_UNKNOWN;	/* "::<unrecognised>" */
+	return AMR_UNKNOWN;	/* "::<unrecognized>" */
 
 found_op:
 	if (expr->name[0] == '\0') {
@@ -3621,7 +3611,7 @@ ApplyModifier_Remember(const char **pp, ModChain *ch)
 		/*
 		 * XXX: This ad-hoc call to strcspn deviates from the usual
 		 * behavior defined in ParseModifierPart.  This creates an
-		 * unnecessary, undocumented inconsistency in make.
+		 * unnecessary and undocumented inconsistency in make.
 		 */
 		const char *arg = mod + 2;
 		size_t argLen = strcspn(arg, ":)}");
@@ -3671,7 +3661,7 @@ ApplyModifier_Unique(const char **pp, ModChain *ch)
 	words = Expr_Words(ch->expr);
 
 	if (words.len > 1) {
-		size_t si, di;
+		size_t di, si;
 
 		di = 0;
 		for (si = 1; si < words.len; si++) {
@@ -3690,6 +3680,26 @@ ApplyModifier_Unique(const char **pp, ModChain *ch)
 }
 
 #ifdef SYSVVARSUB
+/* Test whether the modifier has the form '<lhs>=<rhs>'. */
+static bool
+IsSysVModifier(const char *p, char startc, char endc)
+{
+	bool eqFound = false;
+
+	int depth = 1;
+	while (*p != '\0' && depth > 0) {
+		if (*p == '=')	/* XXX: should also test depth == 1 */
+			eqFound = true;
+		else if (*p == endc)
+			depth--;
+		else if (*p == startc)
+			depth++;
+		if (depth > 0)
+			p++;
+	}
+	return *p == endc && eqFound;
+}
+
 /* :from=to */
 static ApplyModifierResult
 ApplyModifier_SysV(const char **pp, ModChain *ch)
@@ -3702,33 +3712,15 @@ ApplyModifier_SysV(const char **pp, ModChain *ch)
 	const char *lhsSuffix;
 
 	const char *mod = *pp;
-	bool eqFound = false;
 
-	/*
-	 * First we make a pass through the string trying to verify it is a
-	 * SysV-make-style translation. It must be: <lhs>=<rhs>
-	 */
-	int depth = 1;
-	const char *p = mod;
-	while (*p != '\0' && depth > 0) {
-		if (*p == '=') {	/* XXX: should also test depth == 1 */
-			eqFound = true;
-			/* continue looking for ch->endc */
-		} else if (*p == ch->endc)
-			depth--;
-		else if (*p == ch->startc)
-			depth++;
-		if (depth > 0)
-			p++;
-	}
-	if (*p != ch->endc || !eqFound)
+	if (!IsSysVModifier(mod, ch->startc, ch->endc))
 		return AMR_UNKNOWN;
 
 	if (!ParseModifierPart(pp, '=', expr->emode, ch, &lhsBuf))
 		return AMR_CLEANUP;
 
 	/*
-	 * The SysV modifier lasts until the end of the variable expression.
+	 * The SysV modifier lasts until the end of the expression.
 	 */
 	if (!ParseModifierPart(pp, ch->endc, expr->emode, ch, &rhsBuf)) {
 		LazyBuf_Done(&lhsBuf);
@@ -3929,16 +3921,16 @@ typedef enum ApplyModifiersIndirectResult {
 } ApplyModifiersIndirectResult;
 
 /*
- * While expanding a variable expression, expand and apply indirect modifiers,
+ * While expanding an expression, expand and apply indirect modifiers,
  * such as in ${VAR:${M_indirect}}.
  *
- * All indirect modifiers of a group must come from a single variable
+ * All indirect modifiers of a group must come from a single
  * expression.  ${VAR:${M1}} is valid but ${VAR:${M1}${M2}} is not.
  *
  * Multiple groups of indirect modifiers can be chained by separating them
  * with colons.  ${VAR:${M1}:${M2}} contains 2 indirect modifiers.
  *
- * If the variable expression is not followed by ch->endc or ':', fall
+ * If the expression is not followed by ch->endc or ':', fall
  * back to trying the SysV modifier, such as in ${VAR:${FROM}=${TO}}.
  */
 static ApplyModifiersIndirectResult
@@ -3971,7 +3963,7 @@ ApplyModifiersIndirect(ModChain *ch, const char **pp)
 	if (*p == ':')
 		p++;
 	else if (*p == '\0' && ch->endc != '\0') {
-		Error("Unclosed variable expression after indirect "
+		Error("Unclosed expression after indirect "
 			  "modifier, expecting '%c' for variable \"%s\"",
 			ch->endc, expr->name);
 		*pp = p;
@@ -4024,7 +4016,7 @@ ApplySingleModifier(const char **pp, ModChain *ch)
 
 	if (*p == '\0' && ch->endc != '\0') {
 		Error(
-			"Unclosed variable expression, expecting '%c' for "
+			"Unclosed expression, expecting '%c' for "
 			"modifier \"%.*s\" of variable \"%s\" with value \"%s\"",
 			ch->endc,
 			(int)(p - mod), mod,
@@ -4082,7 +4074,7 @@ ApplyModifiers(
 
 	if (*p == '\0' && endc != '\0') {
 		Error(
-			"Unclosed variable expression (expecting '%c') for \"%s\"",
+			"Unclosed expression, expecting '%c' for \"%s\"",
 			ch.endc, expr->name);
 		goto cleanup;
 	}
@@ -4207,7 +4199,7 @@ ParseVarname(const char **pp, char startc, char endc,
 		 LazyBuf *buf)
 {
 	const char *p = *pp;
-	int depth = 0;		/* Track depth so we can spot parse errors. */
+	int depth = 0;
 
 	LazyBuf_Init(buf, p);
 
@@ -4219,7 +4211,7 @@ ParseVarname(const char **pp, char startc, char endc,
 		if (*p == endc)
 			depth--;
 
-		/* A variable inside a variable, expand. */
+		/* An expression inside an expression, expand. */
 		if (*p == '$') {
 			FStr nested_val = Var_Parse(&p, scope, emode);
 			/* TODO: handle errors */
@@ -4427,7 +4419,7 @@ ParseVarnameLong(
 		}
 
 		/*
-		 * The variable expression is based on an undefined variable.
+		 * The expression is based on an undefined variable.
 		 * Nevertheless it needs a Var, for modifiers that access the
 		 * variable name, such as :L or :?.
 		 *
@@ -4503,7 +4495,7 @@ Var_Parse_FastLane(const char **pp, VarEvalMode emode, FStr *out_value)
 }
 
 /*
- * Given the start of a variable expression (such as $v, $(VAR),
+ * Given the start of an expression (such as $v, $(VAR),
  * ${VAR:Mpattern}), extract the variable name and value, and the modifiers,
  * if any.  While doing that, apply the modifiers to the value of the
  * expression, forming its final value.  A few of the modifiers such as :!cmd!
@@ -4523,7 +4515,7 @@ Var_Parse_FastLane(const char **pp, VarEvalMode emode, FStr *out_value)
  *			point to some random character in the string, to the
  *			location of the parse error, or at the end of the
  *			string.
- *	return		The value of the variable expression, never NULL.
+ *	return		The value of the expression, never NULL.
  *	return		var_Error if there was a parse error.
  *	return		var_Error if the base variable of the expression was
  *			undefined, emode is VARE_UNDEFERR, and none of
@@ -4731,8 +4723,8 @@ VarSubstExpr(const char **pp, Buffer *buf, GNode *scope,
 }
 
 /*
- * Skip as many characters as possible -- either to the end of the string
- * or to the next dollar sign (variable expression).
+ * Skip as many characters as possible -- either to the end of the string,
+ * or to the next dollar sign, which may start an expression.
  */
 static void
 VarSubstPlain(const char **pp, Buffer *res)
@@ -4747,11 +4739,11 @@ VarSubstPlain(const char **pp, Buffer *res)
 }
 
 /*
- * Expand all variable expressions like $V, ${VAR}, $(VAR:Modifiers) in the
+ * Expand all expressions like $V, ${VAR}, $(VAR:Modifiers) in the
  * given string.
  *
  * Input:
- *	str		The string in which the variable expressions are
+ *	str		The string in which the expressions are
  *			expanded.
  *	scope		The scope in which to start searching for
  *			variables.  The other scopes are searched as well.

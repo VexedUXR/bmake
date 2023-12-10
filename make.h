@@ -812,7 +812,6 @@ void PrintLocation(FILE *, bool, const GNode *);
 void PrintStackTrace(bool);
 void Parse_Error(ParseErrorLevel, MAKE_ATTR_PRINTFLIKE const char *, ...);
 bool MAKE_ATTR_USE Parse_VarAssign(const char *, bool, GNode *);
-void Parse_AddIncludeDir(const char *);
 void Parse_File(const char *, int);
 void Parse_PushInput(const char *, unsigned, unsigned, Buffer,
 		     struct ForLoop *);

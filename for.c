@@ -45,7 +45,7 @@
  *
  * After reaching the .endfor, the values from the .for line are grouped
  * according to the number of variables.  For each such group, the unexpanded
- * body is scanned for variable expressions, and those that match the
+ * body is scanned for expressions, and those that match the
  * variable names are replaced with expressions of the form ${:U...}.  After
  * that, the body is treated like a file from an .include directive.
  *
@@ -296,8 +296,8 @@ For_Accum(const char *line, int *forLevel)
 /*
  * When the body of a '.for i' loop is prepared for an iteration, each
  * occurrence of $i in the body is replaced with ${:U...}, inserting the
- * value of the item.  If this item contains a '$', it may be the start of a
- * variable expression.  This expression is copied verbatim, its length is
+ * value of the item.  If this item contains a '$', it may be the start of an
+ * expression.  This expression is copied verbatim, its length is
  * determined here, in a rather naive way, ignoring escape characters and
  * funny delimiters in modifiers like ':S}from}to}'.
  */
@@ -426,7 +426,7 @@ ForLoop_SubstVarLong(ForLoop *f, unsigned int firstItem, Buffer *body,
 
 /*
  * While expanding the body of a .for loop, replace single-character
- * variable expressions like $i with their ${:U...} expansion.
+ * expressions like $i with their ${:U...} expansion.
  */
 static void
 ForLoop_SubstVarShort(ForLoop *f, unsigned int firstItem, Buffer *body,
@@ -462,7 +462,7 @@ found:
  * Compute the body for the current iteration by copying the unexpanded body,
  * replacing the expressions for the iteration variables on the way.
  *
- * Using variable expressions ensures that the .for loop can't generate
+ * Using expressions ensures that the .for loop can't generate
  * syntax, and that the later parsing will still see an expression.
  * This code assumes that the variable with the empty name is never defined,
  * see unit-tests/varname-empty.mk.

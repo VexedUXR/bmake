@@ -207,7 +207,7 @@ Arch_ParseArchive(char **pp, GNodeList *gns, GNode *scope)
 	FStr lib;		/* Library-part of specification */
 	FStr mem;		/* Member-part of specification */
 	char saveChar;		/* Ending delimiter of member-name */
-	bool expandLib;		/* Whether the parsed lib contains variable
+	bool expandLib;		/* Whether the parsed lib contains
 				 * expressions that need to be expanded */
 
 	spec = *pp;
@@ -216,7 +216,7 @@ Arch_ParseArchive(char **pp, GNodeList *gns, GNode *scope)
 
 	for (cp = lib.str; *cp != '(' && *cp != '\0';) {
 		if (*cp == '$') {
-			/* Expand nested variable expressions. */
+			/* Expand nested expressions. */
 			/* XXX: This code can probably be shortened. */
 			const char *nested_p = cp;
 			FStr result;
@@ -253,7 +253,7 @@ Arch_ParseArchive(char **pp, GNodeList *gns, GNode *scope)
 		mem = FStr_InitRefer(cp);
 		while (*cp != '\0' && *cp != ')' && !ch_isspace(*cp)) {
 			if (*cp == '$') {
-				/* Expand nested variable expressions. */
+				/* Expand nested expressions. */
 				/*
 				 * XXX: This code can probably be shortened.
 				 */

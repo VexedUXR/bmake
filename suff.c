@@ -1286,7 +1286,7 @@ ExpandWildcards(GNodeListNode *cln, GNode *pgn)
  * add those nodes to the members list.
  *
  * Unfortunately, we can't use Str_Words because it doesn't understand about
- * variable expressions with spaces in them.
+ * expressions with spaces in them.
  */
 static void
 ExpandChildrenRegular(char *cp, GNode *pgn, GNodeList *members)
@@ -1309,13 +1309,13 @@ ExpandChildrenRegular(char *cp, GNode *pgn, GNodeList *members)
 			/* Continue at the next non-space. */
 			start = cp;
 		} else if (*cp == '$') {
-			/* Skip over the variable expression. */
+			/* Skip over the expression. */
 			const char *nested_p = cp;
 			FStr junk = Var_Parse(&nested_p, pgn, VARE_PARSE_ONLY);
 			/* TODO: handle errors */
 			if (junk.str == var_Error) {
 				Parse_Error(PARSE_FATAL,
-				    "Malformed variable expression at \"%s\"",
+				    "Malformed expression at \"%s\"",
 				    cp);
 				cp++;
 			} else {
@@ -1346,7 +1346,7 @@ ExpandChildrenRegular(char *cp, GNode *pgn, GNodeList *members)
 }
 
 /*
- * Expand the names of any children of a given node that contain variable
+ * Expand the names of any children of a given node that contain
  * expressions or file wildcards into actual targets.
  *
  * The expanded node is removed from the parent's list of children, and the

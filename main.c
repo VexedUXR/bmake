@@ -114,7 +114,7 @@
 CmdOpts opts;
 time_t now;			/* Time at start of make */
 GNode *defaultNode;		/* .DEFAULT node */
-bool allPrecious;		/* .PRECIOUS given on line by itself */
+bool allPrecious;		/* .PRECIOUS given on a line by itself */
 bool deleteOnError;		/* .DELETE_ON_ERROR: set */
 
 static int maxJobTokens;	/* -j argument */
@@ -141,7 +141,7 @@ static HashTable cached_realpaths;
 
 /*
  * For compatibility with the POSIX version of MAKEFLAGS that includes
- * all the options without '-', convert 'flags' to '-f -l -a -g -s'.
+ * all the options without '-', convert 'flags' to '-f -l -a -g -s '.
  */
 static char *
 explode(const char *flags)
@@ -395,7 +395,7 @@ MainParseArgJobs(const char *arg)
 
 	forceJobs = true;
 	opts.maxJobs = (int)strtol(arg, &end, 0);
-	p = arg + (end - arg);
+	p = end;
 
 	if (*p != '\0') {
 		double d;
@@ -404,10 +404,10 @@ MainParseArgJobs(const char *arg)
 			d = (opts.maxJobs > 0) ? opts.maxJobs : 1;
 		} else if (*p == '.') {
 			d = strtod(arg, &end);
-			p = arg + (end - arg);
+			p = end;
 		} else
-			d = 0;
-		if (d > 0) {
+			d = 0.0;
+		if (d > 0.0) {
 			p = "";
 			opts.maxJobs = numCpus;
 			opts.maxJobs = (int)(d * (double)opts.maxJobs);
@@ -431,8 +431,7 @@ MainParseArgJobs(const char *arg)
 static void
 MainParseArgSysInc(const char *argvalue)
 {
-	/* look for magic parent directory search string */
-	if (strncmp(".../", argvalue, 4) == 0) {
+	if (strncmp(argvalue, ".../", 4) == 0) {
 		char *found_path = Dir_FindHereOrAbove(curdir, argvalue + 4);
 		if (found_path == NULL)
 			return;
@@ -468,7 +467,7 @@ MainParseOption(char c, const char *argvalue)
 		Global_Append(MAKEFLAGS, argvalue);
 		break;
 	case 'I':
-		Parse_AddIncludeDir(argvalue);
+		SearchPath_Add(parseIncPath, argvalue);
 		Global_Append(MAKEFLAGS, "-I");
 		Global_Append(MAKEFLAGS, argvalue);
 		break;
@@ -679,13 +678,13 @@ Main_ParseArgLine(const char *line)
 {
 	Words words;
 	char *buf;
+	const char *p;
 
 	if (line == NULL)
 		return;
-	/* XXX: don't use line as an iterator variable */
-	for (; *line == ' '; line++)
+	for (p = line; *p == ' '; p++)
 		continue;
-	if (line[0] == '\0')
+	if (p[0] == '\0')
 		return;
 
 #ifndef POSIX
@@ -715,7 +714,7 @@ Main_ParseArgLine(const char *line)
 		 */
 		replaceSlash(tmp);
 
-		buf = str_concat3(tmp, " ", line);
+		buf = str_concat3(tmp, " ", p);
 		FStr_Done(&argv0);
 	}
 
@@ -1221,29 +1220,19 @@ main_Init(int argc, char **argv)
 
 	progname = str_basename(argv[0]);
 
-	/*
-	 * Get the name of this type of MACHINE from utsname
-	 * so we can share an executable for similar machines.
-	 * (i.e. m68k: amiga hp300, mac68k, sun3, ...)
-	 *
-	 * Note that both MACHINE and MACHINE_ARCH are decided at
-	 * run-time.
-	 */
 	machine = InitVarMachine();
 	machine_arch = machine;
 
 	myPid = GetCurrentProcessId();
 
-	/*
-	 * Just in case MAKEOBJDIR wants us to do something tricky.
-	 */
+	/* Just in case MAKEOBJDIR wants us to do something tricky. */
 	Targ_Init();
 	Var_Init();
 	Global_Set_ReadOnly(".MAKE.OS", "Windows");
 	Global_Set("MACHINE", machine);
 	Global_Set("MACHINE_ARCH", machine_arch);
 	Global_Set("MAKE_VERSION", MAKE_VERSION);
-	Global_Set_ReadOnly(".newline", "\n");	/* handy for :@ loops */
+	Global_Set_ReadOnly(".newline", "\n");
 #ifndef MAKEFILE_PREFERENCE_LIST
 	/* This is the traditional preference for makefiles. */
 # define MAKEFILE_PREFERENCE_LIST "makefile Makefile"

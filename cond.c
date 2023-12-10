@@ -153,10 +153,10 @@ typedef struct CondParser {
 	 * expanded before it is evaluated, due to ease of implementation.
 	 * This means that at the point where the condition is evaluated,
 	 * make cannot know anymore whether the left-hand side had originally
-	 * been a variable expression or a plain word.
+	 * been an expression or a plain word.
 	 *
 	 * In conditional directives like '.if', the left-hand side must
-	 * either be a variable expression, a quoted string or a number.
+	 * either be an expression, a quoted string or a number.
 	 */
 	bool leftUnquotedOK;
 
@@ -382,7 +382,7 @@ is_separator(char ch)
 }
 
 /*
- * In a quoted or unquoted string literal or a number, parse a variable
+ * In a quoted or unquoted string literal or a number, parse an
  * expression and add its value to the buffer.
  *
  * Return whether to continue parsing the leaf.
@@ -428,7 +428,7 @@ CondParser_StringExpr(CondParser *par, const char *start,
 }
 
 /*
- * Parse a string from a variable expression or an optionally quoted string,
+ * Parse a string from an expression or an optionally quoted string,
  * on the left-hand and right-hand sides of comparisons.
  *
  * Results:
@@ -488,7 +488,7 @@ CondParser_Leaf(CondParser *par, bool doEval, bool unquotedOK,
 			    !ch_isdigit(*start)) {
 				/*
 				 * The left-hand side must be quoted,
-				 * a variable expression or a number.
+				 * an expression or a number.
 				 */
 				str = FStr_InitRefer(NULL);
 				goto return_str;
@@ -733,7 +733,7 @@ CondParser_FuncCall(CondParser *par, bool doEval, Token *out_token)
 /*
  * Parse a comparison that neither starts with '"' nor '$', such as the
  * unusual 'bare == right' or '3 == ${VAR}', or a simple leaf without
- * operator, which is a number, a variable expression or a string literal.
+ * operator, which is a number, an expression or a string literal.
  *
  * TODO: Can this be merged into CondParser_Comparison?
  */
@@ -758,7 +758,7 @@ CondParser_ComparisonOrLeaf(CondParser *par, bool doEval)
 	 * as an expression.
 	 */
 	/*
-	 * XXX: In edge cases, a variable expression may be evaluated twice,
+	 * XXX: In edge cases, an expression may be evaluated twice,
 	 *  see cond-token-plain.mk, keyword 'twice'.
 	 */
 	arg = ParseWord(&cp, doEval);
@@ -960,7 +960,7 @@ CondParser_Eval(CondParser *par)
 }
 
 /*
- * Evaluate the condition, including any side effects from the variable
+ * Evaluate the condition, including any side effects from the
  * expressions in the condition. The condition consists of &&, ||, !,
  * function(arg), comparisons and parenthetical groupings thereof.
  */
