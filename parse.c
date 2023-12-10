@@ -1443,7 +1443,7 @@ ParseDependencySourcesSpecial(char *start,
 				  ParseSpecial special, SearchPathList *paths)
 {
 	while (*start != '\0') {
-		char *savedEnd;
+		char savedEnd;
 		char *end = start;
 		while (*end != '\0' && !ch_isspace(*end))
 			end++;
