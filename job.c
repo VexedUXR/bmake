@@ -91,14 +91,6 @@
  *			a decent clip, since job table entries aren't
  *			removed until their process is caught this way.
  *
- *	Job_CatchOutput
- *			Print any output our children have produced.
- *			Should also be called fairly frequently to
- *			keep the user informed of what's going on.
- *			If no output is waiting, it will block for
- *			a time given by the SEL_* constants, below,
- *			or until output is ready.
- *
  *	Job_ParseShell	Given a special dependency line with target '.SHELL',
  *			define the shell that is used for the creation
  *			commands in jobs mode.
@@ -1009,11 +1001,7 @@ Job_CheckCommands(GNode *gn, void (*abortProc)(const char *, ...))
 	return false;
 }
 
-/*
- * Execute the shell for the given job.
- *
- * See Job_CatchOutput for handling the output of the shell.
- */
+/* Execute the shell for the given job. */
 static void
 JobExec(Job *job, char *args)
 {
@@ -1415,31 +1403,12 @@ again:
 static void
 JobRun(GNode *targ)
 {
-#if 0
-	/*
-	 * Unfortunately it is too complicated to run .BEGIN, .END, and
-	 * .INTERRUPT job in the parallel job module.  As of 2020-09-25,
-	 * unit-tests/deptgt-end-jobs.mk hangs in an endless loop.
-	 *
-	 * Running these jobs in compat mode also guarantees that these
-	 * jobs do not overlap with other unrelated jobs.
-	 */
-	GNodeList lst = LST_INIT;
-	Lst_Append(&lst, targ);
-	(void)Make_Run(&lst);
-	Lst_Done(&lst);
-	JobStart(targ, true);
-	while (jobTokensRunning != 0) {
-		Job_CatchOutput();
-	}
-#else
 	Compat_Make(targ, targ);
 	/* XXX: Replace with GNode_IsError(gn) */
 	if (targ->made == ERROR) {
 		PrintOnError(targ, "\n\nStop.\n");
 		exit(1);
 	}
-#endif
 }
 
 /*
