@@ -2016,7 +2016,7 @@ bool
 Job_TokenWithdraw(void)
 {
 	char tok, tok1;
-	DWORD count, ret = 0;
+	DWORD ret = 0;
 
 	DEBUG3(JOB, "Job_TokenWithdraw(%lu): aborting %d, running %d\n",
 		myPid, aborting, jobTokensRunning);
@@ -2024,7 +2024,7 @@ Job_TokenWithdraw(void)
 	if (aborting != ABORT_NONE || (jobTokensRunning >= opts.maxJobs))
 		return false;
 
-	if (ReadFile(tokenWaitJob.inPipe, &tok, 1, &count, NULL) == 0 &&
+	if (ReadFile(tokenWaitJob.inPipe, &tok, 1, NULL, NULL) == 0 &&
 		(ret = GetLastError()) != ERROR_NO_DATA)
 		Fatal("Failed to read from pipe: %s", strerr(ret));
 
@@ -2033,11 +2033,11 @@ Job_TokenWithdraw(void)
 		return false;
 	}
 
-	if (count == 1 && tok != '+') {
+	if (ret != ERROR_NO_DATA && tok != '+') {
 		/* make being aborted - remove any other job tokens */
 		DEBUG2(JOB, "(%lu) aborted by token %c\n", myPid, tok);
 
-		while (ReadFile(tokenWaitJob.inPipe, &tok1, 1, &count, NULL) != 0);
+		while (ReadFile(tokenWaitJob.inPipe, &tok1, 1, NULL, NULL) != 0);
 		if ((ret = GetLastError()) != ERROR_NO_DATA)
 			Fatal("Failed to read from pipe: %s", strerr(ret));
 
@@ -2050,7 +2050,7 @@ Job_TokenWithdraw(void)
 			  "in another branch of the parallel make");
 	}
 
-	if (count == 1 && jobTokensRunning == 0)
+	if (ret != ERROR_NO_DATA && jobTokensRunning == 0)
 		/* We didn't want the token really */
 		if (WriteFile(tokenWaitJob.outPipe, &tok, 1, NULL, NULL) == 0)
 			Fatal("Failed to write to pipe: %s", strerr(GetLastError()));
