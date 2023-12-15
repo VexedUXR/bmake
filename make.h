@@ -997,7 +997,6 @@ bool MAKE_ATTR_USE shouldDieQuietly(GNode *, int);
 void PrintOnError(GNode *, const char *);
 void Main_ExportMAKEFLAGS(bool);
 bool Main_SetObjdir(bool, MAKE_ATTR_PRINTFLIKE const char *, ...);
-FILE * MAKE_ATTR_USE mkTempFile(char *, size_t);
 const char *strerr(DWORD e);
 int str2Lst_Append(StringList *, char *);
 void GNode_FprintDetails(FILE *, const char *, const GNode *, const char *);

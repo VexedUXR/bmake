@@ -1973,41 +1973,6 @@ getTmpdir(void)
 	return tmpdir;
 }
 
-/*
- * Create and open a temp file using "pattern".
- * If out_fname is provided, set it to a copy of the filename created.
- * Otherwise unlink the file once open.
- */
-FILE *
-mkTempFile(char *tfile, size_t tfile_sz)
-{
-	static char *tmpdir = NULL;
-	FILE *fp;
-
-	if (tmpdir == NULL)
-		tmpdir = getTmpdir();
-
-	/*
-	 * Generate 6 random characters and append them to
-	 * tmpdir\make
-	 */
-	{
-		int i;
-		char tmp[7];
-		for (i = 0; i < 6; i++)
-			tmp[i] = rand() % ('Z' - 'A' + 1) + 'A';
-		tmp[6] = '\0';
-
-		snprintf(tfile, tfile_sz, "%s%s%s", tmpdir, "make", tmp);
-	}
-
-	if ((fp = fopen(tfile, "w+")) == NULL)
-		Punt("could not create temporary file %s: %s", tfile,
-			strerror(errno));
-
-	return fp;
-}
-
 /* strerror for winapi functions */
 const char *
 strerr(DWORD e)

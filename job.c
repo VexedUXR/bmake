@@ -1111,11 +1111,26 @@ JobWriteShellCommands(Job *job, GNode *gn, bool *out_run)
 	*out_run = JobWriteCommands(job);
 
 	if (DEBUG(SCRIPT)) {
-		char tfile[MAXPATHLEN];
-		FILE *fp = mkTempFile(tfile, sizeof tfile);
+		/*
+		 * Generate 6 random characters and append them to
+		 * tmpdir\make
+		 */
+		int i;
+		char tmp[7];
+		char *tfile, *tmpdir;
+		FILE *fp;
 
-		if (fp == NULL)
-			Punt("could not open %s", tfile);
+		for (i = 0; i < 6; i++)
+			tmp[i] = rand() % ('Z' - 'A' + 1) + 'A';
+		tmp[6] = '\0';
+
+		tmpdir = getTmpdir();
+		tfile = _alloca(snprintf(NULL, 0, "%s%s%s", tmpdir, "make", tmp));
+		sprintf(tfile, "%s%s%s", tmpdir, "make", tmp);
+
+		if ((fp = fopen(tfile, "w+")) == NULL)
+			Punt("could not create temporary file %s: %s", tfile,
+				strerror(errno));
 
 		fprintf(fp, "%s", job->cmdBuffer->data);
 		fclose(fp);
