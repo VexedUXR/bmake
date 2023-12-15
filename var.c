@@ -135,7 +135,6 @@
 #include "tre/tre.h"
 #include "dir.h"
 #include "job.h"
-#include "metachar.h"
 
 /*	"@(#)var.c	8.3 (Berkeley) 3/19/94" */
 
@@ -1777,22 +1776,41 @@ SubstringWords_JoinFree(SubstringWords words)
 static void
 QuoteShell(const char *str, bool quoteDollar, LazyBuf *buf)
 {
+	ShellInfo *info = Shell_GetInfo();
 	const char *p;
 
 	LazyBuf_Init(buf, str);
+	if (info->metaChar == NULL) {
+		if (quoteDollar)
+			for (p = str; *p != '\0'; p++) {
+				if (*p == '$')
+					LazyBuf_Add(buf, '$');
+				LazyBuf_Add(buf, *p);
+			}
+
+		return;
+	}
+
 	for (p = str; *p != '\0'; p++) {
-		if (*p == '\n') {
-			const char *newline = Shell_GetNewline();
-			if (newline == NULL)
-				newline = "\\\n";
-			LazyBuf_AddStr(buf, newline);
-			continue;
+		if (ch_is_shell_meta(*p, info->metaChar)) {
+			const char *s;
+
+			if ((s = ch_is_shell_special(*p, info->specialChar))
+				!= NULL) {
+				LazyBuf_AddStr(buf, s);
+				if (quoteDollar && *p == '$')
+					LazyBuf_AddStr(buf, s);
+				continue;
+			}
+
+			LazyBuf_Add(buf, info->escapeChar);
+			LazyBuf_Add(buf, *p);
+
+			if (quoteDollar && *p == '$')
+				LazyBuf_AddStr(buf, (char[]){info->escapeChar, '$', '\0'});
 		}
-		if (ch_isspace(*p) || ch_is_shell_meta(*p))
-			LazyBuf_Add(buf, '\\');
-		LazyBuf_Add(buf, *p);
-		if (quoteDollar && *p == '$')
-			LazyBuf_AddStr(buf, "\\$");
+		else
+			LazyBuf_Add(buf, *p);
 	}
 }
 

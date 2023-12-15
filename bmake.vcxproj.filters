@@ -84,9 +84,6 @@
     <ClCompile Include="var.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="metachar.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="message.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -126,9 +123,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="trace.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="metachar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

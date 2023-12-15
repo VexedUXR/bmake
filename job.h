@@ -154,14 +154,50 @@ typedef struct Job {
 #endif
 } Job;
 
+/*
+ * A small subset of the variables in Shell.
+ * Used by var.c for :Qq.
+ */
+typedef struct ShellInfo {
+	const char *specialChar;
+	const unsigned char *metaChar;
+
+	char escapeChar;
+} ShellInfo;
+
 extern const char *shellPath;
 extern const char *shellName;
 extern char *shellErrFlag;
 
 extern int jobTokensRunning;	/* tokens currently "out" */
 
+MAKE_INLINE bool MAKE_ATTR_USE
+ch_is_shell_meta(char c, const unsigned char *metachar)
+{
+	return metachar[c & 0x7f] != 0;
+}
+
+MAKE_STATIC const char *MAKE_ATTR_USE
+ch_is_shell_special(char c, const char *specialChar)
+{
+	size_t i = 0;
+	if (specialChar == NULL)
+		return NULL;
+
+	while (specialChar[i] != '\0') {
+		if (specialChar[i++] != c) {
+			i += strlen(&specialChar[i]) + 1;
+			continue;
+		}
+
+		return &specialChar[i];
+	}
+
+	return NULL;
+}
+
 void Shell_Init(void);
-const char *Shell_GetNewline(void) MAKE_ATTR_USE;
+ShellInfo *Shell_GetInfo(void);
 void Job_Touch(GNode *, bool);
 bool Job_CheckCommands(GNode *, void (*abortProc)(const char *, ...))
 	MAKE_ATTR_USE;

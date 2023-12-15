@@ -167,7 +167,6 @@
     <ClCompile Include="make_malloc.c" />
     <ClCompile Include="message.c" />
     <ClCompile Include="meta.c" />
-    <ClCompile Include="metachar.c" />
     <ClCompile Include="parse.c" />
     <ClCompile Include="str.c" />
     <ClCompile Include="stresep.c" />
@@ -188,7 +187,6 @@
     <ClInclude Include="make.h" />
     <ClInclude Include="make_malloc.h" />
     <ClInclude Include="meta.h" />
-    <ClInclude Include="metachar.h" />
     <ClInclude Include="pathnames.h" />
     <ClInclude Include="str.h" />
     <ClInclude Include="trace.h" />

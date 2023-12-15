@@ -171,17 +171,37 @@ typedef struct Shell {
 	const char *echoTmpl;	/* template to echo a command */
 
 	/*
-	 * A string literal that results in a newline character when it
-	 * occurs outside of any 'quote' or "quote" characters.
-	 */
-	const char *newline;
-
-	/*
 	 * Character used to execute multiple commands on one line,
 	 * regardless of whether the last command failed or not.
 	 */
 	char separator;
 	char commentChar; /* character used by shell for comment lines */
+
+	char escapeChar; /* escape character used by shell */
+
+	/*
+	 * Characters that need to be escaped in a special way e.g
+	 * double quotes needs to be escaped with '`\' instead of
+	 * the usual '`' when using them with /c for powerhsell.
+	 *
+	 * specialChar[0] is the character to be escaped, and the rest
+	 * of the string is the escaped character. Multiple characters
+	 * should be seperated by a nul character, the array ends with
+	 * two trailing nuls.
+	 * e.g "a!a\0b^b\0" means that 'a' can be escaped using '!a'
+	 * and 'b' can be escaped using '^b'.
+	 */
+	char *specialChar;
+
+	/*
+	 * An array used to determine characters are interpreted
+	 * specially by the shell.
+	 *
+	 * When we predefine shells, this is initialized as
+	 * a string of characters for convenience. Shell_Init turns
+	 * this into a metaChar table.
+	 */
+	unsigned char *metaChar;
 } Shell;
 
 typedef struct CommandFlags {
@@ -262,12 +282,14 @@ static Shell shells[] = {
 	/* Command Prompt description.*/
 	{
 		"cmd.exe", /* .name */
-		"%s\n", /* .runIgnTmpl */
-		"%s||exit !errorlevel!\n", /* .runChkTmpl */
-		"echo %s\n", /* .echoTmpl */
-		"&echo:", /* .newline */
+		"%s&", /* .runIgnTmpl */
+		"%s||exit&", /* .runChkTmpl */
+		"echo %s&", /* .echoTmpl */
 		'&', /* .separator */
-		'\0' /* .commentChar */
+		'\0', /* .commentChar */
+		'^', /* .escapeChar */
+		"\n&echo:\0", /* .specialChar */
+		"\n%&<>^|" /* .metaChar */
 	},
 	/* Powershell description. */
 	{
@@ -277,7 +299,7 @@ static Shell shells[] = {
 		 * We set $lastexitcode to null if the command fails
 		 * in order not to confuse runChkTmpl.
 		 */
-		"$(%s)||$($lastexitcode=$null)\n", /* .runIgnTmpl */
+		"$(%s)||$($lastexitcode=$null);", /* .runIgnTmpl */
 
 		/*
 		 * Powershell only sets $lastexitcode when
@@ -286,12 +308,14 @@ static Shell shells[] = {
 		 * In this case, we simply exit with 1.
 		 */
 		"$(%s)||$(if($lastexitcode-ne$null)"
-		"{exit $lastexitcode}exit 1)\n", /* .runChkTmpl */
+		"{exit $lastexitcode}exit 1);", /* .runChkTmpl */
 
-		"$(echo \"\"%s\"\")\n", /* .echoTmpl */
-		"`n", /*.newline */
+		"echo %s;", /* .echoTmpl */
 		';', /* .separator */
 		'#', /* .commentChar */
+		'`', /* .escapeChar */
+		"\"`\\\"\0\n`n\0", /* .specialChar */
+		"\n\"#$&'*();<>@`{|} " /* .metaChar */
 	}
 };
 
@@ -453,23 +477,35 @@ ParseCommandFlags(char **pp, CommandFlags *out_cmdFlags)
 	*pp = p;
 }
 
-/* Escape a string for a double-quoted string literal in sh, csh and ksh. */
+/* Escape characters interpreted specially by the shell. */
 static char *
-EscapeShellDblQuot(const char *cmd)
+EscapeShell(char *cmd)
 {
-	size_t i, j;
+	size_t i;
+	LazyBuf esc;
 
-	/* Worst that could happen is every char needs escaping. */
-	char *esc = bmake_malloc(strlen(cmd) * 2 + 1);
-	for (i = 0, j = 0; cmd[i] != '\0'; i++, j++) {
-		if (cmd[i] == '$' || cmd[i] == '`' || cmd[i] == '\\' ||
-			cmd[i] == '"')
-			esc[j++] = '\\';
-		esc[j] = cmd[i];
+	if (shell->metaChar == NULL)
+		return cmd;
+
+	LazyBuf_Init(&esc, cmd);
+	for (i = 0; cmd[i] != '\0'; i++) {
+		if (ch_is_shell_meta(cmd[i], shell->metaChar)) {
+			const char *s;
+
+			if ((s = ch_is_shell_special(cmd[i], shell->specialChar))
+				!= NULL) {
+				LazyBuf_AddStr(&esc, s);
+				continue;
+			}
+
+			LazyBuf_Add(&esc, shell->escapeChar);
+		}
+
+		LazyBuf_Add(&esc, cmd[i]);
 	}
-	esc[j] = '\0';
+	LazyBuf_Add(&esc, '\0');
 
-	return esc;
+	return esc.data == NULL ? UNCONST(esc.expected) : esc.data;
 }
 
 static void
@@ -493,15 +529,6 @@ static void
 ShellWriter_EchoCmd(ShellWriter *wr, const char *escCmd)
 {
 	ShellWriter_WriteFmt(wr, shell->echoTmpl, escCmd);
-}
-
-static void
-ShellWriter_TraceOn(ShellWriter *wr)
-{
-	if (!wr->xtraced) {
-		ShellWriter_WriteLine(wr, "set -x");
-		wr->xtraced = true;
-	}
 }
 
 /*
@@ -604,13 +631,7 @@ JobWriteCommand(Job *job, ShellWriter *wr, StringListNode *ln, const char *ucmd)
 		return;
 	}
 
-	/*
-	 * If the shell doesn't have error control, the alternate echoing
-	 * will be done (to avoid showing additional error checking code)
-	 * and this needs some characters escaped.
-	 */
-	escCmd = xcmd;
-	
+	escCmd = EscapeShell(xcmd);
 	if (cmdFlags.ignerr) {
 		JobWriteSpecials(job, wr, escCmd, run, &cmdFlags, &cmdTemplate);
 	} else {
@@ -621,7 +642,7 @@ JobWriteCommand(Job *job, ShellWriter *wr, StringListNode *ln, const char *ucmd)
 		 * set up commands to run through it.
 		 */
 
-		if (shell ->runChkTmpl != NULL &&
+		if (shell->runChkTmpl != NULL &&
 			shell->runChkTmpl[0] != '\0') {
 			if (job->echo && cmdFlags.echo) {
 				ShellWriter_EchoCmd(wr, escCmd);
@@ -639,11 +660,9 @@ JobWriteCommand(Job *job, ShellWriter *wr, StringListNode *ln, const char *ucmd)
 		}
 	}
 
-	/* XXX: Not needed? */
-	if (DEBUG(SHELL) && strcmp(shellName, "sh") == 0)
-		ShellWriter_TraceOn(wr);
-
 	ShellWriter_WriteFmt(wr, cmdTemplate, xcmd);
+	if (escCmd != xcmd)
+		free(escCmd);
 	free(xcmdStart);
 }
 
@@ -1070,16 +1089,10 @@ JobExec(Job *job, char *args)
 
 /* Create the argv needed to execute the shell for a given job. */
 static char *
-JobMakeArgv(Job *job)
+JobMakeArgs(Job *job)
 {
-	size_t i;
 	char *args;
-	const char *fmt = "\"%s\" /c \"%s\"";
-
-	job->cmdBuffer->data[job->cmdBuffer->len - 1] = '\0';
-	for (i = 0; i < job->cmdBuffer->len; i++)
-		if (job->cmdBuffer->data[i] == '\n')
-			job->cmdBuffer->data[i] = shell->separator;
+	const char *fmt = "\"%s\" /c %s";
 
 	args = bmake_malloc((size_t)snprintf(NULL, 0, fmt,
 		shellPath, job->cmdBuffer->data) + 1);
@@ -1091,12 +1104,6 @@ JobMakeArgv(Job *job)
 static void
 JobWriteShellCommands(Job *job, GNode *gn, bool *out_run)
 {
-	/*
-	 * tfile is the name of a file into which all shell commands
-	 * are put. It is removed before the child shell is executed,
-	 * unless DEBUG(SCRIPT) is set.
-	 */
-
 	job->cmdBuffer = bmake_malloc(sizeof *job->cmdBuffer);
 	Buf_Init(job->cmdBuffer);
 
@@ -1110,6 +1117,13 @@ JobWriteShellCommands(Job *job, GNode *gn, bool *out_run)
 
 	*out_run = JobWriteCommands(job);
 
+	/* Remove trailing separator. */
+	job->cmdBuffer->data[--job->cmdBuffer->len] = '\0';
+
+	/*
+	 * We dont usually create a temporary script file,
+	 * unless if we are required to (by -dn).
+	 */
 	if (DEBUG(SCRIPT)) {
 		/*
 		 * Generate 6 random characters and append them to
@@ -1260,7 +1274,7 @@ JobStart(GNode *gn, bool special)
 	 * Set up the control arguments to the shell. This is based on the
 	 * flags set earlier for this job.
 	 */
-	args = JobMakeArgv(job);
+	args = JobMakeArgs(job);
 
 	/* Create the pipe by which we'll get the shell's output. */
 	JobCreatePipe(job);
@@ -1496,23 +1510,83 @@ InitShellNameAndPath(void)
 #endif
 }
 
+static unsigned char *
+ch_shell_build(char *chrs)
+{
+	unsigned char *metachars;
+	size_t len, i;
+
+	len = strlen(chrs);
+	metachars = bmake_malloc(128);
+
+	memset(metachars, 0, 128);
+	for (i = 0; i < len; i++)
+		metachars[chrs[i]] = '\x1';
+
+	return metachars;
+}
+
+static char *
+ch_shell_build_special(char *spec)
+{
+	size_t i, j, len;
+	char *ret, delim;
+
+	if (*spec == '\0')
+		return "";
+
+	len = strlen(spec);
+	if (len < 4) {
+		Error("Expected \"special=char,escapedChar,\"");
+		return NULL;
+	}
+
+	ret = bmake_malloc(len);
+	delim = spec[1];
+
+	for (i = j = 0; spec[i] != '\0'; i++) {
+		ret[j++] = spec[i];
+
+		for (i += 2; spec[i] != delim; i++) {
+			if (spec[i] == '\0') {
+				Error("Expected '%c'", delim);
+				return NULL;
+			}
+
+			ret[j++] = spec[i];
+		}
+
+		ret[j++] = '\0';
+	}
+
+	ret[j++] = '\0';
+	return ret;
+}
+
 void
 Shell_Init(void)
 {
 	if (shellPath == NULL)
 		InitShellNameAndPath();
+	if (shell->metaChar != NULL)
+		shell->metaChar = ch_shell_build(UNCONST(shell->metaChar));
 
 	Var_SetWithFlags(SCOPE_CMDLINE, ".SHELL", shellPath, VAR_SET_READONLY);
 }
 
-/*
- * Return the string literal that is used in the current command shell
- * to produce a newline character.
- */
-const char *
-Shell_GetNewline(void)
+ShellInfo *
+Shell_GetInfo(void)
 {
-	return shell->newline;
+	static ShellInfo info = {0};
+
+	if (info.specialChar != NULL)
+		return &info;
+
+	info.specialChar = shell->specialChar;
+	info.metaChar = shell->metaChar;
+	info.escapeChar = shell->escapeChar;
+
+	return &info;
 }
 
 void
@@ -1569,7 +1643,9 @@ Job_Init(void)
 	if ((job_mutex = CreateMutexA(NULL, FALSE, NULL)) == NULL)
 		Punt("failed to create mutex: %s", strerr(GetLastError()));
 
-	Shell_Init();
+	if (shellPath == NULL)
+		Shell_Init();
+
 	Msg_Init(JobPassSig_int, JobPassSig_term);
 
 	(void)Job_RunTarget(".BEGIN", NULL);
@@ -1688,24 +1764,28 @@ Job_ParseShell(char *line)
 
 	for (path = NULL, argv = words; argc != 0; argc--, argv++) {
 		char *arg = *argv;
-		if (strncmp(arg, "path=", 5) == 0) {
+		if (strncmp(arg, "path=", 5) == 0)
 			path = arg + 5;
-		} else if (strncmp(arg, "name=", 5) == 0) {
+		else if (strncmp(arg, "name=", 5) == 0)
 			newShell.name = arg + 5;
-		} else {
-			if (strncmp(arg, "check=", 6) == 0) {
-				newShell.echoTmpl = arg + 6;
-			} else if (strncmp(arg, "ignore=", 7) == 0) {
+		else {
+			if (strncmp(arg, "echo=", 5) == 0)
+				newShell.echoTmpl = arg + 5;
+			else if (strncmp(arg, "ignore=", 7) == 0)
 				newShell.runIgnTmpl = arg + 7;
-			} else if (strncmp(arg, "errout=", 7) == 0) {
-				newShell.runChkTmpl = arg + 7;
-			} else if (strncmp(arg, "newline=", 8) == 0) {
-				newShell.newline = arg + 8;
-			} else if (strncmp(arg, "comment=", 8) == 0) {
+			else if (strncmp(arg, "check=", 6) == 0)
+				newShell.runChkTmpl = arg + 6;
+			else if (strncmp(arg, "meta=", 5) == 0)
+				newShell.metaChar = (unsigned char *)arg + 5;
+			else if (strncmp(arg, "special=", 8) == 0)
+				newShell.specialChar = arg + 8;
+			else if (strncmp(arg, "escape=", 7) == 0)
+				newShell.escapeChar = arg[7];
+			else if (strncmp(arg, "comment=", 8) == 0)
 				newShell.commentChar = arg[8];
-			} else if (strncmp(arg, "separator=", 10) == 0) {
+			else if (strncmp(arg, "separator=", 10) == 0)
 				newShell.separator = arg[10];
-			} else {
+			else {
 				Parse_Error(PARSE_FATAL,
 					"Unknown keyword \"%s\"", arg);
 				free(words);
@@ -1735,7 +1815,8 @@ Job_ParseShell(char *line)
 				return false;
 			}
 			shell = sh;
-			shellName = newShell.name;
+			/* We free wordsList, preserve shellName. */
+			shellName = bmake_strdup(newShell.name);
 			if (shellPath != NULL) {
 				/*
 				 * Shell_Init has already been called!
@@ -1756,21 +1837,16 @@ Job_ParseShell(char *line)
 		 */
 		shellPath = path;
 		path = lastSlash(path);
-		if (path == NULL) {
+		if (path == NULL)
 			path = UNCONST(shellPath);
-		} else {
+		else
 			/*
 			 * For some reason, cmd.exe insists that that last slash
 			 * is a backslash.
 			 */
-			*path = '\\';
-			path++;
-		}
-		if (newShell.name != NULL) {
-			shellName = newShell.name;
-		} else {
-			shellName = path;
-		}
+			*(path++) = '\\';
+
+		shellName = newShell.name != NULL ? newShell.name : path;
 		if (!fullSpec) {
 			if ((sh = FindShellByName(shellName)) == NULL) {
 				Parse_Error(PARSE_WARNING,
@@ -1780,23 +1856,52 @@ Job_ParseShell(char *line)
 			}
 			shell = sh;
 		} else {
+			char s[2] = {'\0'};
+
+			/* If these arent given, we assume them. */
+			if (newShell.escapeChar == '\0')
+				newShell.escapeChar = '\\';
+			if (newShell.separator == '\0')
+				newShell.separator = '&';
+			if (newShell.specialChar == NULL)
+				newShell.specialChar = "";
+
+			s[0] = newShell.separator;
+
+			newShell.specialChar = newShell.specialChar == NULL ?
+				"" : ch_shell_build_special(newShell.specialChar);
+
+			if (newShell.specialChar == NULL)
+				return false;
+
+			newShell.echoTmpl = newShell.echoTmpl == NULL ? "" :
+				str_concat2(newShell.echoTmpl, s);
+			newShell.runIgnTmpl = newShell.runIgnTmpl == NULL ?
+				str_concat2("%s", s) : str_concat2(newShell.runIgnTmpl, s);
+			newShell.runChkTmpl = newShell.runChkTmpl == NULL ?
+				NULL : str_concat2(newShell.runChkTmpl, s);
+
 			shell = bmake_malloc(sizeof *shell);
 			*shell = newShell;
 		}
-		/* this will take care of shellErrFlag */
+
+		/*
+		 * At this point, only shallPath, shellName and possibly
+		 * metaChar are using wordsList. There is no point in keeping
+		 * all of it around, just copy shellPath and Name then free it.
+		 * metaChar is replaced by Shell_Init.
+		 */
+		{
+			char *newPath = bmake_strdup(shellPath);
+
+			shellName = shellName == shellPath ? newPath : bmake_strdup(shellName);
+			shellPath = newPath;
+		}
+
 		Shell_Init();
 	}
 
-	if (shell->echoTmpl == NULL)
-		shell->echoTmpl = "";
-	if (shell->runIgnTmpl == NULL)
-		shell->runIgnTmpl = "%s\n";
-
-	/*
-	 * Do not free up the words themselves, since they might be in use
-	 * by the shell specification.
-	 */
-	free(words);
+	Words_Free(wordsList);
 	return true;
 }
 
