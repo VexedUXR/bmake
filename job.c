@@ -830,8 +830,7 @@ JobFinish(Job *job, DWORD status)
 		job->cmdBuffer = NULL;
 	}
 
-	if (status != 0)
-		JobFinishDoneExited(job, &status);
+	JobFinishDoneExited(job, &status);
 
 #ifdef USE_META
 	if (useMeta) {
