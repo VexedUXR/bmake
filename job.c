@@ -278,6 +278,23 @@ typedef enum JobStartResult {
 #define DEFSHELL_INDEX 0	/* DEFSHELL_INDEX_CUSTOM or DEFSHELL_INDEX_SH */
 #endif /* !DEFSHELL_INDEX */
 
+/*
+ * The maximum number of pointers that can
+ * be stored in shell_freeIt.
+ * 
+ * This includes:
+ * 
+ * shell itself
+ * ShellName
+ * ShellPath
+ * Shell.runIgnTmpl
+ * Shell.runChkTmpl
+ * Shell.echoTmpl
+ * Shell.specialChar
+ * Shell.metaChar
+ */
+#define NSHELLDATA 8
+
 static Shell shells[] = {
 	/* Command Prompt description.*/
 	{
@@ -326,7 +343,7 @@ static Shell shells[] = {
 static Shell *shell = &shells[DEFSHELL_INDEX];
 const char *shellPath = NULL;	/* full pathname of executable image */
 const char *shellName = NULL;	/* last component of shellPath */
-static char *shell_freeIt = NULL; /* Allocated memory for custom .SHELL */
+static void *shell_freeIt[NSHELLDATA]; /* Allocated memory for custom .SHELL */
 
 static Job *job_table;		/* The structures that describe them */
 static Job *job_table_end;	/* job_table + maxJobs */
@@ -1567,8 +1584,12 @@ Shell_Init(void)
 {
 	if (shellPath == NULL)
 		InitShellNameAndPath();
-	if (shell->metaChar != NULL)
-		shell->metaChar = ch_shell_build(UNCONST(shell->metaChar));
+	if (shell->metaChar != NULL) {
+		int i;
+
+		for (i = 0; shell_freeIt[i] != NULL; i++);
+		shell->metaChar = shell_freeIt[i] = ch_shell_build(shell->metaChar);
+	}
 
 	Var_SetWithFlags(SCOPE_CMDLINE, ".SHELL", shellPath, VAR_SET_READONLY);
 }
@@ -1711,7 +1732,7 @@ Job_ParseShell(char *line)
 	Words wordsList;
 	char **words;
 	char **argv;
-	size_t argc;
+	size_t argc, i = 0;
 	char *path;
 	Shell newShell;
 	bool fullSpec = false;
@@ -1720,7 +1741,10 @@ Job_ParseShell(char *line)
 	/* XXX: don't use line as an iterator variable */
 	pp_skip_whitespace(&line);
 
-	free(shell_freeIt);
+	for (; i < NSHELLDATA && shell_freeIt[i] != NULL; i++) {
+		free(shell_freeIt[i]);
+		shell_freeIt[i] = NULL;
+	} i = 0;
 
 	memset(&newShell, 0, sizeof newShell);
 
@@ -1759,7 +1783,6 @@ Job_ParseShell(char *line)
 		Error("Unterminated quoted string [%s]", line);
 		return false;
 	}
-	shell_freeIt = path;
 
 	for (path = NULL, argv = words; argc != 0; argc--, argv++) {
 		char *arg = *argv;
@@ -1815,13 +1838,12 @@ Job_ParseShell(char *line)
 			}
 			shell = sh;
 			/* We free wordsList, preserve shellName. */
-			shellName = bmake_strdup(newShell.name);
+			shellName = shell_freeIt[i++] = bmake_strdup(newShell.name);
 			if (shellPath != NULL) {
 				/*
 				 * Shell_Init has already been called!
 				 * Do it again.
 				 */
-				free(UNCONST(shellPath));
 				shellPath = NULL;
 				Shell_Init();
 			}
@@ -1867,20 +1889,23 @@ Job_ParseShell(char *line)
 
 			s[0] = newShell.separator;
 
-			newShell.specialChar = newShell.specialChar == NULL ?
-				"" : ch_shell_build_special(newShell.specialChar);
+			newShell.specialChar = newShell.specialChar == NULL ? "" :
+				(shell_freeIt[i++] = ch_shell_build_special(newShell.specialChar));
 
 			if (newShell.specialChar == NULL)
 				return false;
 
 			newShell.echoTmpl = newShell.echoTmpl == NULL ? "" :
-				str_concat2(newShell.echoTmpl, s);
-			newShell.runIgnTmpl = newShell.runIgnTmpl == NULL ?
-				str_concat2("%s", s) : str_concat2(newShell.runIgnTmpl, s);
-			newShell.runChkTmpl = newShell.runChkTmpl == NULL ?
-				NULL : str_concat2(newShell.runChkTmpl, s);
+				(shell_freeIt[i++] = str_concat2(newShell.echoTmpl, s));
 
-			shell = bmake_malloc(sizeof *shell);
+			newShell.runIgnTmpl = newShell.runIgnTmpl == NULL ?
+				(shell_freeIt[i++] = str_concat2("%s", s)) :
+				(shell_freeIt[i++] = str_concat2(newShell.runIgnTmpl, s));
+
+			newShell.runChkTmpl = newShell.runChkTmpl == NULL ? NULL :
+				(shell_freeIt[i++] = str_concat2(newShell.runChkTmpl, s));
+
+			shell = shell_freeIt[i++] = bmake_malloc(sizeof *shell);
 			*shell = newShell;
 		}
 
@@ -1891,9 +1916,10 @@ Job_ParseShell(char *line)
 		 * metaChar is replaced by Shell_Init.
 		 */
 		{
-			char *newPath = bmake_strdup(shellPath);
+			char *newPath = shell_freeIt[i++] = bmake_strdup(shellPath);
 
-			shellName = shellName == shellPath ? newPath : bmake_strdup(shellName);
+			shellName = shellName == shellPath ? newPath :
+				(shell_freeIt[i++] = bmake_strdup(shellName));
 			shellPath = newPath;
 		}
 
