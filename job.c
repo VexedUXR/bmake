@@ -1747,30 +1747,6 @@ Job_ParseShell(char *line)
 	} i = 0;
 
 	memset(&newShell, 0, sizeof newShell);
-
-	/*
-	 * Str_Words treats backslashes as escape sequences.
-	 * Replace all instances of '\' with '/'.
-	 */
-	if ((path = strstr(line, "path=")) != NULL) {
-		bool quoted = false;
-
-		path += 5;
-		if (*path == '"') {
-			quoted = true;
-			path++;
-		}
-
-		for (; *path != '\0' && *path != (quoted ? '"' : ' ');
-			path++)
-			if (*path == '\\')
-				*path = '/';
-
-		if (quoted && *path != '"') {
-			Error("Unterminated quoted string [%s]", line);
-			return false;
-		}
-	}
 	
 	/*
 	 * Parse the specification by keyword
