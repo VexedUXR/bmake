@@ -129,37 +129,29 @@
 
 /*
  * A shell defines how the commands are run.  All commands for a target are
- * written into a single file, which is then given to the shell to execute
- * the commands from it.  The commands are written to the file using a few
- * templates for echo control and error control.
+ * written into a single buffer, which is then given to the shell to execute
+ * the commands, using -c, from it.  The commands are written to the buffer
+ * using a few templates for echo control and error control.
  *
- * The name of the shell is the basename for the predefined shells, such as
- * "sh", "csh", "bash".  For custom shells, it is the full pathname, and its
- * basename is used to select the type of shell; the longest match wins.
- * So /usr/pkg/bin/bash has type sh, /usr/local/bin/tcsh has type csh.
+ * The name of the shell is the basename for the shell, such as "cmd.exe"
+ * and "pwsh.exe".
  *
- * The echoing of command lines is controlled using hasEchoCtl, echoOff,
- * echoOn, noPrint and noPrintLen.  When echoOff is executed by the shell, it
- * still outputs something, but this something is not interesting, therefore
- * it is filtered out using noPrint and noPrintLen.
+ * The error checking for individual commands is controlled using runChkTmpl.
  *
- * The error checking for individual commands is controlled using hasErrCtl,
- * errOn, errOff and runChkTmpl.
- *
- * In case a shell doesn't have error control, echoTmpl is a printf template
- * for echoing the command, should echoing be on; runIgnTmpl is another
- * printf template for executing the command while ignoring the return
- * status. Finally runChkTmpl is a printf template for running the command and
- * causing the shell to exit on error. If any of these strings are empty when
- * hasErrCtl is false, the command will be executed anyway as is, and if it
- * causes an error, so be it. Any templates set up to echo the command will
- * escape any '$ ` \ "' characters in the command string to avoid unwanted
- * shell code injection, the escaped command is safe to use in double quotes.
- *
- * The command-line flags "echo" and "exit" also control the behavior.  The
- * "echo" flag causes the shell to start echoing commands right away.  The
- * "exit" flag causes the shell to exit when an error is detected in one of
- * the commands.
+ * echoTmpl is a printf template for echoing the command, should echoing
+ * be on; runIgnTmpl is another printf template for executing the command
+ * while ignoring the return status. Finally runChkTmpl is a printf template
+ * for running the command and causing the shell to exit on error. If any of
+ * these strings are empty the command will be executed anyway as is, and if
+ * it causes an error, so be it. Any templates set up to echo the command will
+ * escape any meta characters in the command string to avoid unwanted shell code
+ * injection, the escaped command is safe to use in double quotes.
+ * 
+ * metaChar and specialChar are used for escaping characters. metaChar is a
+ * char array with 128 elements where metaChar[c] would be 1 if c needed to
+ * be escaped and 0 otherwise. specialChar lists characters that need to be
+ * escaped in a special way, e.g a newline. All characters used in specialChar
+ * also need to be present in metaChar.
  */
 typedef struct Shell {
 	const char *name;	/* name of the shell */
@@ -180,10 +172,7 @@ typedef struct Shell {
 	char escapeChar; /* escape character used by shell */
 
 	/*
-	 * Characters that need to be escaped in a special way e.g
-	 * double quotes needs to be escaped with '`\' instead of
-	 * the usual '`' when using them with /c for powerhsell.
-	 *
+	 * Characters that need to be escaped in a special way.
 	 * specialChar[0] is the character to be escaped, and the rest
 	 * of the string is the escaped character. Multiple characters
 	 * should be seperated by a nul character, the array ends with
