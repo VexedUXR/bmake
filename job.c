@@ -1813,8 +1813,8 @@ Job_ParseShell(char *line)
 				return false;
 			}
 			shell = sh;
-			/* We free wordsList, preserve shellName. */
-			shellName = shell_freeIt[i++] = bmake_strdup(newShell.name);
+			shellName = sh->name;
+
 			if (shellPath != NULL) {
 				/*
 				 * Shell_Init has already been called!
