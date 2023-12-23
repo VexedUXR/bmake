@@ -1776,8 +1776,12 @@ SubstringWords_JoinFree(SubstringWords words)
 static void
 QuoteShell(const char *str, bool quoteDollar, LazyBuf *buf)
 {
-	ShellInfo *info = Shell_GetInfo();
+	ShellInfo *info;
 	const char *p;
+
+	if (shellPath == NULL)
+		Shell_Init();
+	info = Shell_GetInfo();
 
 	LazyBuf_Init(buf, str);
 	if (info->metaChar == NULL) {
