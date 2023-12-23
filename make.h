@@ -756,7 +756,8 @@ lastSlash(const char *pathname)
 
 /* Replace all instances of '\' with '/' */
 MAKE_INLINE void
-replaceSlash(char* p) {
+replaceSlash(char* p)
+{
 	if ((p = strchr(p, '\\')) != NULL)
 		for (; *p != '\0'; p++)
 			if (*p == '\\')
