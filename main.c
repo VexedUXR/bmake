@@ -1166,6 +1166,38 @@ InitMaxJobs(void)
 	free(value);
 }
 
+/*
+ * For compatibility, look at the directories in the VPATH variable
+ * and add them to the search path, if the variable is defined. The
+ * variable's value is in the same format as the PATH environment
+ * variable, i.e. <directory>;<directory>;<directory>...
+ */
+static void
+InitVpath(void)
+{
+	char *vpath, savec, *path;
+	if (!Var_Exists(SCOPE_CMDLINE, "VPATH"))
+		return;
+
+	vpath = Var_Subst("${VPATH}", SCOPE_CMDLINE, VARE_WANTRES);
+	/* TODO: handle errors */
+	path = vpath;
+	do {
+		char *cp;
+		/* skip to end of directory */
+		for (cp = path; *cp != ';' && *cp != '\0'; cp++);
+
+		/* Save terminator character so know when to stop */
+		savec = *cp;
+		*cp = '\0';
+		/* Add directory to search path */
+		(void)SearchPath_Add(&dirSearchPath, path);
+		*cp = savec;
+		path = cp + 1;
+	} while (savec == ';');
+	free(vpath);
+}
+
 static void
 ReadAllMakefiles(const StringList *makefiles)
 {
@@ -1404,6 +1436,8 @@ main_PrepareMaking(void)
 
 	if (opts.printVars == PVM_NONE)
 		Main_ExportMAKEFLAGS(true);	/* initial export */
+
+	InitVpath();
 
 	/*
 	 * Now that all search paths have been read for suffixes et al, it's

@@ -9,9 +9,7 @@ You can build this either by running `msbuild`, or opening `bmake.sln` and build
 - `.MAKE.PPID`, `.MAKE.UID` and `.MAKE.GID` are all set to -1
 - Milliseconds used instead of microseconds in trace records
 - The `.SHELL` target uses different sources, see [the wiki](https://github.com/VexedUXR/bmake/wiki#special-targets)
-- The `VPATH` variable is treated as a normal variable  
-<sub>This is because `VPATH` uses `:` as a delimiter for the paths, which is a valid character in a Windows path.
-Since `VPATH` is only here for compatibility, there is no point in changing the delimiter.</sub>
+- `VPATH` is delimited with `;` instead of `:`.
 - By default, bmake only searches for `sys.mk` in `./mk` (if neither `MAKESYSPATH` or `-m` are used)
 
 ## Status
