@@ -162,6 +162,9 @@ typedef struct Shell {
 	const char *runChkTmpl;
 	const char *echoTmpl;	/* template to echo a command */
 
+	/* flag used to run a command then exit, usually /c. */
+	const char *exec;
+
 	/*
 	 * Character used to execute multiple commands on one line,
 	 * regardless of whether the last command failed or not.
@@ -281,8 +284,9 @@ typedef enum JobStartResult {
  * Shell.echoTmpl
  * Shell.specialChar
  * Shell.metaChar
+ * Shell.exec
  */
-#define NSHELLDATA 8
+#define NSHELLDATA 9
 
 static Shell shells[] = {
 	/* Command Prompt description.*/
@@ -291,6 +295,7 @@ static Shell shells[] = {
 		"%s&", /* .runIgnTmpl */
 		"%s||exit&", /* .runChkTmpl */
 		"echo %s&", /* .echoTmpl */
+		"/c", /* .exec */
 		'&', /* .separator */
 		'\0', /* .commentChar */
 		'^', /* .escapeChar */
@@ -317,6 +322,7 @@ static Shell shells[] = {
 		"{exit $lastexitcode}exit 1);", /* .runChkTmpl */
 
 		"echo %s;", /* .echoTmpl */
+		"/c", /* .exec */
 		';', /* .separator */
 		'#', /* .commentChar */
 		'`', /* .escapeChar */
@@ -1097,11 +1103,11 @@ static char *
 JobMakeArgs(Job *job)
 {
 	char *args;
-	const char *fmt = "\"%s\" /c %s";
+	const char *fmt = "\"%s\" %s %s";
 
 	args = bmake_malloc((size_t)snprintf(NULL, 0, fmt,
-		shellPath, job->cmdBuffer->data) + 1);
-	sprintf(args, fmt, shellPath, job->cmdBuffer->data);
+		shellPath, shell->exec, job->cmdBuffer->data) + 1);
+	sprintf(args, fmt, shellPath, shell->exec, job->cmdBuffer->data);
 
 	return args;
 }
@@ -1598,6 +1604,12 @@ Shell_GetInfo(void)
 	return &info;
 }
 
+const char *
+Shell_GetExec(void)
+{
+	return shell->exec;
+}
+
 void
 Job_SetPrefix(void)
 {
@@ -1766,6 +1778,8 @@ Job_ParseShell(char *line)
 				newShell.metaChar = (unsigned char *)arg + 5;
 			else if (strncmp(arg, "special=", 8) == 0)
 				newShell.specialChar = arg + 8;
+			else if (strncmp(arg, "exec=", 5) == 0)
+				newShell.exec = arg + 5;
 			else if (strncmp(arg, "escape=", 7) == 0)
 				newShell.escapeChar = arg[7];
 			else if (strncmp(arg, "comment=", 8) == 0)
@@ -1844,13 +1858,16 @@ Job_ParseShell(char *line)
 		} else {
 			char s[2] = {'\0'};
 
-			/* If these arent given, we assume them. */
+			/* If these arent given, we guess them. */
 			if (newShell.escapeChar == '\0')
 				newShell.escapeChar = '\\';
 			if (newShell.separator == '\0')
 				newShell.separator = '&';
 			if (newShell.specialChar == NULL)
 				newShell.specialChar = "";
+
+			newShell.exec = newShell.exec == NULL ? "/c" :
+				(shell_freeIt[i++] = bmake_strdup(newShell.exec));
 
 			s[0] = newShell.separator;
 

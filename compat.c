@@ -286,11 +286,12 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 	DEBUG1(JOB, "Execute: '%s'\n", cmd);
 
 	{
-		const char *fmt = "\"%s\" /c \"%s\"";
+		const char *exec = Shell_GetExec();
+		const char *fmt = "\"%s\" %s %s";
 		char *tmp = _alloca((size_t)snprintf(NULL, 0,
-			fmt, shellPath, cmd));
+			fmt, shellPath, exec, cmd));
 
-		sprintf(tmp, fmt, shellPath, cmd);
+		sprintf(tmp, fmt, shellPath, exec, cmd);
 		
 		cmd = tmp;
 	}
