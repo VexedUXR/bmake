@@ -1358,6 +1358,9 @@ again:
 	for (i = job->curPos + nr - 1;
 		 i >= job->curPos && i != (size_t)-1; i--) {
 		if (job->outBuf[i] == '\n') {
+			if (job->outBuf[i - 1] == '\r')
+				i--;
+
 			gotNL = true;
 			break;
 		}
