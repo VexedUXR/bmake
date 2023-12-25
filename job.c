@@ -162,8 +162,11 @@ typedef struct Shell {
 	const char *runChkTmpl;
 	const char *echoTmpl;	/* template to echo a command */
 
-	/* flag used to run a command then exit, usually /c. */
-	const char *exec;
+	/* 
+	 * Arguments to be passed to the shell.
+	 * This should end with the 'exec' flag, usually /c.
+	 */
+	const char *args;
 
 	/*
 	 * Character used to execute multiple commands on one line,
@@ -284,7 +287,7 @@ typedef enum JobStartResult {
  * Shell.echoTmpl
  * Shell.specialChar
  * Shell.metaChar
- * Shell.exec
+ * Shell.args
  */
 #define NSHELLDATA 9
 
@@ -295,7 +298,7 @@ static Shell shells[] = {
 		"%s&", /* .runIgnTmpl */
 		"%s||exit&", /* .runChkTmpl */
 		"echo %s&", /* .echoTmpl */
-		"/c", /* .exec */
+		"/c", /* .args */
 		'&', /* .separator */
 		'\0', /* .commentChar */
 		'^', /* .escapeChar */
@@ -322,7 +325,7 @@ static Shell shells[] = {
 		"{exit $lastexitcode}exit 1);", /* .runChkTmpl */
 
 		"echo %s;", /* .echoTmpl */
-		"/c", /* .exec */
+		"/c", /* .args */
 		';', /* .separator */
 		'#', /* .commentChar */
 		'`', /* .escapeChar */
@@ -1106,8 +1109,8 @@ JobMakeArgs(Job *job)
 	const char *fmt = "\"%s\" %s %s";
 
 	args = bmake_malloc((size_t)snprintf(NULL, 0, fmt,
-		shellPath, shell->exec, job->cmdBuffer->data) + 1);
-	sprintf(args, fmt, shellPath, shell->exec, job->cmdBuffer->data);
+		shellPath, shell->args, job->cmdBuffer->data) + 1);
+	sprintf(args, fmt, shellPath, shell->args, job->cmdBuffer->data);
 
 	return args;
 }
@@ -1605,9 +1608,9 @@ Shell_GetInfo(void)
 }
 
 const char *
-Shell_GetExec(void)
+Shell_GetArgs(void)
 {
-	return shell->exec;
+	return shell->args;
 }
 
 void
@@ -1778,8 +1781,8 @@ Job_ParseShell(char *line)
 				newShell.metaChar = (unsigned char *)arg + 5;
 			else if (strncmp(arg, "special=", 8) == 0)
 				newShell.specialChar = arg + 8;
-			else if (strncmp(arg, "exec=", 5) == 0)
-				newShell.exec = arg + 5;
+			else if (strncmp(arg, "args=", 5) == 0)
+				newShell.args = arg + 5;
 			else if (strncmp(arg, "escape=", 7) == 0)
 				newShell.escapeChar = arg[7];
 			else if (strncmp(arg, "comment=", 8) == 0)
@@ -1866,8 +1869,8 @@ Job_ParseShell(char *line)
 			if (newShell.specialChar == NULL)
 				newShell.specialChar = "";
 
-			newShell.exec = newShell.exec == NULL ? "/c" :
-				(shell_freeIt[i++] = bmake_strdup(newShell.exec));
+			newShell.args = newShell.args == NULL ? "/c" :
+				(shell_freeIt[i++] = bmake_strdup(newShell.args));
 
 			s[0] = newShell.separator;
 

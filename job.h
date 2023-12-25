@@ -198,7 +198,7 @@ ch_is_shell_special(char c, const char *specialChar)
 
 void Shell_Init(void);
 ShellInfo *Shell_GetInfo(void);
-const char *Shell_GetExec(void);
+const char *Shell_GetArgs(void);
 void Job_Touch(GNode *, bool);
 bool Job_CheckCommands(GNode *, void (*abortProc)(const char *, ...))
 	MAKE_ATTR_USE;

@@ -286,7 +286,7 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 	DEBUG1(JOB, "Execute: '%s'\n", cmd);
 
 	{
-		const char *exec = Shell_GetExec();
+		const char *exec = Shell_GetArgs();
 		const char *fmt = "\"%s\" %s %s";
 		char *tmp = _alloca((size_t)snprintf(NULL, 0,
 			fmt, shellPath, exec, cmd));
