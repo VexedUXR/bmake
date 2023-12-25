@@ -162,7 +162,7 @@ typedef struct Shell {
 	const char *runChkTmpl;
 	const char *echoTmpl;	/* template to echo a command */
 
-	/* 
+	/*
 	 * Arguments to be passed to the shell.
 	 * This should end with the 'exec' flag, usually /c.
 	 */
