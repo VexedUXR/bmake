@@ -249,11 +249,9 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 			silent = !DEBUG(LOUD);
 		else if (*cmd == '-')
 			errCheck = false;
-		else if (*cmd == '+') {
+		else if (*cmd == '+')
 			doIt = true;
-			if (shellName == NULL)	/* we came here from jobs */
-				Shell_Init();
-		} else if (!ch_isspace(*cmd))
+		else if (!ch_isspace(*cmd))
 			/* Ignore whitespace for compatibility with gnu make */
 			break;
 		cmd++;
@@ -284,6 +282,9 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 		return true;
 
 	DEBUG1(JOB, "Execute: '%s'\n", cmd);
+
+	if (shellPath == NULL)
+		Shell_Init();		/* we need shellPath */
 
 	{
 		const char *exec = Shell_GetArgs();
