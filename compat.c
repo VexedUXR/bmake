@@ -356,6 +356,7 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 				 * but let others continue.
 				 */
 				printf(" (continuing)\n");
+				fflush(stdout);
 			} else {
 				printf("\n");
 			}
@@ -367,6 +368,7 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 			 * If we return 0, this will happen...
 			 */
 			printf(" (ignored)\n");
+			fflush(stdout);
 			status = 0;
 		}
 	}
