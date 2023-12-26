@@ -351,6 +351,12 @@ static Job tokenWaitJob;	/* token wait pseudo-job */
 
 static HANDLE job_mutex = NULL;
 
+/*
+ * Format for executing shells.
+ * "shellPath" args cmd
+ */
+const char *cmdFmt = "\"%s\" %s %s";
+
 static void CollectOutput(Job *, bool);
 static void MAKE_ATTR_DEAD JobInterrupt(bool);
 
@@ -1106,11 +1112,10 @@ static char *
 JobMakeArgs(Job *job)
 {
 	char *args;
-	const char *fmt = "\"%s\" %s %s";
 
-	args = bmake_malloc((size_t)snprintf(NULL, 0, fmt,
+	args = bmake_malloc((size_t)snprintf(NULL, 0, cmdFmt,
 		shellPath, shell->args, job->cmdBuffer->data) + 1);
-	sprintf(args, fmt, shellPath, shell->args, job->cmdBuffer->data);
+	sprintf(args, cmdFmt, shellPath, shell->args, job->cmdBuffer->data);
 
 	return args;
 }

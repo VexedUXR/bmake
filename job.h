@@ -168,6 +168,7 @@ typedef struct ShellInfo {
 extern const char *shellPath;
 extern const char *shellName;
 extern char *shellErrFlag;
+extern const char *cmdFmt;
 
 extern int jobTokensRunning;	/* tokens currently "out" */
 

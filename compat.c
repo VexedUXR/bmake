@@ -287,12 +287,11 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 		Shell_Init();		/* we need shellPath */
 
 	{
-		const char *exec = Shell_GetArgs();
-		const char *fmt = "\"%s\" %s %s";
+		const char *args = Shell_GetArgs();
 		char *tmp = _alloca((size_t)snprintf(NULL, 0,
-			fmt, shellPath, exec, cmd));
+			cmdFmt, shellPath, args, cmd));
 
-		sprintf(tmp, fmt, shellPath, exec, cmd);
+		sprintf(tmp, cmdFmt, shellPath, args, cmd);
 		
 		cmd = tmp;
 	}

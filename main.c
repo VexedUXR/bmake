@@ -1614,11 +1614,9 @@ Cmd_Exec(const char *cmd, char **error)
 	if (shellName == NULL)
 		Shell_Init();
 
-	{
-		const char *fmt = "\"%s\" /c \"%s\"";
-		cp = _alloca((size_t)snprintf(NULL, 0, fmt, shellPath, cmd));
-		sprintf(cp, fmt, shellPath, cmd);
-	}
+	cp = Shell_GetArgs();
+	output = _alloca((size_t)snprintf(NULL, 0, cmdFmt, shellPath, cp, cmd));
+	sprintf(output, cmdFmt, shellPath, cp, cmd);
 
 	DEBUG1(VAR, "Capturing the output of command \"%s\"\n", cmd);
 
@@ -1637,8 +1635,8 @@ Cmd_Exec(const char *cmd, char **error)
 	si.hStdOutput = si.hStdError = write;
 	si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 
-	if (CreateProcessA(shellPath, cp, NULL, NULL, TRUE, 0, NULL, NULL,
-		&si, &pi) == 0)
+	if (CreateProcessA(shellPath, output, NULL, NULL, TRUE, 0, NULL,
+		NULL, &si, &pi) == 0)
 		Punt("could not create process: %s",
 			strerr(GetLastError()));
 	if (WaitForSingleObject(pi.hProcess, INFINITE) == WAIT_FAILED)
