@@ -1724,18 +1724,8 @@ FindShellByName(const char *name)
  *	anything (most notably a double-quote and a space) and
  *	provides the functionality it does in C. Each word consists of
  *	keyword and value separated by an equal sign. There should be no
- *	unnecessary spaces in the word. The keywords are as follows:
- *	    name	Name of shell.
- *	    path	Location of shell.
- *	    check	Template of command to echo a command
- *	    ignore	Template of command to run a command,
- *				dont exit on error
- *		errout	Template of command to run a command,
- *				exit on error
- *		comment The character used for comments by the shell.
- *					Can be '\0' if no such character exists.
- *		separator The character used to execute multiple commands
- *					on a single line, e.g '&' for CMD.
+ *	unnecessary spaces in the word. The keywords can be found at the
+ *  Shell struct definition, at the top of this file.
  */
 bool
 Job_ParseShell(char *line)
