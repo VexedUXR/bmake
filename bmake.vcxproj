@@ -207,7 +207,6 @@
     <ClInclude Include="make.h" />
     <ClInclude Include="make_malloc.h" />
     <ClInclude Include="meta.h" />
-    <ClInclude Include="pathnames.h" />
     <ClInclude Include="str.h" />
     <ClInclude Include="trace.h" />
   </ItemGroup>

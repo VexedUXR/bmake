@@ -104,7 +104,6 @@
 
 #include "dir.h"
 #include "job.h"
-#include "pathnames.h"
 
 #define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
 

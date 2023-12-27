@@ -102,7 +102,6 @@
 #include "make.h"
 #include "dir.h"
 #include "job.h"
-#include "pathnames.h"
 #include "trace.h"
 
 /*	"@(#)main.c	8.3 (Berkeley) 3/19/94"	*/

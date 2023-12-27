@@ -100,6 +100,11 @@
 /* MAKE_STATIC marks a function that may or may not be inlined. */
 #define MAKE_STATIC static MAKE_ATTR_UNUSED
 
+/* path names */
+#define _PATH_OBJDIR		"obj"
+#define _PATH_DEFSYSMK		"sys.mk"
+#define _PATH_DEFSYSPATH	"./mk"
+
 #include "lst.h"
 #include "make_malloc.h"
 #include "str.h"

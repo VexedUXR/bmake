@@ -116,9 +116,6 @@
     <ClInclude Include="meta.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pathnames.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="str.h">
       <Filter>Header Files</Filter>
     </ClInclude>
