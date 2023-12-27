@@ -471,7 +471,7 @@ meta_mode_init(const char *make_mode)
 	 * and :tA will resolve that to cwd.
 	 */
 	Global_Set(MAKE_META_PREFIX,
-		"Building ${.TARGET:H:tA}/${.TARGET:T}");
+		"Building ${.TARGET:H:tA}\\${.TARGET:T}");
 	}
 	if (once)
 	return;
