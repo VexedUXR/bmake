@@ -1611,7 +1611,7 @@ Cmd_Exec(const char *cmd, char **error)
 	PROCESS_INFORMATION pi;
 	HANDLE read, write;
 
-	if (shellName == NULL)
+	if (shellPath == NULL)
 		Shell_Init();
 
 	cp = Shell_GetArgs();
