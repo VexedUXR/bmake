@@ -1405,8 +1405,9 @@ Dir_UpdateMTime(GNode *gn, bool forceRefresh)
 static CachedDir *
 CacheNewDir(const char *name, SearchPath *path)
 {
-	CachedDir *dir;
 	WIN32_FIND_DATAA dp;
+	CachedDir *cdir;
+	DWORD ret;
 	HANDLE d;
 
 	/* Suffix the dir with "\*" */
@@ -1424,25 +1425,25 @@ CacheNewDir(const char *name, SearchPath *path)
 
 	DEBUG1(DIR, "Caching %s ...\n", name);
 
-	dir = CachedDir_New(name);
+	cdir = CachedDir_New(name);
 
 	do {
-		(void)HashSet_Add(&dir->files, dp.cFileName);
+		(void)HashSet_Add(&cdir->files, dp.cFileName);
 	} while (FindNextFileA(d, &dp) != 0);
 
-	OpenDirs_Add(&openDirs, dir);
+	OpenDirs_Add(&openDirs, cdir);
 	if (path != NULL)
-		Lst_Append(&path->dirs, CachedDir_Ref(dir));
+		Lst_Append(&path->dirs, CachedDir_Ref(cdir));
 
-	if (GetLastError() != ERROR_NO_MORE_FILES)
+	if ((ret = GetLastError()) != ERROR_NO_MORE_FILES)
 		Punt("failed to find next file in dir: %s",
-			strerr(GetLastError()));
+			strerr(ret));
 	if (FindClose(d) == 0)
 		Punt("failed to close file handle: %s",
 			strerr(GetLastError()));
 
 	DEBUG1(DIR, "Caching %s done\n", name);
-	return dir;
+	return cdir;
 }
 
 /*
