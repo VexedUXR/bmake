@@ -73,21 +73,23 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(OutDir)</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(OutDir)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(OutDir)</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(OutDir)</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -95,7 +97,6 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>.\Debug/tre.tlb</TypeLibraryName>
       <HeaderFileName />
     </Midl>
     <ClCompile>
@@ -105,12 +106,11 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <PrecompiledHeaderOutputFile>.\Debug/tre.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
-      <ObjectFileName>.\Debug/</ObjectFileName>
-      <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
-      <BrowseInformation>true</BrowseInformation>
-      <WarningLevel>Level3</WarningLevel>
+      <AssemblerListingLocation>
+      </AssemblerListingLocation>
+      <ObjectFileName>$(OutDir)</ObjectFileName>
+      <BrowseInformation>false</BrowseInformation>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
@@ -118,29 +118,12 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x040c</Culture>
     </ResourceCompile>
-    <Link>
-      <AdditionalDependencies>msvcprt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\Debug/tre.dll</OutputFile>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\tre.def</ModuleDefinitionFile>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\Debug/tre.pdb</ProgramDatabaseFile>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention />
-      <ImportLibrary>.\Debug/tre.lib</ImportLibrary>
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-    <Bscmake>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Debug/tre.bsc</OutputFile>
-    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <TypeLibraryName>.\Debug/tre.tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -150,12 +133,11 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;TRE_EXPORTS;HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <PrecompiledHeaderOutputFile>.\Debug/tre.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
-      <ObjectFileName>.\Debug/</ObjectFileName>
-      <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
-      <BrowseInformation>true</BrowseInformation>
-      <WarningLevel>Level3</WarningLevel>
+      <AssemblerListingLocation>
+      </AssemblerListingLocation>
+      <ObjectFileName>$(OutDir)</ObjectFileName>
+      <BrowseInformation>false</BrowseInformation>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -163,22 +145,6 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x040c</Culture>
     </ResourceCompile>
-    <Link>
-      <AdditionalDependencies>msvcprt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\Debug/tre.dll</OutputFile>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\tre.def</ModuleDefinitionFile>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\Debug/tre.pdb</ProgramDatabaseFile>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
-      <ImportLibrary>.\Debug/tre.lib</ImportLibrary>
-    </Link>
-    <Bscmake>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Debug/tre.bsc</OutputFile>
-    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -186,7 +152,6 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>.\Release/tre.tlb</TypeLibraryName>
       <HeaderFileName />
     </Midl>
     <ClCompile>
@@ -197,40 +162,23 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeaderOutputFile>.\Release/tre.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\Release/</AssemblerListingLocation>
-      <ObjectFileName>.\Release/</ObjectFileName>
-      <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
-      <BrowseInformation>true</BrowseInformation>
-      <WarningLevel>Level3</WarningLevel>
+      <AssemblerListingLocation>
+      </AssemblerListingLocation>
+      <ObjectFileName>$(OutDir)</ObjectFileName>
+      <BrowseInformation>false</BrowseInformation>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x040c</Culture>
     </ResourceCompile>
-    <Link>
-      <AdditionalDependencies>msvcrt.lib;msvcprt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\Release/tre.dll</OutputFile>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\tre.def</ModuleDefinitionFile>
-      <ProgramDatabaseFile>.\Release/tre.pdb</ProgramDatabaseFile>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention />
-      <ImportLibrary>.\Release/tre.lib</ImportLibrary>
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-    <Bscmake>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release/tre.bsc</OutputFile>
-    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <TypeLibraryName>.\Release/tre.tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -242,33 +190,17 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeaderOutputFile>.\Release/tre.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\Release/</AssemblerListingLocation>
-      <ObjectFileName>.\Release/</ObjectFileName>
-      <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
-      <BrowseInformation>true</BrowseInformation>
-      <WarningLevel>Level3</WarningLevel>
+      <AssemblerListingLocation>
+      </AssemblerListingLocation>
+      <ObjectFileName>$(OutDir)</ObjectFileName>
+      <BrowseInformation>false</BrowseInformation>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x040c</Culture>
     </ResourceCompile>
-    <Link>
-      <AdditionalDependencies>msvcrt.lib;msvcprt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\Release/tre.dll</OutputFile>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\tre.def</ModuleDefinitionFile>
-      <ProgramDatabaseFile>.\Release/tre.pdb</ProgramDatabaseFile>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
-      <ImportLibrary>.\Release/tre.lib</ImportLibrary>
-    </Link>
-    <Bscmake>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release/tre.bsc</OutputFile>
-    </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="regcomp.c" />
