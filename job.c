@@ -221,9 +221,6 @@ typedef struct CommandFlags {
 typedef struct ShellWriter {
 	Buffer *b;
 
-	/* we've sent 'set -x' */
-	bool xtraced;
-
 } ShellWriter;
 
 /*
@@ -702,7 +699,6 @@ JobWriteCommands(Job *job)
 	ShellWriter wr;
 
 	wr.b = job->cmdBuffer;
-	wr.xtraced = false;
 
 	for (ln = job->node->commands.first; ln != NULL; ln = ln->next) {
 		const char *cmd = ln->datum;
