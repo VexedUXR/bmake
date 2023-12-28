@@ -533,7 +533,7 @@ ShellWriter_WriteFmt(ShellWriter *wr, const char *fmt, const char *arg)
 {
 	DEBUG1(JOB, fmt, arg);
 
-	char *str = _alloca(snprintf(NULL, 0, fmt, arg) + 1);
+	char *str = _alloca((size_t)snprintf(NULL, 0, fmt, arg) + 1);
 	sprintf(str, fmt, arg);
 
 	Buf_AddStr(wr->b, str);
@@ -1157,7 +1157,8 @@ JobWriteShellCommands(Job *job, GNode *gn, bool *out_run)
 		tmp[6] = '\0';
 
 		tmpdir = getTmpdir();
-		tfile = _alloca(snprintf(NULL, 0, "%s%s%s", tmpdir, "make", tmp));
+		tfile = _alloca((size_t)snprintf(NULL, 0, "%s%s%s", tmpdir,
+			"make", tmp) + 1);
 		sprintf(tfile, "%s%s%s", tmpdir, "make", tmp);
 
 		if ((fp = fopen(tfile, "w+")) == NULL)

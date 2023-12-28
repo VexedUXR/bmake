@@ -288,7 +288,7 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 	{
 		const char *args = Shell_GetArgs();
 		char *tmp = _alloca((size_t)snprintf(NULL, 0,
-			cmdFmt, shellPath, args, cmd));
+			cmdFmt, shellPath, args, cmd) + 1);
 
 		sprintf(tmp, cmdFmt, shellPath, args, cmd);
 		

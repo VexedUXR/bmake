@@ -1615,7 +1615,7 @@ Cmd_Exec(const char *cmd, char **error)
 		Shell_Init();
 
 	cp = Shell_GetArgs();
-	output = _alloca((size_t)snprintf(NULL, 0, cmdFmt, shellPath, cp, cmd));
+	output = _alloca((size_t)snprintf(NULL, 0, cmdFmt, shellPath, cp, cmd) + 1);
 	sprintf(output, cmdFmt, shellPath, cp, cmd);
 
 	DEBUG1(VAR, "Capturing the output of command \"%s\"\n", cmd);
