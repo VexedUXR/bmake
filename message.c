@@ -44,7 +44,7 @@ MsgConsoleH(DWORD ev)
 	return TRUE;
 }
 
-static LRESULT
+static LRESULT CALLBACK
 MsgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) {
