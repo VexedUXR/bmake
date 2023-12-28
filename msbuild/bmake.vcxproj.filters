@@ -15,111 +15,111 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="arch.c">
+    <ClCompile Include="..\arch.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="buf.c">
+    <ClCompile Include="..\buf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="compat.c">
+    <ClCompile Include="..\compat.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cond.c">
+    <ClCompile Include="..\cond.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dir.c">
+    <ClCompile Include="..\dir.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dirname.c">
+    <ClCompile Include="..\dirname.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="for.c">
+    <ClCompile Include="..\for.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hash.c">
+    <ClCompile Include="..\hash.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="job.c">
+    <ClCompile Include="..\job.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lst.c">
+    <ClCompile Include="..\lst.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.c">
+    <ClCompile Include="..\main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="make.c">
+    <ClCompile Include="..\make.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="make_malloc.c">
+    <ClCompile Include="..\make_malloc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="meta.c">
+    <ClCompile Include="..\message.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="parse.c">
+    <ClCompile Include="..\meta.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="str.c">
+    <ClCompile Include="..\parse.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stresep.c">
+    <ClCompile Include="..\str.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="strlcpy.c">
+    <ClCompile Include="..\stresep.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="suff.c">
+    <ClCompile Include="..\strlcpy.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="targ.c">
+    <ClCompile Include="..\suff.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="trace.c">
+    <ClCompile Include="..\targ.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util.c">
+    <ClCompile Include="..\trace.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="var.c">
+    <ClCompile Include="..\util.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="message.c">
+    <ClCompile Include="..\var.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="buf.h">
+    <ClInclude Include="..\buf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dir.h">
+    <ClInclude Include="..\dir.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hash.h">
+    <ClInclude Include="..\hash.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="job.h">
+    <ClInclude Include="..\job.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lst.h">
+    <ClInclude Include="..\lst.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="make-conf.h">
+    <ClInclude Include="..\make.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="make.h">
+    <ClInclude Include="..\make_malloc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="make_malloc.h">
+    <ClInclude Include="..\make-conf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="meta.h">
+    <ClInclude Include="..\meta.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="str.h">
+    <ClInclude Include="..\str.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="trace.h">
+    <ClInclude Include="..\trace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

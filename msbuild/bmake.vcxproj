@@ -116,7 +116,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>$(ProjectDir)tre\$(Platform)\$(Configuration)\tre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\tre\$(Platform)\$(Configuration)\tre.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -134,7 +134,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>$(ProjectDir)tre\$(Platform)\$(Configuration)\tre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\tre\$(Platform)\$(Configuration)\tre.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -153,7 +153,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(ProjectDir)tre\$(Platform)\$(Configuration)\tre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\tre\$(Platform)\$(Configuration)\tre.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -172,47 +172,47 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(ProjectDir)tre\$(Platform)\$(Configuration)\tre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\tre\$(Platform)\$(Configuration)\tre.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="arch.c" />
-    <ClCompile Include="buf.c" />
-    <ClCompile Include="compat.c" />
-    <ClCompile Include="cond.c" />
-    <ClCompile Include="dir.c" />
-    <ClCompile Include="dirname.c" />
-    <ClCompile Include="for.c" />
-    <ClCompile Include="hash.c" />
-    <ClCompile Include="job.c" />
-    <ClCompile Include="lst.c" />
-    <ClCompile Include="main.c" />
-    <ClCompile Include="make.c" />
-    <ClCompile Include="make_malloc.c" />
-    <ClCompile Include="message.c" />
-    <ClCompile Include="meta.c" />
-    <ClCompile Include="parse.c" />
-    <ClCompile Include="str.c" />
-    <ClCompile Include="stresep.c" />
-    <ClCompile Include="strlcpy.c" />
-    <ClCompile Include="suff.c" />
-    <ClCompile Include="targ.c" />
-    <ClCompile Include="trace.c" />
-    <ClCompile Include="util.c" />
-    <ClCompile Include="var.c" />
+    <ClCompile Include="..\arch.c" />
+    <ClCompile Include="..\buf.c" />
+    <ClCompile Include="..\compat.c" />
+    <ClCompile Include="..\cond.c" />
+    <ClCompile Include="..\dir.c" />
+    <ClCompile Include="..\dirname.c" />
+    <ClCompile Include="..\for.c" />
+    <ClCompile Include="..\hash.c" />
+    <ClCompile Include="..\job.c" />
+    <ClCompile Include="..\lst.c" />
+    <ClCompile Include="..\main.c" />
+    <ClCompile Include="..\make.c" />
+    <ClCompile Include="..\make_malloc.c" />
+    <ClCompile Include="..\message.c" />
+    <ClCompile Include="..\meta.c" />
+    <ClCompile Include="..\parse.c" />
+    <ClCompile Include="..\str.c" />
+    <ClCompile Include="..\stresep.c" />
+    <ClCompile Include="..\strlcpy.c" />
+    <ClCompile Include="..\suff.c" />
+    <ClCompile Include="..\targ.c" />
+    <ClCompile Include="..\trace.c" />
+    <ClCompile Include="..\util.c" />
+    <ClCompile Include="..\var.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="buf.h" />
-    <ClInclude Include="dir.h" />
-    <ClInclude Include="hash.h" />
-    <ClInclude Include="job.h" />
-    <ClInclude Include="lst.h" />
-    <ClInclude Include="make-conf.h" />
-    <ClInclude Include="make.h" />
-    <ClInclude Include="make_malloc.h" />
-    <ClInclude Include="meta.h" />
-    <ClInclude Include="str.h" />
-    <ClInclude Include="trace.h" />
+    <ClInclude Include="..\buf.h" />
+    <ClInclude Include="..\dir.h" />
+    <ClInclude Include="..\hash.h" />
+    <ClInclude Include="..\job.h" />
+    <ClInclude Include="..\lst.h" />
+    <ClInclude Include="..\make-conf.h" />
+    <ClInclude Include="..\make.h" />
+    <ClInclude Include="..\make_malloc.h" />
+    <ClInclude Include="..\meta.h" />
+    <ClInclude Include="..\str.h" />
+    <ClInclude Include="..\trace.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
