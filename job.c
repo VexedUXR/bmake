@@ -1726,7 +1726,7 @@ FindShellByName(const char *name)
  *	provides the functionality it does in C. Each word consists of
  *	keyword and value separated by an equal sign. There should be no
  *	unnecessary spaces in the word. The keywords can be found at the
- *  Shell struct definition, at the top of this file.
+ *	Shell struct definition, at the top of this file.
  */
 bool
 Job_ParseShell(char *line)
