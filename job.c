@@ -1980,7 +1980,8 @@ void
 Job_End(void)
 {
 #ifdef CLEANUP
-	free(shell_freeIt);
+	for (int i = 0; i < NSHELLDATA; i++)
+		free(shell_freeIt[i]);
 #endif
 }
 
