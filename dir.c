@@ -391,7 +391,7 @@ OpenDirs_Remove(OpenDirs *odirs, const char *name)
 }
 
 /*
- * Returns 0 and the result of stat(2) or lstat(2) in *out_cst,
+ * Returns 0 and the result of stat(2) in *out_cst,
  * or -1 on error.
  */
 static int
@@ -438,12 +438,6 @@ cached_stats(const char *pathname, struct cached_stat *out_cst,
 
 int
 cached_stat(const char *pathname, struct cached_stat *cst)
-{
-	return cached_stats(pathname, cst, false);
-}
-
-int
-cached_lstat(const char *pathname, struct cached_stat *cst)
 {
 	return cached_stats(pathname, cst, false);
 }
@@ -510,7 +504,6 @@ Dir_End(void)
 	SearchPath_Clear(&dirSearchPath);
 	OpenDirs_Done(&openDirs);
 	HashTable_Done(&mtimes);
-	HashTable_Done(&lmtimes);
 #endif
 }
 

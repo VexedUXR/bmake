@@ -102,7 +102,6 @@ struct cached_stat {
 	unsigned short cst_mode;
 };
 
-int cached_lstat(const char *, struct cached_stat *);
 int cached_stat(const char *, struct cached_stat *);
 
 #endif
