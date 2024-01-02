@@ -317,8 +317,8 @@ MainParseArgDebug(const char *argvalue)
 
 finish:
 	opts.debug = debug;
-
-		setvbuf(opts.debug_file, NULL, _IONBF, 0);
+	
+	setvbuf(opts.debug_file, NULL, _IONBF, 0);
 	if (opts.debug_file != stdout)
 		setvbuf(stdout, NULL, _IONBF, 0);
 }
@@ -1375,6 +1375,14 @@ main_Init(int argc, char **argv)
 	InitVarTargets();
 
 	InitDefSysIncPath(syspath);
+
+	/*
+	 * If we are in text mode, text printed with CRLF
+	 * has a trailing newline. We switch to binary mode
+	 * to avoid this.
+	 */
+	_setmode(_fileno(stdout), _O_BINARY);
+	_setmode(_fileno(stderr), _O_BINARY);
 }
 
 /*

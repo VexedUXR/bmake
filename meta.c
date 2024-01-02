@@ -1084,18 +1084,7 @@ void meta_compat_catch(char *cmd)
 	if (sz <= 0)
 		return;
 
-	{
-		size_t len = strlen(cmd);
-		buf = _alloca(len + 2);
-
-		memcpy(buf, cmd, len);
-		buf[len] = '\n';
-		buf[len + 1] = '\0';
-
-		cmd = buf;
-	}
 	buf = _alloca(sz + 1);
-
 	if (ReadFile(childPipe[0], buf, sz, NULL, NULL) == 0)
 		Punt("failed to read from pipe: %s", strerr(GetLastError()));
 
@@ -1103,7 +1092,6 @@ void meta_compat_catch(char *cmd)
 	fflush(stdout);
 
 	buf[sz] = '\0';
-	meta_job_output(NULL, cmd, "");
 	meta_job_output(NULL, buf, "");
 
 	CloseHandle(childPipe[0]);
