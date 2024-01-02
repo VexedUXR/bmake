@@ -1641,7 +1641,8 @@ Cmd_Exec(const char *cmd, char **error)
 	Var_ReexportVars();
 
 	si.dwFlags = STARTF_USESTDHANDLES;
-	si.hStdOutput = si.hStdError = write;
+	si.hStdOutput = write;
+	si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
 	si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 
 	if (CreateProcessA(shellPath, output, NULL, NULL, TRUE, 0, NULL,
