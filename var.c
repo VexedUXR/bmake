@@ -3491,8 +3491,8 @@ ApplyModifier_IfElse(const char **pp, ModChain *ch)
 	if (cond_rc == CR_ERROR) {
 		Substring thenExpr = LazyBuf_Get(&thenBuf);
 		Substring elseExpr = LazyBuf_Get(&elseBuf);
-		Error("Bad conditional expression '%s' in '%s?%.*s:%.*s'",
-			expr->name, expr->name,
+		Error("Bad conditional expression '%s' before '?%.*s:%.*s'",
+			expr->name,
 			(int)Substring_Length(thenExpr), thenExpr.start,
 			(int)Substring_Length(elseExpr), elseExpr.start);
 		LazyBuf_Done(&thenBuf);
