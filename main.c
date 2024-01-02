@@ -318,8 +318,9 @@ MainParseArgDebug(const char *argvalue)
 finish:
 	opts.debug = debug;
 
-	if (opts.debug_file != stdout)
 		setvbuf(opts.debug_file, NULL, _IONBF, 0);
+	if (opts.debug_file != stdout)
+		setvbuf(stdout, NULL, _IONBF, 0);
 }
 
 /* Is path relative or does it contain any relative component "." or ".."? */
