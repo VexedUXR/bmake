@@ -909,11 +909,13 @@ TouchRegular(GNode *gn)
 	ft.dwHighDateTime = t.HighPart;
 
 	if ((fh = CreateFileA(file, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS,
-		FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE)
-		Punt("failed to create/open file \"%s\": %s", file,
-			strerr(GetLastError()));
-	if (SetFileTime(fh, NULL, &ft, &ft) == 0)
-		Punt("failed to set file time: %s", strerr(GetLastError()));
+		FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE ||
+		SetFileTime(fh, NULL, &ft, &ft) == 0) {
+		(void)fprintf(stderr, "*** couldn't touch %s: %s\n",
+			file, strerr(GetLastError()));
+		(void)fflush(stderr);
+		return;
+	}
 
 	CloseHandle(fh);
 }
