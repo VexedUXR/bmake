@@ -814,6 +814,8 @@ JobFinishDoneExited(Job *job, DWORD *inout_status)
 		(void)printf("*** [%s] Completed successfully\n",
 			job->node->name);
 	}
+
+	(void)fflush(stdout);
 }
 
 /*
