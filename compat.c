@@ -341,6 +341,9 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 			if (avail >= PIPESZ)
 				meta_compat_catch(cmdStart);
 		}
+
+		if (status == WAIT_FAILED)
+			Punt("failed to wait for process: %s", strerr(GetLastError()));
 	} else
 #endif
 	if (WaitForSingleObject(pi.hProcess, INFINITE) == WAIT_FAILED)
