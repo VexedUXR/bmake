@@ -1059,7 +1059,7 @@ static HANDLE childPipe[2];
 
 void meta_compat_start(void)
 {
-	if (CreatePipe(&childPipe[0], &childPipe[1], NULL, 0) == 0)
+	if (CreatePipe(&childPipe[0], &childPipe[1], NULL, PIPESZ) == 0)
 		Punt("failed to create pipe: %s", strerr(GetLastError()));
 	if (SetNamedPipeHandleState(childPipe[0], &(DWORD){PIPE_NOWAIT},
 		NULL, NULL) == 0)
@@ -1069,9 +1069,9 @@ void meta_compat_start(void)
 		Punt("failed to set pipe attributes: %s", strerr(GetLastError()));
 }
 
-HANDLE meta_compat_stdout(void)
+HANDLE *meta_compat_pipe(void)
 {
-	return childPipe[1];
+	return childPipe;
 }
 
 void meta_compat_catch(char *cmd)
@@ -1081,7 +1081,7 @@ void meta_compat_catch(char *cmd)
 
 	if (PeekNamedPipe(childPipe[0], NULL, 0, NULL, &sz, NULL) == 0)
 		Punt("failed to peek pipe: %s", strerr(GetLastError()));
-	if (sz <= 0)
+	if (sz == 0)
 		return;
 
 	buf = _alloca(sz + 1);
@@ -1093,7 +1093,11 @@ void meta_compat_catch(char *cmd)
 
 	buf[sz] = '\0';
 	meta_job_output(NULL, buf, "");
+}
 
+void
+meta_compat_done(void)
+{
 	CloseHandle(childPipe[0]);
 	CloseHandle(childPipe[1]);
 }

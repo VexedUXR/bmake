@@ -1609,7 +1609,7 @@ char *
 Cmd_Exec(const char *cmd, char **error)
 {
 	DWORD status;		/* command exit status */
-	Buffer buf;		/* buffer to store the result */
+	Buffer buf = {0};		/* buffer to store the result */
 	DWORD bytes_read;
 	char *output;
 	char *cp;
@@ -1629,7 +1629,7 @@ Cmd_Exec(const char *cmd, char **error)
 
 	DEBUG1(VAR, "Capturing the output of command \"%s\"\n", cmd);
 
-	if (CreatePipe(&read, &write, NULL, 0) == 0)
+	if (CreatePipe(&read, &write, NULL, PIPESZ) == 0)
 		Punt("failed to create pipe: %s", strerr(GetLastError()));
 	if (SetNamedPipeHandleState(read, &(DWORD){PIPE_NOWAIT},
 		NULL, NULL) == 0)
@@ -1649,7 +1649,28 @@ Cmd_Exec(const char *cmd, char **error)
 		NULL, &si, &pi) == 0)
 		Punt("could not create process: %s",
 			strerr(GetLastError()));
-	if (WaitForSingleObject(pi.hProcess, INFINITE) == WAIT_FAILED)
+
+	while ((status = WaitForSingleObject(pi.hProcess, PROCESSWAIT))
+		== WAIT_TIMEOUT) {
+		DWORD avail;
+
+		if (PeekNamedPipe(read, NULL, 0, NULL, &avail, NULL) == 0)
+			Punt("failed to peek pipe: %s", strerr(GetLastError()));
+
+		if (avail >= PIPESZ) {
+			if (buf.cap == 0)
+				Buf_InitSize(&buf, avail);
+
+			while (ReadFile(read, result, sizeof result, &bytes_read,
+				NULL) != 0)
+				Buf_AddBytes(&buf, result, (size_t)bytes_read);
+
+			if ((status = GetLastError()) != ERROR_NO_DATA)
+				Punt("failed to read from pipe: %s", strerr(status));
+		}
+	}
+
+	if (status == WAIT_FAILED)
 		Punt("failed to wait for process: %s",
 			strerr(GetLastError()));
 	if (GetExitCodeProcess(pi.hProcess, &status) == 0)
@@ -1659,7 +1680,8 @@ Cmd_Exec(const char *cmd, char **error)
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
 
-	Buf_Init(&buf);
+	if (buf.cap == 0)
+		Buf_Init(&buf);
 
 	while (ReadFile(read, result, sizeof result, &bytes_read, NULL) != 0)
 		Buf_AddBytes(&buf, result, (size_t)bytes_read);

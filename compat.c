@@ -306,7 +306,7 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 	if (useMeta) {
 		STARTUPINFOA si = {sizeof si, 0};
 		si.dwFlags = STARTF_USESTDHANDLES;
-		si.hStdOutput = si.hStdError = meta_compat_stdout();
+		si.hStdOutput = si.hStdError = meta_compat_pipe()[1];
 		si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 
 		if (CreateProcessA(shellPath, cmd, NULL, NULL, TRUE, 0, NULL,
@@ -328,14 +328,31 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 	/*
 	 * The child is off and running. Now all we can do is wait...
 	 */
+#ifdef USE_META
+	if (useMeta) {
+		while ((status = WaitForSingleObject(pi.hProcess, PROCESSWAIT))
+			== WAIT_TIMEOUT) {
+			DWORD avail;
+
+			if (PeekNamedPipe(meta_compat_pipe()[0], NULL, 0, NULL, &avail, NULL)
+				== 0)
+				Punt("failed to peek pipe: %s", strerr(GetLastError()));
+
+			if (avail >= PIPESZ)
+				meta_compat_catch(cmdStart);
+		}
+	} else
+#endif
 	if (WaitForSingleObject(pi.hProcess, INFINITE) == WAIT_FAILED)
 		Punt("failed to wait for process: %s", strerr(GetLastError()));
 
 	(void)GetExitCodeProcess(pi.hProcess, &status);
 
 #ifdef USE_META
-	if (useMeta)
+	if (useMeta) {
 		meta_compat_catch(cmdStart);
+		meta_compat_done();
+	}
 #endif
 
 	if (status != 0) {

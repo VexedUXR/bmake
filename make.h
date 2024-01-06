@@ -797,6 +797,17 @@ void ForLoop_Free(struct ForLoop *);
 void For_Break(struct ForLoop *);
 
 /* main.c */
+
+/*
+ * If a process's output pipe is full, any writes to it block.
+ * While the process is running, we check if the pipe is full
+ * every PROCESSWAIT ms.
+ */
+#define PROCESSWAIT 100
+
+/* pipe size */
+#define PIPESZ 4096
+
 void Main_ParseArgLine(const char *);
 char * MAKE_ATTR_USE Cmd_Exec(const char *, char **);
 void Error(MAKE_ATTR_PRINTFLIKE const char *, ...);
