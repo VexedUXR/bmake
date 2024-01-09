@@ -1035,7 +1035,7 @@ Job_CheckCommands(GNode *gn, void (*abortProc)(const char *, ...))
 		return false;
 	}
 
-	abortProc("%s: don't know how to make %s. Stop", progname, gn->name);
+	abortProc("don't know how to make %s. Stop", gn->name);
 	return false;
 }
 

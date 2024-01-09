@@ -1766,6 +1766,7 @@ Fatal(MAKE_ATTR_PRINTFLIKE const char *fmt, ...)
 		Job_Wait();
 
 	(void)fflush(stdout);
+	fprintf(stderr, "%s: ", progname);
 	va_start(ap, fmt);
 	(void)vfprintf(stderr, fmt, ap);
 	va_end(ap);
