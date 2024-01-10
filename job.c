@@ -713,6 +713,7 @@ JobWriteCommands(Job *job)
 		seen = true;
 	}
 
+	DEBUG0(JOB, "\n");
 	return seen;
 }
 
