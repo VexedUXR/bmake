@@ -1141,17 +1141,18 @@ JobWriteShellCommands(Job *job, GNode *gn, bool *out_run)
 
 	/*
 	 * We dont usually create a temporary script file,
-	 * unless if we are required to (by -dn).
+	 * unless if we are required to by -dn.
 	 */
 	if (DEBUG(SCRIPT)) {
-		/*
-		 * Generate 6 random characters and append them to
-		 * tmpdir\make
-		 */
 		int i;
 		char tmp[7];
 		char *tfile, *tmpdir;
 		FILE *fp;
+
+		/*
+		 * Generate 6 random characters and append them to
+		 * tmpdir\make
+		 */
 
 		for (i = 0; i < 6; i++)
 			tmp[i] = rand() % ('Z' - 'A' + 1) + 'A';
