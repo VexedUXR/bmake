@@ -1252,11 +1252,15 @@ JobStart(GNode *gn, bool special)
 		 * This still sets up job->tailCmds correctly.
 		 */
 		SwitchOutputTo(gn);
+
 		job->cmdBuffer = bmake_malloc(sizeof *job->cmdBuffer);
 		Buf_Init(job->cmdBuffer);
+
 		if (cmdsOK)
 			JobWriteCommands(job);
 
+		/* Replace trailing separator. */
+		job->cmdBuffer->data[job->cmdBuffer->len - 1] = '\n';
 		printf("%s", job->cmdBuffer->data);
 
 		run = false;
