@@ -1264,7 +1264,8 @@ Dir_FindHereOrAbove(const char *here, const char *needle)
 				 * directory.
 				 */
 				try_end = try + strlen(try);
-				while (try_end > try && !isAbs(*try_end))
+				while (try_end > try && *try_end != '/' &&
+					*try_end != '\\')
 					try_end--;
 				if (try_end > try)
 					*try_end = '\0';	/* chop! */

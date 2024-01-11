@@ -165,7 +165,7 @@ meta_name(char *mname, size_t mnamelen,
 		int x;
 
 		ldname = strlen(dname);
-		if (strncmp(dname, dtp, ldname) == 0 && isAbs(dtp[ldname]))
+		if (strncmp(dname, dtp, ldname) == 0 && (dtp[ldname] == '/' || dtp[ldname] == '\\'))
 			x = snprintf(mname, mnamelen, "%s\\%s.meta", dname, &tname[ldname + 1]);
 		else
 			x = snprintf(mname, mnamelen, "%s\\%s.meta", dname, tname);
