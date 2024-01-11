@@ -399,7 +399,7 @@ PrintStackTrace(bool includingInnermost)
 		const char *fname = entry->name.str;
 		char dirbuf[MAXPATHLEN + 1];
 
-		if (!isAbs(fname[0]) && strcmp(fname, "(stdin)") != 0) {
+		if (!isAbs(fname) && strcmp(fname, "(stdin)") != 0) {
 			const char *realPath = _fullpath(dirbuf, fname, MAXPATHLEN);
 			if (realPath != NULL)
 				fname = realPath;
@@ -482,7 +482,7 @@ PrintLocation(FILE *f, bool useVars, const GNode *gn)
 	} else
 		return;
 
-	if (!useVars || isAbs(fname[0]) || strcmp(fname, "(stdin)") == 0) {
+	if (!useVars || isAbs(fname) || strcmp(fname, "(stdin)") == 0) {
 		(void)fprintf(f, "\"%s\" line %u: ", fname, lineno);
 		return;
 	}
@@ -490,7 +490,7 @@ PrintLocation(FILE *f, bool useVars, const GNode *gn)
 	dir = Var_Value(SCOPE_GLOBAL, ".PARSEDIR");
 	if (dir.str == NULL)
 		dir.str = ".";
-	if (!isAbs(dir.str[0]))
+	if (!isAbs(dir.str))
 		dir.str = _fullpath(dirbuf, dir.str, MAXPATHLEN);
 
 	base = Var_Value(SCOPE_GLOBAL, ".PARSEFILE");
@@ -1237,7 +1237,7 @@ IncludeFile(const char *file, bool isSystem, bool depinc, bool silent)
 	char *fullname;		/* full pathname of file */
 	int fd;
 
-	fullname = isAbs(file[0]) ? bmake_strdup(file) : NULL;
+	fullname = isAbs(file) ? bmake_strdup(file) : NULL;
 
 	if (fullname == NULL && !isSystem)
 		fullname = FindInQuotPath(file);

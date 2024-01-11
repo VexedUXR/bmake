@@ -146,7 +146,7 @@ meta_name(char *mname, size_t mnamelen,
 			 * of generating the same meta file name that we will
 			 * next time through.
 			 */
-			if (isAbs(tname[0])) {
+			if (isAbs(tname)) {
 				strlcpy(buf, tname, sizeof buf);
 			} else {
 				snprintf(buf, sizeof buf, "%s\\%s", cwd, tname);
@@ -701,7 +701,7 @@ meta_ignore(GNode *gn, const char *p)
 	if (p == NULL)
 		return true;
 
-	if (isAbs(*p)) {
+	if (isAbs(p)) {
 		/* first try the raw path "as is" */
 		if (has_any_prefix(p, &metaIgnorePaths)) {
 #ifdef DEBUG_META_MODE

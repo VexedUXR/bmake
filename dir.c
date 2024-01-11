@@ -1213,7 +1213,7 @@ Dir_FindFile(const char *name, SearchPath *path)
 		base = trailing_dot;	/* we were given a trailing "/" */
 	}
 
-	if (!isAbs(name[0])) {
+	if (!isAbs(name)) {
 		if (FindFileRelative(path, seenDotLast, name, &file))
 			return file;
 	} else {

@@ -329,7 +329,7 @@ IsRelativePath(const char *path)
 {
 	char *p, *s;
 
-	if (!isAbs(path[0]))
+	if (!isAbs(path))
 		return true;
 
 	/* Make life easier by replacing all backslashes. */
@@ -744,7 +744,7 @@ Main_SetObjdir(bool writable, MAKE_ATTR_PRINTFLIKE const char *fmt, ...)
 	vsnprintf(path = buf, MAXPATHLEN, fmt, ap);
 	va_end(ap);
 
-	if (!isAbs(path[0])) {
+	if (!isAbs(path)) {
 		if (snprintf(buf2, MAXPATHLEN, "%s\\%s", curdir, path) <= MAXPATHLEN)
 			path = buf2;
 		else
@@ -1054,11 +1054,11 @@ InitVarMake(const char *argv0)
 {
 	const char *make = argv0;
 
-	if (!isAbs(argv0[0]) && lastSlash(argv0) != NULL) {
+	if (!isAbs(argv0) && lastSlash(argv0) != NULL) {
 		char pathbuf[MAXPATHLEN];
 		const char *abspath = cached_realpath(argv0, pathbuf);
 		struct stat st;
-		if (abspath != NULL && isAbs(abspath[0]) &&
+		if (abspath != NULL && isAbs(abspath) &&
 		    stat(make, &st) == 0)
 			make = abspath;
 	}
@@ -1553,7 +1553,7 @@ ReadMakefile(const char *fname)
 		Var_Set(SCOPE_INTERNAL, "MAKEFILE", "");
 	} else {
 		/* if we've chdir'd, rebuild the path name */
-		if (strcmp(curdir, objdir) != 0 && !isAbs(*fname)) {
+		if (strcmp(curdir, objdir) != 0 && !isAbs(fname)) {
 			path = str_concat3(curdir, "\\", fname);
 			fd = open(path, O_RDONLY);
 			if (fd != -1) {
@@ -1858,7 +1858,7 @@ purge_relative_cached_realpaths(void)
 	he = HashIter_Next(&hi);
 	while (he != NULL) {
 		nhe = HashIter_Next(&hi);
-		if (!isAbs(he->key[0])) {
+		if (!isAbs(he->key)) {
 			DEBUG1(DIR, "cached_realpath: purging %s\n", he->key);
 			HashTable_DeleteEntry(&cached_realpaths, he);
 			/*

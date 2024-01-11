@@ -1726,7 +1726,7 @@ ModifyWord_Realpath(Substring word, SepBuf *buf, void *data MAKE_ATTR_UNUSED)
 
 	assert(word.end[0] == '\0');	/* assume null-terminated word */
 	rp = cached_realpath(word.start, rbuf);
-	if (rp != NULL && isAbs(*rp) && stat(rp, &st) == 0)
+	if (rp != NULL && isAbs(rp) && stat(rp, &st) == 0)
 		SepBuf_AddStr(buf, rp);
 	else
 		SepBuf_AddSubstring(buf, word);
