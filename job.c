@@ -1360,9 +1360,6 @@ again:
 	for (i = job->curPos + nr - 1;
 		 i >= job->curPos && i != (size_t)-1; i--) {
 		if (job->outBuf[i] == '\n') {
-			if (job->outBuf[i - 1] == '\r')
-				i--;
-
 			gotNL = true;
 			break;
 		}
@@ -1479,31 +1476,31 @@ Job_CatchChildren(void)
 		return;
 
 	for (job = job_table; job < job_table_end; job++) {
-		DWORD status; /* Exit/termination status */
-
-		if (job->status < JOB_ST_RUNNING)
+		if (job->status != JOB_ST_RUNNING)
 			continue;
 
-		while ((status = WaitForSingleObject(job->handle, PROCESSWAIT))
-			== WAIT_TIMEOUT) {
-			DWORD avail;
+		switch (WaitForSingleObject(job->handle, 0)) {
+		case WAIT_OBJECT_0:
+			DWORD status; /* Exit/termination status */
 
-			if (PeekNamedPipe(job->inPipe, NULL, 0, NULL, &avail, NULL) == 0)
-				Punt("failed to peek pipe: %s", strerr(GetLastError()));
-			if (avail >= PIPESZ)
-				CollectOutput(job, false);
-		}
+			if (GetExitCodeProcess(job->handle, &status) == 0)
+				Punt("failed to get exit code for process: %s",
+					strerr(GetLastError()));
 
-		if (status == WAIT_FAILED)
+			DEBUG2(JOB, "Process %d exited/stopped status %lx.\n",
+				job->pid, status);
+
+			job->status = JOB_ST_FINISHED;
+			job->exit_status = status;
+
+			JobFinish(job, status);
+			break;
+		case WAIT_TIMEOUT:
+			CollectOutput(job, false);
+			break;
+		case WAIT_FAILED:
 			Punt("failed to wait for process: %s", strerr(GetLastError()));
-		if (GetExitCodeProcess(job->handle, &status) == 0)
-			Punt("failed to get exit code for process: %s",
-				strerr(GetLastError()));
-
-		job->status = JOB_ST_FINISHED;
-		job->exit_status = status;
-
-		JobFinish(job, status);
+		}
 	}
 }
 
