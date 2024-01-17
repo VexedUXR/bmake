@@ -1,4 +1,4 @@
-/*	$NetBSD: str.c,v 1.99 2023/06/23 05:03:04 rillig Exp $	*/
+/*	$NetBSD: str.c,v 1.102 2024/01/05 23:22:06 rillig Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990, 1993
@@ -104,6 +104,10 @@ str_concat3(const char *s1, const char *s2, const char *s3)
 /*
  * Fracture a string into an array of words (as delineated by tabs or spaces)
  * taking quotation marks into account.
+ *
+ * A string that is empty or only contains whitespace nevertheless results in
+ * a single word.  This is unexpected in many places, and the caller needs to
+ * correct for this edge case.
  *
  * If expand is true, quotes are removed and escape sequences such as \r, \t,
  * etc... are expanded. In this case, return NULL on parse errors.
@@ -320,17 +324,13 @@ StrMatchResult
 Str_Match(const char *str, const char *pat)
 {
 	StrMatchResult res = { NULL, false };
-	const char *fixed_str, *fixed_pat;
-	bool asterisk, matched;
-
-	asterisk = false;
-	fixed_str = str;
-	fixed_pat = pat;
+	bool asterisk = false;
+	const char *fixed_str = str;
+	const char *fixed_pat = pat;
 
 match_fixed_length:
 	str = fixed_str;
 	pat = fixed_pat;
-	matched = false;
 	for (; *pat != '\0' && *pat != '*'; str++, pat++) {
 		if (*str == '\0')
 			return res;
@@ -348,7 +348,7 @@ match_fixed_length:
 			if (*pat == ']' || *pat == '\0') {
 				if (neg)
 					goto end_of_char_list;
-				goto match_done;
+				goto no_match;
 			}
 			if (*pat == *str)
 				goto end_of_char_list;
@@ -367,7 +367,7 @@ match_fixed_length:
 
 		end_of_char_list:
 			if (neg && *pat != ']' && *pat != '\0')
-				goto match_done;
+				goto no_match;
 			while (*pat != ']' && *pat != '\0')
 				pat++;
 			if (*pat == '\0')
@@ -377,43 +377,40 @@ match_fixed_length:
 
 		if (*pat == '\\')	/* match the next character exactly */
 			pat++;
-		if (*pat != *str)
-			goto match_done;
-	}
-	matched = true;
-
-match_done:
-	if (!asterisk) {
-		if (!matched)
-			return res;
-		if (*pat == '\0') {
-			res.matched = *str == '\0';
-			return res;
-		}
-		asterisk = true;
-	} else {
-		if (!matched) {
-			fixed_str++;
-			goto match_fixed_length;
-		}
-		if (*pat == '\0') {
-			if (*str == '\0') {
-				res.matched = true;
-				return res;
+		if (*pat != *str) {
+			if (asterisk && str == fixed_str) {
+				while (*str != '\0' && *str != *pat)
+					str++;
+				fixed_str = str;
+				goto match_fixed_length;
 			}
-			fixed_str += strlen(str);
-			goto match_fixed_length;
+			goto no_match;
 		}
 	}
 
-	while (*pat == '*')
-		pat++;
-	if (*pat == '\0') {
-		res.matched = true;
-		return res;
+	if (*pat == '*') {
+		asterisk = true;
+		while (*pat == '*')
+			pat++;
+		if (*pat == '\0') {
+			res.matched = true;
+			return res;
+		}
+		fixed_str = str;
+		fixed_pat = pat;
+		goto match_fixed_length;
 	}
-	fixed_str = str;
-	fixed_pat = pat;
+	if (asterisk && *str != '\0') {
+		fixed_str += strlen(str);
+		goto match_fixed_length;
+	}
+	res.matched = *str == '\0';
+	return res;
+
+no_match:
+	if (!asterisk)
+		return res;
+	fixed_str++;
 	goto match_fixed_length;
 }
 

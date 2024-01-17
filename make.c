@@ -1,4 +1,4 @@
-/*	$NetBSD: make.c,v 1.259 2023/02/14 21:38:31 rillig Exp $	*/
+/*	$NetBSD: make.c,v 1.262 2024/01/05 23:22:06 rillig Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990, 1993
@@ -131,7 +131,7 @@ GNodeType_ToString(GNodeType type, void **freeIt)
 {
 	Buffer buf;
 
-	Buf_InitSize(&buf, 32);
+	Buf_Init(&buf);
 #define ADD(flag) Buf_AddFlag(&buf, (type & (flag)) != OP_NONE, #flag)
 	ADD(OP_DEPENDS);
 	ADD(OP_FORCE);
@@ -173,7 +173,7 @@ GNodeFlags_ToString(GNodeFlags flags, void **freeIt)
 {
 	Buffer buf;
 
-	Buf_InitSize(&buf, 32);
+	Buf_Init(&buf);
 	Buf_AddFlag(&buf, flags.remake, "REMAKE");
 	Buf_AddFlag(&buf, flags.childMade, "CHILDMADE");
 	Buf_AddFlag(&buf, flags.force, "FORCE");
@@ -329,13 +329,12 @@ GNode_IsOODate(GNode *gn)
 		 * out-of-date.
 		 */
 		if (DEBUG(MAKE)) {
-			if (gn->type & OP_FORCE) {
+			if (gn->type & OP_FORCE)
 				debug_printf("! operator...");
-			} else if (gn->type & OP_PHONY) {
+			else if (gn->type & OP_PHONY)
 				debug_printf(".PHONY node...");
-			} else {
+			else
 				debug_printf(".EXEC node...");
-			}
 		}
 		oodate = true;
 	} else if (IsOODateRegular(gn)) {
@@ -439,11 +438,10 @@ Make_HandleUse(GNode *cgn, GNode *pgn)
 		 * We don't need to do this for commands.
 		 * They get expanded properly when we execute.
 		 */
-		if (gn->uname == NULL) {
+		if (gn->uname == NULL)
 			gn->uname = gn->name;
-		} else {
+		else
 			free(gn->name);
-		}
 		gn->name = Var_Subst(gn->uname, pgn, VARE_WANTRES);
 		/* TODO: handle errors */
 		if (gn->uname != NULL && strcmp(gn->name, gn->uname) != 0) {
@@ -545,9 +543,8 @@ Make_Recheck(GNode *gn)
 	 * depend on FRC to be made, so we have to check for gn->children
 	 * being empty as well.
 	 */
-	if (!Lst_IsEmpty(gn->commands) || Lst_IsEmpty(gn->children)) {
+	if (!Lst_IsEmpty(gn->commands) || Lst_IsEmpty(gn->children))
 		gn->mtime = now;
-	}
 #else
 	/*
 	 * This is what Make does and it's actually a good thing, as it
@@ -688,9 +685,8 @@ Make_Update(GNode *cgn)
 	 * now -- some rules won't actually update the file. If the file
 	 * still doesn't exist, make its mtime now.
 	 */
-	if (cgn->made != UPTODATE) {
+	if (cgn->made != UPTODATE)
 		mtime = Make_Recheck(cgn);
-	}
 
 	/*
 	 * If this is a `::' node, we must consult its first instance
@@ -1224,7 +1220,7 @@ MakePrintStatusList(GNodeList *gnodes, int *errors)
 static void
 ExamineLater(GNodeList *examine, GNodeList *toBeExamined)
 {
-	ListNode *ln;
+	GNodeListNode *ln;
 
 	for (ln = toBeExamined->first; ln != NULL; ln = ln->next) {
 		GNode *gn = ln->datum;

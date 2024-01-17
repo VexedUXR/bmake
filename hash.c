@@ -1,4 +1,4 @@
-/*	$NetBSD: hash.c,v 1.72 2022/02/09 21:09:24 rillig Exp $	*/
+/*	$NetBSD: hash.c,v 1.74 2023/12/19 19:33:39 rillig Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990 The Regents of the University of California.
@@ -69,7 +69,7 @@
  * SUCH DAMAGE.
  */
 
-/* Hash tables with string keys. */
+ /* Hash tables with string keys and pointer values. */
 
 #include "make.h"
 
@@ -112,7 +112,7 @@ Hash_Substring(Substring key)
 static HashEntry *
 HashTable_Find(HashTable *t, Substring key, unsigned int h)
 {
-	HashEntry *e;
+	HashEntry *he;
 	unsigned int chainlen = 0;
 	size_t keyLen = Substring_Length(key);
 
@@ -121,18 +121,18 @@ HashTable_Find(HashTable *t, Substring key, unsigned int h)
 	    t, h, (int)keyLen, key.start);
 #endif
 
-	for (e = t->buckets[h & t->bucketsMask]; e != NULL; e = e->next) {
+	for (he = t->buckets[h & t->bucketsMask]; he != NULL; he = he->next) {
 		chainlen++;
-		if (e->key_hash == h &&
-		    strncmp(e->key, key.start, keyLen) == 0 &&
-		    e->key[keyLen] == '\0')
+		if (he->hash == h &&
+		    strncmp(he->key, key.start, keyLen) == 0 &&
+		    he->key[keyLen] == '\0')
 			break;
 	}
 
 	if (chainlen > t->maxchain)
 		t->maxchain = chainlen;
 
-	return e;
+	return he;
 }
 
 /* Set up the hash table. */
@@ -206,7 +206,7 @@ HashTable_FindValueBySubstringHash(HashTable *t, Substring key, unsigned int h)
 
 /*
  * Make the hash table larger. Any bucket numbers from the old table become
- * invalid; the hash codes stay valid though.
+ * invalid; the hash values stay valid though.
  */
 static void
 HashTable_Enlarge(HashTable *t)
@@ -225,8 +225,8 @@ HashTable_Enlarge(HashTable *t)
 		HashEntry *he = oldBuckets[i];
 		while (he != NULL) {
 			HashEntry *next = he->next;
-			he->next = newBuckets[he->key_hash & newMask];
-			newBuckets[he->key_hash & newMask] = he;
+			he->next = newBuckets[he->hash & newMask];
+			newBuckets[he->hash & newMask] = he;
 			he = next;
 		}
 	}
@@ -263,7 +263,7 @@ HashTable_CreateEntry(HashTable *t, const char *key, bool *out_isNew)
 
 	he = bmake_malloc(sizeof *he + (size_t)(keyEnd - key));
 	he->value = NULL;
-	he->key_hash = h;
+	he->hash = h;
 	memcpy(he->key, key, (size_t)(keyEnd - key) + 1);
 
 	he->next = t->buckets[h & t->bucketsMask];
@@ -286,7 +286,7 @@ HashTable_Set(HashTable *t, const char *key, void *value)
 void
 HashTable_DeleteEntry(HashTable *t, HashEntry *he)
 {
-	HashEntry **ref = &t->buckets[he->key_hash & t->bucketsMask];
+	HashEntry **ref = &t->buckets[he->hash & t->bucketsMask];
 	HashEntry *p;
 
 	for (; (p = *ref) != NULL; ref = &p->next) {

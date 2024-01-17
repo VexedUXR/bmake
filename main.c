@@ -214,8 +214,7 @@ MainParseArgDebugFile(const char *arg)
 
 	opts.debug_file = fopen(fname, mode);
 	if (opts.debug_file == NULL) {
-		fprintf(stderr, "Cannot open debug file \"%s\"\n",
-		    fname);
+		fprintf(stderr, "Cannot open debug file \"%s\"\n", fname);
 		exit(2);
 	}
 	free(fname);
@@ -401,9 +400,9 @@ MainParseArgJobs(const char *arg)
 	if (*p != '\0') {
 		double d;
 
-		if (*p == 'C') {
+		if (*p == 'C')
 			d = (opts.maxJobs > 0) ? opts.maxJobs : 1;
-		} else if (*p == '.') {
+		else if (*p == '.') {
 			d = strtod(arg, &end);
 			p = end;
 		} else
@@ -789,22 +788,17 @@ SetVarObjdir(bool writable, const char *var, const char *suffix)
 }
 
 /*
- * Splits str into words, adding them to the list.
+ * Splits str into words (in-place, modifying it), adding them to the list.
  * The string must be kept alive as long as the list.
  */
-int
-str2Lst_Append(StringList *lp, char *str)
+void
+AppendWords(StringList *lp, char *str)
 {
-	char *cp;
-	int n;
-
+	char *p;
 	const char *sep = " \t";
 
-	for (n = 0, cp = strtok(str, sep); cp != NULL; cp = strtok(NULL, sep)) {
-		Lst_Append(lp, cp);
-		n++;
-	}
-	return n;
+	for (p = strtok(str, sep); p != NULL; p = strtok(NULL, sep))
+		Lst_Append(lp, p);
 }
 
 /* Allow makefiles some control over the mode we run in. */
@@ -1075,7 +1069,7 @@ static void
 InitDefSysIncPath(char *syspath)
 {
 	static char defsyspath[MAXPATHLEN];
-	char *start, *cp;
+	char *start, *p;
 
 	/*
 	 * If no user-supplied system path was given (through the -m option)
@@ -1089,11 +1083,11 @@ InitDefSysIncPath(char *syspath)
 	else
 		syspath = bmake_strdup(syspath);
 
-	for (start = syspath; *start != '\0'; start = cp) {
-		for (cp = start; *cp != '\0' && *cp != ';'; cp++)
+	for (start = syspath; *start != '\0'; start = p) {
+		for (p = start; *p != '\0' && *p != ';'; p++)
 			continue;
-		if (*cp == ';')
-			*cp++ = '\0';
+		if (*p == ';')
+			*p++ = '\0';
 
 		/* look for magic parent directory search string */
 		if (strncmp(start, ".../", 4) == 0) {
@@ -1184,17 +1178,17 @@ InitVpath(void)
 	/* TODO: handle errors */
 	path = vpath;
 	do {
-		char *cp;
+		char *p;
 		/* skip to end of directory */
-		for (cp = path; *cp != ';' && *cp != '\0'; cp++);
+		for (p = path; *p != ';' && *p != '\0'; p++);
 
 		/* Save terminator character so know when to stop */
-		savec = *cp;
-		*cp = '\0';
+		savec = *p;
+		*p = '\0';
 		/* Add directory to search path */
 		(void)SearchPath_Add(&dirSearchPath, path);
-		*cp = savec;
-		path = cp + 1;
+		*p = savec;
+		path = p + 1;
 	} while (savec == ';');
 	free(vpath);
 }
@@ -1220,7 +1214,7 @@ ReadFirstDefaultMakefile(void)
 	    SCOPE_CMDLINE, VARE_WANTRES);
 	/* TODO: handle errors */
 
-	(void)str2Lst_Append(&makefiles, prefs);
+	AppendWords(&makefiles, prefs);
 
 	for (ln = makefiles.first; ln != NULL; ln = ln->next)
 		if (ReadMakefile(ln->datum))
@@ -1612,7 +1606,7 @@ Cmd_Exec(const char *cmd, char **error)
 	Buffer buf = {0};		/* buffer to store the result */
 	DWORD bytes_read;
 	char *output;
-	char *cp;
+	char *p;
 	DWORD saved_errno;
 	char result[BUFSIZ];
 
@@ -1623,9 +1617,9 @@ Cmd_Exec(const char *cmd, char **error)
 	if (shellPath == NULL)
 		Shell_Init();
 
-	cp = Shell_GetArgs();
-	output = _alloca((size_t)snprintf(NULL, 0, cmdFmt, shellPath, cp, cmd) + 1);
-	sprintf(output, cmdFmt, shellPath, cp, cmd);
+	p = Shell_GetArgs();
+	output = _alloca((size_t)snprintf(NULL, 0, cmdFmt, shellPath, p, cmd) + 1);
+	sprintf(output, cmdFmt, shellPath, p, cmd);
 
 	DEBUG1(VAR, "Capturing the output of command \"%s\"\n", cmd);
 
@@ -1698,13 +1692,13 @@ Cmd_Exec(const char *cmd, char **error)
 	}
 
 	output = Buf_DoneData(&buf);
-	for (cp = output; *cp != '\0'; cp++)
+	for (p = output; *p != '\0'; p++)
 		/*
 		 * XXX: This makes it so that there are
 		 * two spaces in the case of \r\n.
 		 */
-		if (*cp == '\n' || *cp == '\r')
-			*cp = ' ';
+		if (*p == '\n' || *p == '\r')
+			*p = ' ';
 
 	if (status != 0)
 		*error = str_concat3(
@@ -1851,13 +1845,13 @@ unlink_file(const char *file)
 static void
 purge_relative_cached_realpaths(void)
 {
-	HashEntry *he, *nhe;
+	HashEntry *he, *next;
 	HashIter hi;
 
 	HashIter_Init(&hi, &cached_realpaths);
 	he = HashIter_Next(&hi);
 	while (he != NULL) {
-		nhe = HashIter_Next(&hi);
+		next = HashIter_Next(&hi);
 		if (!isAbs(he->key)) {
 			DEBUG1(DIR, "cached_realpath: purging %s\n", he->key);
 			HashTable_DeleteEntry(&cached_realpaths, he);
@@ -1866,7 +1860,7 @@ purge_relative_cached_realpaths(void)
 			 * free them or document why they cannot be freed.
 			 */
 		}
-		he = nhe;
+		he = next;
 	}
 }
 

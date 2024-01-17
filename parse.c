@@ -117,9 +117,7 @@ typedef enum {
 	GS_NO			/* the file is not guarded */
 } GuardState;
 
-/*
- * A file being read.
- */
+/* A file being parsed. */
 typedef struct IncludedFile {
 	FStr name;		/* absolute or relative to the cwd */
 	unsigned lineno;	/* 1-based */
@@ -314,6 +312,23 @@ enum PosixState posix_state = PS_NOT_YET;
 
 static HashTable /* full file name -> Guard */ guards;
 
+
+static List *
+Lst_New(void)
+{
+	List *list = bmake_malloc(sizeof *list);
+	Lst_Init(list);
+	return list;
+}
+
+static void
+Lst_Free(List *list)
+{
+
+	Lst_Done(list);
+	free(list);
+}
+
 static IncludedFile *
 GetInclude(size_t i)
 {
@@ -321,7 +336,7 @@ GetInclude(size_t i)
 	return Vector_Get(&includes, i);
 }
 
-/* The makefile that is currently being read. */
+/* The makefile or the body of a .for loop that is currently being read. */
 static IncludedFile *
 CurFile(void)
 {
@@ -368,7 +383,7 @@ LoadFile(const char *path, int fd)
 	}
 	assert(buf.len <= buf.cap);
 
-	if (!Buf_EndsWith(&buf, '\n'))
+	if (buf.len > 0 && !Buf_EndsWith(&buf, '\n'))
 		Buf_AddByte(&buf, '\n');
 
 	return buf;		/* may not be null-terminated */
@@ -428,8 +443,8 @@ IsEscaped(const char *line, const char *p)
 }
 
 /*
- * Add the filename and lineno to the GNode so that we remember where its
- * last command was added or where it was mentioned in a .depend file.
+ * Remember the location (filename and lineno) where the last command was
+ * added or where the node was mentioned in a .depend file.
  */
 static void
 RememberLocation(GNode *gn)
@@ -1735,10 +1750,7 @@ Parse_IsVar(const char *p, VarAssign *out_var)
 	nameStart = p;
 	firstSpace = NULL;
 
-	/*
-	 * Scan for one of the assignment operators outside a variable
-	 * expansion.
-	 */
+	/* Scan for one of the assignment operators outside an expression. */
 	while (*p != '\0') {
 		char ch = *p++;
 		if (ch == '(' || ch == '{') {
@@ -2220,7 +2232,7 @@ IsSysVInclude(const char *line)
 static void
 ParseTraditionalInclude(char *line)
 {
-	char *cp;		/* current position in file spec */
+	char *p;		/* current position in file spec */
 	bool done = false;
 	bool silent = line[0] != 'i';
 	char *file = line + (silent ? 8 : 7);
@@ -2233,13 +2245,13 @@ ParseTraditionalInclude(char *line)
 	all_files = Var_Subst(file, SCOPE_CMDLINE, VARE_WANTRES);
 	/* TODO: handle errors */
 
-	for (file = all_files; !done; file = cp + 1) {
+	for (file = all_files; !done; file = p + 1) {
 		/* Skip to end of line or next whitespace */
-		for (cp = file; *cp != '\0' && !ch_isspace(*cp); cp++)
+		for (p = file; *p != '\0' && !ch_isspace(*p); p++)
 			continue;
 
-		if (*cp != '\0')
-			*cp = '\0';
+		if (*p != '\0')
+			*p = '\0';
 		else
 			done = true;
 
@@ -2724,26 +2736,26 @@ HandleBreak(const char *arg)
 static bool
 ParseDirective(char *line)
 {
-	char *cp = line + 1;
+	char *p = line + 1;
 	const char *arg;
 	Substring dir;
 
-	pp_skip_whitespace(&cp);
-	if (IsInclude(cp, false)) {
-		ParseInclude(cp);
+	pp_skip_whitespace(&p);
+	if (IsInclude(p, false)) {
+		ParseInclude(p);
 		return true;
 	}
 
-	dir.start = cp;
-	while (ch_islower(*cp) || *cp == '-')
-		cp++;
-	dir.end = cp;
+	dir.start = p;
+	while (ch_islower(*p) || *p == '-')
+		p++;
+	dir.end = p;
 
-	if (*cp != '\0' && !ch_isspace(*cp))
+	if (*p != '\0' && !ch_isspace(*p))
 		return false;
 
-	pp_skip_whitespace(&cp);
-	arg = cp;
+	pp_skip_whitespace(&p);
+	arg = p;
 
 	if (Substring_Equals(dir, "break"))
 		HandleBreak(arg);
@@ -2804,7 +2816,7 @@ Parse_GuardEndif(void)
 static char *
 FindSemicolon(char *p)
 {
-	int level = 0;
+	int depth = 0;
 
 	for (; *p != '\0'; p++) {
 		if (*p == '\\' && p[1] != '\0') {
@@ -2813,10 +2825,10 @@ FindSemicolon(char *p)
 		}
 
 		if (*p == '$' && (p[1] == '(' || p[1] == '{'))
-			level++;
-		else if (level > 0 && (*p == ')' || *p == '}'))
-			level--;
-		else if (level == 0 && *p == ';')
+			depth++;
+		else if (depth > 0 && (*p == ')' || *p == '}'))
+			depth--;
+		else if (depth == 0 && *p == ';')
 			break;
 	}
 	return p;
@@ -2890,13 +2902,6 @@ ParseDependencyLine(char *line)
 static void
 ParseLine(char *line)
 {
-	/*
-	 * Lines that begin with '.' can be pretty much anything:
-	 *	- directives like '.include' or '.if',
-	 *	- suffix rules like '.c.o:',
-	 *	- dependencies for filenames that start with '.',
-	 *	- variable assignments like '.tmp=value'.
-	 */
 	if (line[0] == '.' && ParseDirective(line))
 		return;
 

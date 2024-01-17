@@ -108,7 +108,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <DisableSpecificWarnings>6255;4820;4996;4668;4061;4774;5045;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalOptions>/DMAKE_VERSION=\"20231210\" /fsanitize=address %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/DMAKE_VERSION=\"20240108\" /fsanitize=address %(AdditionalOptions)</AdditionalOptions>
       <CompileAs>CompileAsC</CompileAs>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <ExceptionHandling>false</ExceptionHandling>
@@ -126,7 +126,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <DisableSpecificWarnings>6255;4820;4996;4668;4061;4774;5045;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalOptions>/DMAKE_VERSION=\"20231210\" /fsanitize=address %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/DMAKE_VERSION=\"20240108\" /fsanitize=address %(AdditionalOptions)</AdditionalOptions>
       <CompileAs>CompileAsC</CompileAs>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <ExceptionHandling>false</ExceptionHandling>
@@ -144,7 +144,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>6255;4820;4996;4668;4061;4774;5045;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalOptions>/DMAKE_VERSION=\"20231210\" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/DMAKE_VERSION=\"20240108\" %(AdditionalOptions)</AdditionalOptions>
       <CompileAs>CompileAsC</CompileAs>
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
@@ -163,7 +163,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>6255;4820;4996;4668;4061;4774;5045;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalOptions>/DMAKE_VERSION=\"20231210\" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/DMAKE_VERSION=\"20240108\" %(AdditionalOptions)</AdditionalOptions>
       <CompileAs>CompileAsC</CompileAs>
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>

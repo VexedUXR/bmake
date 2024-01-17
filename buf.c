@@ -1,4 +1,4 @@
-/*	$NetBSD: buf.c,v 1.56 2023/06/01 07:44:10 rillig Exp $	*/
+/*	$NetBSD: buf.c,v 1.57 2023/12/19 19:33:39 rillig Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990 The Regents of the University of California.
@@ -69,7 +69,7 @@
  * SUCH DAMAGE.
  */
 
-/* Automatically-expanding null-terminated character buffers. */
+/* Automatically growing null-terminated buffers of characters. */
 
 #include <limits.h>
 #include "make.h"

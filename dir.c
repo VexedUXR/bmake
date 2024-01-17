@@ -225,8 +225,6 @@ struct CachedDir {
 typedef List CachedDirList;
 typedef ListNode CachedDirListNode;
 
-typedef ListNode SearchPathNode;
-
 /* A list of cached directories, with fast lookup by directory name. */
 typedef struct OpenDirs {
 	CachedDirList list;
@@ -451,9 +449,7 @@ Dir_Init(void)
 	CachedDir_Assign(&dotLast, CachedDir_New(".DOTLAST"));
 }
 
-/*
- * Called by Dir_InitDir and whenever .CURDIR is assigned to.
- */
+/* Called by Dir_InitDir and whenever .CURDIR is assigned to. */
 void
 Dir_InitCur(const char *newCurdir)
 {
@@ -663,21 +659,18 @@ DirMatchFiles(const char *pattern, CachedDir *dir, StringList *expansions)
 	}
 }
 
-/*
- * Find the next closing brace in the string, taking nested braces into
- * account.
- */
+/* Find the next closing brace in 'p', taking nested braces into account. */
 static const char *
 closing_brace(const char *p)
 {
-	int nest = 0;
+	int depth = 0;
 	while (*p != '\0') {
-		if (*p == '}' && nest == 0)
+		if (*p == '}' && depth == 0)
 			break;
 		if (*p == '{')
-			nest++;
+			depth++;
 		if (*p == '}')
-			nest--;
+			depth--;
 		p++;
 	}
 	return p;
@@ -690,14 +683,14 @@ closing_brace(const char *p)
 static const char *
 separator_comma(const char *p)
 {
-	int nest = 0;
+	int depth = 0;
 	while (*p != '\0') {
-		if ((*p == '}' || *p == ',') && nest == 0)
+		if ((*p == '}' || *p == ',') && depth == 0)
 			break;
 		if (*p == '{')
-			nest++;
+			depth++;
 		if (*p == '}')
-			nest--;
+			depth--;
 		p++;
 	}
 	return p;
@@ -754,7 +747,7 @@ DirExpandCurly(const char *word, const char *brace, SearchPath *path,
 	const char *prefix, *middle, *piece, *middle_end, *suffix;
 	size_t prefix_len, suffix_len;
 
-	/* Split the word into prefix '{' middle '}' suffix. */
+	/* Split the word into prefix, '{', middle, '}' and suffix. */
 
 	middle = brace + 1;
 	middle_end = closing_brace(middle);
@@ -795,7 +788,7 @@ DirExpandCurly(const char *word, const char *brace, SearchPath *path,
 static void
 DirExpandPath(const char *pattern, SearchPath *path, StringList *expansions)
 {
-	SearchPathNode *ln;
+	CachedDirListNode *ln;
 	for (ln = path->dirs.first; ln != NULL; ln = ln->next) {
 		CachedDir *dir = ln->datum;
 		DirMatchFiles(pattern, dir, expansions);
@@ -885,9 +878,7 @@ SearchPath_Expand(SearchPath *path, const char *pattern, StringList *expansions)
 
 	slash = lastSlash(pattern);
 	if (slash == NULL) {
-		/* First the files in dot. */
 		DirMatchFiles(pattern, dot, expansions);
-		/* Then the files in every other directory on the path. */
 		DirExpandPath(pattern, path, expansions);
 		goto done;
 	}
@@ -1038,7 +1029,7 @@ static bool
 FindFileRelative(SearchPath *path, bool seenDotLast,
 		 const char *name, char **out_file)
 {
-	SearchPathNode *ln;
+	CachedDirListNode *ln;
 	bool checkedDot = false;
 	char *file;
 
@@ -1101,7 +1092,7 @@ FindFileAbsolute(SearchPath *path, bool seenDotLast,
 		 const char *name, const char *base, char **out_file)
 {
 	char *file;
-	SearchPathNode *ln;
+	CachedDirListNode *ln;
 
 	DEBUG0(DIR, "   Trying exact path matches...\n");
 
@@ -1174,7 +1165,7 @@ Dir_FindFile(const char *name, SearchPath *path)
 	 * of each of the directories on the search path.
 	 */
 	if (base == name || (base - name == 2 && *name == '.')) {
-		SearchPathNode *ln;
+		CachedDirListNode *ln;
 
 		/*
 		 * Look through all the directories on the path seeking one
@@ -1463,7 +1454,7 @@ SearchPath_Add(SearchPath *path, const char *name)
 {
 
 	if (path != NULL && strcmp(name, ".DOTLAST") == 0) {
-		SearchPathNode *ln;
+		CachedDirListNode *ln;
 
 		/* XXX: Linear search gets slow with thousands of entries. */
 		for (ln = path->dirs.first; ln != NULL; ln = ln->next) {
@@ -1496,7 +1487,7 @@ SearchPath *
 Dir_CopyDirSearchPath(void)
 {
 	SearchPath *path = SearchPath_New();
-	SearchPathNode *ln;
+	CachedDirListNode *ln;
 	for (ln = dirSearchPath.dirs.first; ln != NULL; ln = ln->next) {
 		CachedDir *dir = ln->datum;
 		Lst_Append(&path->dirs, CachedDir_Ref(dir));
@@ -1514,7 +1505,7 @@ char *
 SearchPath_ToFlags(SearchPath *path, const char *flag)
 {
 	Buffer buf;
-	SearchPathNode *ln;
+	CachedDirListNode *ln;
 
 	Buf_Init(&buf);
 
@@ -1534,7 +1525,7 @@ SearchPath_ToFlags(SearchPath *path, const char *flag)
 void
 SearchPath_Free(SearchPath *path)
 {
-	SearchPathNode *ln;
+	CachedDirListNode *ln;
 
 	for (ln = path->dirs.first; ln != NULL; ln = ln->next) {
 		CachedDir *dir = ln->datum;
@@ -1565,7 +1556,7 @@ SearchPath_Clear(SearchPath *path)
 void
 SearchPath_AddAll(SearchPath *dst, SearchPath *src)
 {
-	SearchPathNode *ln;
+	CachedDirListNode *ln;
 
 	for (ln = src->dirs.first; ln != NULL; ln = ln->next) {
 		CachedDir *dir = ln->datum;
@@ -1602,7 +1593,7 @@ Dir_PrintDirectories(void)
 void
 SearchPath_Print(const SearchPath *path)
 {
-	SearchPathNode *ln;
+	CachedDirListNode *ln;
 
 	for (ln = path->dirs.first; ln != NULL; ln = ln->next) {
 		const CachedDir *dir = ln->datum;

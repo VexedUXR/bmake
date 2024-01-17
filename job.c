@@ -1,4 +1,4 @@
-/*	$NetBSD: job.c,v 1.459 2023/02/15 06:52:58 rillig Exp $	*/
+/*	$NetBSD: job.c,v 1.465 2024/01/07 11:39:04 rillig Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990 The Regents of the University of California.
@@ -70,12 +70,11 @@
  */
 
 /*
- * job.c --
- *	handle the creation etc. of our child processes.
+ * Create child processes and collect their output.
  *
  * Interface:
  *	Job_Init	Called to initialize this module. In addition,
- *			the .BEGIN target is made including all of its
+ *			the .BEGIN target is made, including all of its
  *			dependencies before this function returns.
  *			Hence, the makefiles must have been parsed
  *			before this function is called.
@@ -223,9 +222,7 @@ typedef struct ShellWriter {
 
 } ShellWriter;
 
-/*
- * error handling variables
- */
+/* error handling variables */
 static int job_errors = 0;	/* number of errors reported */
 static enum {			/* Why is the make aborting? */
 	ABORT_NONE,
@@ -235,9 +232,7 @@ static enum {			/* Why is the make aborting? */
 } aborting = ABORT_NONE;
 #define JOB_TOKENS "+EI+"	/* Token to requeue for each abort state */
 
-/*
- * this tracks the number of tokens currently "out" to build jobs.
- */
+/* Tracks the number of tokens currently "out" to build jobs. */
 int jobTokensRunning = 0;
 
 typedef enum JobStartResult {
@@ -484,7 +479,7 @@ ParseCommandFlags(char **pp, CommandFlags *out_cmdFlags)
 		else if (*p == '+')
 			out_cmdFlags->always = true;
 		else if (!ch_isspace(*p))
-			/* Ignore whitespace for compatibility with gnu make */
+			/* Ignore whitespace for compatibility with GNU make */
 			break;
 		p++;
 	}
@@ -583,13 +578,9 @@ static void
 JobWriteSpecials(Job *job, ShellWriter *wr, const char *escCmd, bool run,
 		 CommandFlags *inout_cmdFlags, const char **inout_cmdTemplate)
 {
-	if (!run) {
-		/*
-		 * If there is no command to run, there is no need to switch
-		 * error checking off and on again for nothing.
-		 */
+	if (!run)
 		inout_cmdFlags->ignerr = false;
-	}  else if (shell->runIgnTmpl != NULL && shell->runIgnTmpl[0] != '\0') {
+	else if (shell->runIgnTmpl != NULL && shell->runIgnTmpl[0] != '\0') {
 		JobWriteSpecialsEchoCtl(job, wr, inout_cmdFlags, escCmd,
 			inout_cmdTemplate);
 	} else
@@ -1054,7 +1045,7 @@ JobExec(Job *job, char *args)
 	}
 
 	/*
-	 * Some jobs produce no output and it's disconcerting to have
+	 * Some jobs produce no output, and it's disconcerting to have
 	 * no feedback of their running (since they produce no output, the
 	 * banner with their name in it never appears). This is an attempt to
 	 * provide that feedback, even if nothing follows it.
@@ -1401,7 +1392,7 @@ again:
 		 */
 		job->outBuf[i] = '\0';
 		if (i >= job->curPos) {
-			char *cp;
+			char *p;
 
 			/*
 			 * FIXME: SwitchOutputTo should be here, according to
@@ -1409,23 +1400,23 @@ again:
 			 * do anything in the default shell, this bug has gone
 			 * unnoticed until now.
 			 */
-			cp = job->outBuf;
+			p = job->outBuf;
 
 			/*
 			 * There's still more in the output buffer. This time,
 			 * though, we know there's no newline at the end, so
 			 * we add one of our own free will.
 			 */
-			if (*cp != '\0') {
+			if (*p != '\0') {
 				if (!opts.silent)
 					SwitchOutputTo(job->node);
 #ifdef USE_META
 				if (useMeta) {
-					meta_job_output(job, cp,
+					meta_job_output(job, p,
 						gotNL ? "\n" : "");
 				}
 #endif
-				(void)fprintf(stdout, "%s%s", cp,
+				(void)fprintf(stdout, "%s%s", p,
 					gotNL ? "\n" : "");
 				(void)fflush(stdout);
 			}
@@ -1640,11 +1631,10 @@ Shell_GetArgs(void)
 void
 Job_SetPrefix(void)
 {
-	if (targPrefix != NULL) {
+	if (targPrefix != NULL)
 		free(targPrefix);
-	} else if (!Var_Exists(SCOPE_GLOBAL, ".MAKE.JOB.PREFIX")) {
+	else if (!Var_Exists(SCOPE_GLOBAL, ".MAKE.JOB.PREFIX"))
 		Global_Set(".MAKE.JOB.PREFIX", "---");
-	}
 
 	targPrefix = Var_Subst("${.MAKE.JOB.PREFIX}",
 		SCOPE_GLOBAL, VARE_WANTRES);
@@ -1766,9 +1756,7 @@ Job_ParseShell(char *line)
 
 	memset(&newShell, 0, sizeof newShell);
 	
-	/*
-	 * Parse the specification by keyword
-	 */
+	/* Parse the specification by keyword. */
 	wordsList = Str_Words(line, true);
 	words = wordsList.words;
 	argc = wordsList.len;
@@ -1845,25 +1833,18 @@ Job_ParseShell(char *line)
 			}
 		}
 	} else {
-		/*
-		 * The user provided a path. If s/he gave nothing else
-		 * (fullSpec is false), try and find a matching shell in the
-		 * ones we know of. Else we just take the specification at
-		 * its word and copy it to a new location. In either case,
-		 * we need to record the path the user gave for the shell.
-		 */
 		shellPath = path;
-		path = lastSlash(path);
-		if (path == NULL)
-			path = UNCONST(shellPath);
-		else
-			/*
-			 * For some reason, cmd.exe insists that that last slash
-			 * is a backslash.
-			 */
+
+		/*
+		 * For some reason, cmd.exe insists that that last slash
+		 * is a backslash.
+		 */
+		if ((path = lastSlash(path)) != NULL)
 			*(path++) = '\\';
 
-		shellName = newShell.name != NULL ? newShell.name : path;
+		shellName = newShell.name != NULL ?
+			newShell.name :
+			path == NULL ? shellPath : path;
 		if (!fullSpec) {
 			if ((sh = FindShellByName(shellName)) == NULL) {
 				Parse_Error(PARSE_WARNING,
@@ -1986,11 +1967,10 @@ Job_Finish(void)
 	GNode *endNode = Targ_GetEndNode();
 	if (!Lst_IsEmpty(&endNode->commands) ||
 		!Lst_IsEmpty(&endNode->children)) {
-		if (job_errors != 0) {
+		if (job_errors != 0)
 			Error("Errors reported so .END ignored");
-		} else {
+		else
 			JobRun(endNode);
-		}
 	}
 	return job_errors;
 }

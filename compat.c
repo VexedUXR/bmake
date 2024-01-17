@@ -1,4 +1,4 @@
-/*	$NetBSD: compat.c,v 1.247 2023/05/04 22:31:17 sjg Exp $	*/
+/*	$NetBSD: compat.c,v 1.252 2024/01/05 23:22:06 rillig Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990 The Regents of the University of California.
@@ -103,10 +103,8 @@ CompatDeleteTarget(GNode *gn)
 	if (gn != NULL && !GNode_IsPrecious(gn) &&
 	    (gn->type & OP_PHONY) == 0) {
 		const char *file = GNode_VarTarget(gn);
-
-		if (!opts.noExecute && unlink_file(file) == 0) {
+		if (!opts.noExecute && unlink_file(file) == 0)
 			Error("*** %s removed", file);
-		}
 	}
 }
 
@@ -259,24 +257,14 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 	while (ch_isspace(*cmd))
 		cmd++;
 
-	/*
-	 * If we did not end up with a command, just skip it.
-	 */
 	if (cmd[0] == '\0')
 		return true;
-	/*
-	 * Print the command before echoing if we're not supposed to be quiet
-	 * for this one. We also print the command if -n given.
-	 */
+
 	if (!silent || !GNode_ShouldExecute(gn)) {
 		printf("%s\n", cmd);
 		fflush(stdout);
 	}
 
-	/*
-	 * If we're not supposed to execute any commands, this is as far as
-	 * we go...
-	 */
 	if (!doIt && !GNode_ShouldExecute(gn))
 		return true;
 
@@ -325,9 +313,7 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 	/* XXX: Setting a list item to NULL is unexpected. */
 	LstNode_SetNull(ln);
 
-	/*
-	 * The child is off and running. Now all we can do is wait...
-	 */
+	/* The child is off and running. Now all we can do is wait... */
 #ifdef USE_META
 	if (useMeta) {
 		while ((status = WaitForSingleObject(pi.hProcess, PROCESSWAIT))
@@ -375,7 +361,6 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 				 * but let others continue.
 				 */
 				printf(" (continuing)\n");
-				fflush(stdout);
 			} else {
 				printf("\n");
 			}
@@ -387,9 +372,9 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 			 * If we return 0, this will happen...
 			 */
 			printf(" (ignored)\n");
-			fflush(stdout);
 			status = 0;
 		}
+		fflush(stdout);
 	}
 
 	free(cmdStart);
@@ -546,10 +531,6 @@ MakeUnmade(GNode *gn, GNode *pgn)
 		gn->type |= OP_SILENT;
 
 	if (Job_CheckCommands(gn, Fatal)) {
-		/*
-		 * Our commands are ok, but we still have to worry about
-		 * the -t flag.
-		 */
 		if (!opts.touch || (gn->type & OP_MAKE)) {
 			curTarg = gn;
 #ifdef USE_META
@@ -720,7 +701,6 @@ Compat_MakeAll(GNodeList *targs)
 			errorNode = gn;
 	}
 
-	/* If the user has defined a .END target, run its commands. */
 	if (errorNode == NULL) {
 		GNode *endNode = Targ_GetEndNode();
 		Compat_Make(endNode, endNode);
