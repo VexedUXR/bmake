@@ -15,3 +15,5 @@ You can build this either by running `msbuild`, or opening `bmake.sln` and build
 ## Status
 The binary itself is functional and can be used as expected, there is still alot of work to be done for the mk files however.  
 `sys.mk` basically does nothing and the rest of the mk collection is yet to be ported.
+
+Up to date with bmake `20240108`.
