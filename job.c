@@ -704,6 +704,10 @@ JobWriteCommands(Job *job)
 		seen = true;
 	}
 
+	/* Remove trailing separator. */
+	if (job->cmdBuffer->len > 0)
+		job->cmdBuffer->data[--job->cmdBuffer->len] = '\0';
+
 	DEBUG0(JOB, "\n");
 	return seen;
 }
@@ -1127,9 +1131,6 @@ JobWriteShellCommands(Job *job, GNode *gn, bool *out_run)
 
 	*out_run = JobWriteCommands(job);
 
-	/* Remove trailing separator. */
-	job->cmdBuffer->data[--job->cmdBuffer->len] = '\0';
-
 	/*
 	 * We dont usually create a temporary script file,
 	 * unless if we are required to by -dn.
@@ -1250,9 +1251,7 @@ JobStart(GNode *gn, bool special)
 		if (cmdsOK)
 			JobWriteCommands(job);
 
-		/* Replace trailing separator. */
-		job->cmdBuffer->data[job->cmdBuffer->len - 1] = '\n';
-		printf("%s", job->cmdBuffer->data);
+		printf("%s\n", job->cmdBuffer->data);
 
 		run = false;
 	} else {
@@ -1558,9 +1557,6 @@ ch_shell_build_special(char *spec)
 	size_t i, j, len;
 	char *ret, delim;
 
-	if (*spec == '\0')
-		return "";
-
 	len = strlen(spec);
 	if (len < 4) {
 		Error("Expected \"special=char,escapedChar,\"");
@@ -1858,8 +1854,6 @@ Job_ParseShell(char *line)
 				newShell.escapeChar = '\\';
 			if (newShell.separator == '\0')
 				newShell.separator = '&';
-			if (newShell.specialChar == NULL)
-				newShell.specialChar = "";
 
 			newShell.args = newShell.args == NULL ? "/c" :
 				(shell_freeIt[i++] = bmake_strdup(newShell.args));
