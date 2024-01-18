@@ -48,7 +48,6 @@ int  meta_job_finish(struct Job *);
 bool meta_oodate(GNode *, bool) MAKE_ATTR_USE;
 void meta_compat_start(void);
 HANDLE *meta_compat_pipe(void);
-void meta_compat_catch(char *);
-void meta_compat_done(void);
+void meta_compat_catch(char *, bool);
 
 extern bool useMeta;

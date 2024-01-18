@@ -1057,7 +1057,8 @@ oodate_out:
 
 static HANDLE childPipe[2];
 
-void meta_compat_start(void)
+void
+meta_compat_start(void)
 {
 	if (CreatePipe(&childPipe[0], &childPipe[1], NULL, PIPESZ) == 0)
 		Punt("failed to create pipe: %s", strerr(GetLastError()));
@@ -1069,12 +1070,14 @@ void meta_compat_start(void)
 		Punt("failed to set pipe attributes: %s", strerr(GetLastError()));
 }
 
-HANDLE *meta_compat_pipe(void)
+HANDLE *
+meta_compat_pipe(void)
 {
 	return childPipe;
 }
 
-void meta_compat_catch(char *cmd)
+void
+meta_compat_catch(char *cmd, bool done)
 {
 	char *buf;
 	DWORD sz;
@@ -1093,13 +1096,11 @@ void meta_compat_catch(char *cmd)
 
 	buf[sz] = '\0';
 	meta_job_output(NULL, buf, "");
-}
 
-void
-meta_compat_done(void)
-{
-	CloseHandle(childPipe[0]);
-	CloseHandle(childPipe[1]);
+	if (done) {
+		CloseHandle(childPipe[0]);
+		CloseHandle(childPipe[1]);
+	}
 }
 
 #endif /* USE_META */

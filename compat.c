@@ -325,7 +325,7 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 				Punt("failed to peek pipe: %s", strerr(GetLastError()));
 
 			if (avail >= PIPESZ)
-				meta_compat_catch(cmdStart);
+				meta_compat_catch(cmdStart, false);
 		}
 
 		if (status == WAIT_FAILED)
@@ -338,10 +338,8 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 	(void)GetExitCodeProcess(pi.hProcess, &status);
 
 #ifdef USE_META
-	if (useMeta) {
-		meta_compat_catch(cmdStart);
-		meta_compat_done();
-	}
+	if (useMeta)
+		meta_compat_catch(cmdStart, true);
 #endif
 
 	if (status != 0) {
