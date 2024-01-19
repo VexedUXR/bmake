@@ -1324,8 +1324,9 @@ main_Init(int argc, char **argv)
 
 #ifdef POSIX
 	{
-		char *makeflags = getenv("MAKEFLAGS");
+		char *makeflags = explode(getenv("MAKEFLAGS"));
 		Main_ParseArgLine(makeflags);
+		free(makeflags);
 	}
 #else
 	/*
