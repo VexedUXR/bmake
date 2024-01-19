@@ -1,0 +1,21 @@
+bmake.exe[1]: "cond-op.mk" line 51: Malformed conditional ("!word" == !word)
+bmake.exe[1]: "cond-op.mk" line 72: Malformed conditional (0 ${ERR::=evaluated})
+bmake.exe[1]: "cond-op.mk" line 77: A misplaced expression after 0 is not evaluated.
+bmake.exe[1]: "cond-op.mk" line 82: Malformed conditional (1 ${ERR::=evaluated})
+bmake.exe[1]: "cond-op.mk" line 87: A misplaced expression after 1 is not evaluated.
+bmake.exe[1]: "cond-op.mk" line 93: A B C   =>   (A || B) && C   A || B && C   A || (B && C)
+bmake.exe[1]: "cond-op.mk" line 108: 0 0 0   =>   0               0             0
+bmake.exe[1]: "cond-op.mk" line 108: 0 0 1   =>   0               0             0
+bmake.exe[1]: "cond-op.mk" line 108: 0 1 0   =>   0               0             0
+bmake.exe[1]: "cond-op.mk" line 108: 0 1 1   =>   1               1             1
+bmake.exe[1]: "cond-op.mk" line 108: 1 0 0   =>   0               1             1
+bmake.exe[1]: "cond-op.mk" line 108: 1 0 1   =>   1               1             1
+bmake.exe[1]: "cond-op.mk" line 108: 1 1 0   =>   0               1             1
+bmake.exe[1]: "cond-op.mk" line 108: 1 1 1   =>   1               1             1
+bmake.exe[1]: "cond-op.mk" line 120: Malformed conditional (1 &&)
+bmake.exe[1]: "cond-op.mk" line 129: Malformed conditional (0 &&)
+bmake.exe[1]: "cond-op.mk" line 138: Malformed conditional (1 ||)
+bmake.exe[1]: "cond-op.mk" line 148: Malformed conditional (0 ||)
+bmake.exe[1]: Fatal errors encountered -- cannot continue
+bmake.exe[1]: stopped in unit-tests
+1

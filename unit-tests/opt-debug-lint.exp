@@ -1,0 +1,10 @@
+bmake.exe[1]: "opt-debug-lint.mk" line 21: Variable "X" is undefined
+bmake.exe[1]: "opt-debug-lint.mk" line 21: Malformed conditional ($X)
+bmake.exe[1]: "opt-debug-lint.mk" line 45: Variable "UNDEF" is undefined
+bmake.exe[1]: "opt-debug-lint.mk" line 45: Malformed conditional (${UNDEF})
+bmake.exe[1]: "opt-debug-lint.mk" line 67: Missing delimiter ':' after modifier "L"
+bmake.exe[1]: "opt-debug-lint.mk" line 67: Missing delimiter ':' after modifier "P"
+bmake.exe[1]: "opt-debug-lint.mk" line 76: Unknown modifier "${"
+bmake.exe[1]: Fatal errors encountered -- cannot continue
+bmake.exe[1]: stopped in unit-tests
+1

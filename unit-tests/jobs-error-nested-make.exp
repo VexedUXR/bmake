@@ -1,0 +1,11 @@
+bmake.exe -f jobs-error-nested-make.mk nested
+exit 1
+*** [nested] Error code 1
+
+bmake.exe[2]: stopped in unit-tests
+bmake.exe[2]: 1 error
+
+bmake.exe[2]: stopped in unit-tests
+
+bmake.exe[1]: stopped in unit-tests
+2

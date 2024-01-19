@@ -1,0 +1,17 @@
+The = assignment operator
+bmake.exe[2]: "cmdline-undefined.mk" line 31: From the command line: Undefined is .
+bmake.exe[2]: "cmdline-undefined.mk" line 34: From .MAKEFLAGS '=': Undefined is .
+bmake.exe[2]: "cmdline-undefined.mk" line 37: From .MAKEFLAGS ':=': Undefined is .
+bmake.exe[2]: "cmdline-undefined.mk" line 43: From the command line: Undefined is now defined.
+bmake.exe[2]: "cmdline-undefined.mk" line 46: From .MAKEFLAGS '=': Undefined is now defined.
+bmake.exe[2]: "cmdline-undefined.mk" line 49: From .MAKEFLAGS ':=': Undefined is now defined.
+
+The := assignment operator
+bmake.exe[2]: "cmdline-undefined.mk" line 31: From the command line: Undefined is .
+bmake.exe[2]: "cmdline-undefined.mk" line 34: From .MAKEFLAGS '=': Undefined is .
+bmake.exe[2]: "cmdline-undefined.mk" line 37: From .MAKEFLAGS ':=': Undefined is .
+bmake.exe[2]: "cmdline-undefined.mk" line 43: From the command line: Undefined is now defined.
+bmake.exe[2]: "cmdline-undefined.mk" line 46: From .MAKEFLAGS '=': Undefined is now defined.
+bmake.exe[2]: "cmdline-undefined.mk" line 49: From .MAKEFLAGS ':=': Undefined is now defined.
+
+0

@@ -1,0 +1,4 @@
+bmake.exe[1]: "cond-op-or-lint.mk" line 10: Unknown operator '|'
+bmake.exe[1]: Fatal errors encountered -- cannot continue
+bmake.exe[1]: stopped in unit-tests
+1

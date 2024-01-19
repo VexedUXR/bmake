@@ -1,0 +1,12 @@
+.BEGIN
+silent
+ignore
+exit 0 in ignore
+exit 1 in ignore
+*** [ignore] Error code 1 (ignored)
+exit 1 without indentation
+exit 1 space
+exit 1 tab
+*** [ignore-cmds] Error code 1 (ignored)
+.END
+0

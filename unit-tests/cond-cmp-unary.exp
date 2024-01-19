@@ -1,0 +1,2 @@
+bmake.exe[1]: "cond-cmp-unary.mk" line 54: This is only reached because of a bug in EvalTruthy.
+0

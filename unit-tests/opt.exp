@@ -1,0 +1,26 @@
+bmake.exe -r -f nul -V MAKEFLAGS
+ -r -k -d 0 
+
+bmake.exe -:
+usage: bmake.exe [-BeikNnqrSstWwX]
+            [-C directory] [-D variable] [-d flags] [-f makefile]
+            [-I directory] [-J private] [-j max_jobs] [-m directory] [-T file]
+            [-V variable] [-v variable] [variable=value] [target ...]
+*** Error code 2 (ignored)
+
+bmake.exe -r -f nul -- -VAR=value -f nul
+bmake.exe[2]: don't know how to make -f (continuing)
+`nul' is up to date.
+
+Stop.
+bmake.exe[2]: stopped in unit-tests
+*** Error code 1 (ignored)
+
+bmake.exe -?
+usage: bmake.exe [-BeikNnqrSstWwX]
+            [-C directory] [-D variable] [-d flags] [-f makefile]
+            [-I directory] [-J private] [-j max_jobs] [-m directory] [-T file]
+            [-V variable] [-v variable] [variable=value] [target ...]
+*** Error code 2 (ignored)
+
+0

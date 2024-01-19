@@ -1,0 +1,5 @@
+bmake.exe[1]: "cond-func-empty.mk" line 168: Unclosed variable "WORD"
+bmake.exe[1]: "cond-func-empty.mk" line 168: Malformed conditional (empty(WORD)
+bmake.exe[1]: Fatal errors encountered -- cannot continue
+bmake.exe[1]: stopped in unit-tests
+1

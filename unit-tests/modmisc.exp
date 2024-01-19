@@ -1,0 +1,23 @@
+# NOTE:
+# NAME should be the user's name
+# The drive letter dosen't have to be C
+
+path=';C:\Users\NAME;;C:;.;/no/such/dir;.'
+path='C:\Users\NAME;C:;/no/such/dir'
+path='C:\Users\NAME;C:;/no/such/dir'
+path='C:\Users\NAME';'C:';'/no/such/dir'
+path='C:\Users\NAME';'C:';'/no/such/dir'
+path_C:\Usersx=C:\Opt/
+paths=C:\Users\NAME C: /no/such/dir C:\Opt
+PATHS=C:\USERS\NAME C: /NO/SUCH/DIR C:\OPT
+S:
+C:
+@:
+S:empty
+C:empty
+@:
+mod-quote: new
+
+line
+mod-break-many-words: 500
+exit status 0

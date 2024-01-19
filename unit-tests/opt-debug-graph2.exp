@@ -1,0 +1,95 @@
+: 'Making made-target.'
+exit 1
+*** Error code 1 (continuing)
+exit 1
+*** Error code 1 (continuing)
+`all' not remade because of errors.
+#*** Input graph:
+# made-target, made, type OP_DEPENDS|OP_PHONY|OP_HAS_COMMANDS|OP_DEPS_FOUND|OP_MARK, flags REMAKE|DONE_ALLSRC
+#
+# *** MAIN TARGET ***
+# No unmade children
+# last modified <timestamp>: made
+# parents: all
+made-target     :
+	(null)
+
+
+# error-target, error when made, type OP_DEPENDS|OP_PHONY|OP_HAS_COMMANDS|OP_DEPS_FOUND|OP_MARK, flags REMAKE|DONE_ALLSRC
+#
+# No unmade children
+# nonexistent (maybe): error when made
+# parents: all
+error-target    :
+	(null)
+
+
+# aborted-target, aborted, type OP_DEPENDS|OP_PHONY|OP_DEPS_FOUND|OP_MARK, flags none
+# aborted-target-dependency, error when made, type OP_DEPENDS|OP_PHONY|OP_HAS_COMMANDS|OP_DEPS_FOUND|OP_MARK, flags REMAKE|DONE_ALLSRC
+#
+# No unmade children
+# nonexistent (maybe): error when made
+# parents: aborted-target
+aborted-target-dependency:
+	(null)
+
+
+# all, aborted, type OP_DEPENDS|OP_DEPS_FOUND, flags CHILDMADE|FORCE
+#
+# 3 unmade children
+# nonexistent (maybe): aborted
+all             : made-target error-target aborted-target
+
+
+# .END, unmade, type OP_SPECIAL, flags none
+
+
+#
+#   Files that are only sources:
+#	.END [.END]
+#*** Global Variables:
+.ALLTARGETS      =  made-target error-target aborted-target aborted-target-dependency all .END
+.CURDIR          = unit-tests
+.INCLUDES        = # (empty)
+.LIBS            = # (empty)
+.MAKE            = bmake.exe
+.MAKE.DEPENDFILE = .depend
+.MAKE.GID        = -1
+.MAKE.JOBS.C     = yes
+.MAKE.LEVEL      = <details omitted>
+.MAKE.MAKEFILES  = opt-debug-graph2.mk
+.MAKE.MAKEFILE_PREFERENCE = makefile Makefile
+.MAKE.OS         = Windows
+.MAKE.PID        = <details omitted>
+.MAKE.PPID       = -1
+.MAKE.UID        = -1
+.MAKEFLAGS       =  -r -k -d g2
+.MAKEOVERRIDES   = # (empty)
+.OBJDIR          = unit-tests
+.PATH            = . unit-tests
+.SYSPATH         = mk
+.TARGETS         =  all
+.newline         = 
+# (ends with space)
+MACHINE          = amd64
+MACHINE_ARCH     = amd64
+MAKE             = bmake.exe
+MAKE_VERSION     = <details omitted>
+MFLAGS           =   -r -k -d g2
+#*** Command-line Variables:
+.MAKE.LEVEL.ENV  = MAKELEVEL
+.SHELL           = <details omitted>
+
+#*** Directory Cache:
+# Stats: 0 hits 4 misses 0 near misses 0 losers (0%)
+#  refs  hits  directory
+#     1     0  unit-tests
+#     1     0  .
+#     2     0  mk
+
+#*** Suffixes:
+#*** Transformations:
+
+Stop.
+bmake.exe[1]: stopped in unit-tests
+1

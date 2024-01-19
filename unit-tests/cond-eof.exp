@@ -1,0 +1,6 @@
+bmake.exe[1]: "cond-eof.mk" line 17: Malformed conditional (0 ${SIDE_EFFECT} ${SIDE_EFFECT2})
+bmake.exe[1]: "cond-eof.mk" line 20: Malformed conditional (1 ${SIDE_EFFECT} ${SIDE_EFFECT2})
+bmake.exe[1]: "cond-eof.mk" line 23: Malformed conditional ((0) ${SIDE_EFFECT} ${SIDE_EFFECT2})
+bmake.exe[1]: Fatal errors encountered -- cannot continue
+bmake.exe[1]: stopped in unit-tests
+1

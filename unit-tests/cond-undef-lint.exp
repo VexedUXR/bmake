@@ -1,0 +1,10 @@
+bmake.exe[1]: "cond-undef-lint.mk" line 25: Variable "UNDEF" is undefined
+bmake.exe[1]: "cond-undef-lint.mk" line 25: Malformed conditional (${UNDEF})
+bmake.exe[1]: "cond-undef-lint.mk" line 43: Variable "UNDEF" is undefined
+bmake.exe[1]: "cond-undef-lint.mk" line 43: Variable "VAR." is undefined
+bmake.exe[1]: "cond-undef-lint.mk" line 43: Malformed conditional (${VAR.${UNDEF}})
+bmake.exe[1]: "cond-undef-lint.mk" line 56: Variable "VAR.defined" is undefined
+bmake.exe[1]: "cond-undef-lint.mk" line 56: Malformed conditional (${VAR.${DEF}})
+bmake.exe[1]: Fatal errors encountered -- cannot continue
+bmake.exe[1]: stopped in unit-tests
+1

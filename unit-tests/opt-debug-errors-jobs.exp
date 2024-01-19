@@ -1,0 +1,56 @@
+echo 3   spaces& exit 1
+3   spaces
+
+*** Failed target: fail-spaces
+*** Failed commands:
+	echo 3   spaces& exit 1
+*** [fail-spaces] Error code 1
+
+bmake.exe[1]: stopped in unit-tests
+echo   indented& exit 1
+  indented
+
+*** Failed target: fail-escaped-space
+*** Failed commands:
+	echo   indented& exit 1
+*** [fail-escaped-space] Error code 1
+
+bmake.exe[1]: stopped in unit-tests
+echo line1&echo:line2& exit 1
+line1
+line2
+
+*** Failed target: fail-newline
+*** Failed commands:
+	echo line1${.newline:Q}line2& exit 1
+	=> echo line1&echo:line2& exit 1
+*** [fail-newline] Error code 1
+
+bmake.exe[1]: stopped in unit-tests
+echo line1 line2& exit 1
+line1 line2
+
+*** Failed target: fail-multiline
+*** Failed commands:
+	echo line1 line2& exit 1
+*** [fail-multiline] Error code 1
+
+bmake.exe[1]: stopped in unit-tests
+echo	'word1'							 'word2'& exit 1
+'word1'							 'word2'
+
+*** Failed target: fail-multiline-intention
+*** Failed commands:
+	echo	'word1'							 'word2'& exit 1
+*** [fail-multiline-intention] Error code 1
+
+bmake.exe[1]: stopped in unit-tests
+
+*** Failed target: fail-vars
+*** Failed commands:
+	@${COMPILE_C} ${COMPILE_C_FLAGS}
+	=> @exit 1 c-compiler flag1 -macro="several words"
+*** [fail-vars] Error code 1
+
+bmake.exe[1]: stopped in unit-tests
+1

@@ -1,0 +1,7 @@
+bmake.exe[1]: "cond-op-and.mk" line 37: Malformed conditional (0 || (${DEF} && ${UNDEF}))
+bmake.exe[1]: "cond-op-and.mk" line 42: Malformed conditional (0 || (${UNDEF} && ${UNDEF}))
+bmake.exe[1]: "cond-op-and.mk" line 45: Malformed conditional (0 || (!${UNDEF} && ${UNDEF}))
+bmake.exe[1]: "cond-op-and.mk" line 75: Malformed conditional (0 &&& 0)
+bmake.exe[1]: Fatal errors encountered -- cannot continue
+bmake.exe[1]: stopped in unit-tests
+1

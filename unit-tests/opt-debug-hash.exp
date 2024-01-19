@@ -1,0 +1,6 @@
+bmake.exe[1]: "opt-debug-hash.mk" line 12: Missing argument for ".error"
+bmake.exe[1]: Fatal errors encountered -- cannot continue
+HashTable targets: size=16 numEntries=0 maxchain=0
+HashTable Global variables: size=16 numEntries=<entries> maxchain=3
+bmake.exe[1]: stopped in unit-tests
+1

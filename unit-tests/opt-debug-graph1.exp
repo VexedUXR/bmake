@@ -1,0 +1,57 @@
+#*** Input graph:
+# all, unmade, type OP_DEPENDS|OP_HAS_COMMANDS, flags none
+# made-target, unmade, type OP_DEPENDS, flags none
+# made-target-no-sources, unmade, type OP_DEPENDS, flags none
+# made-source, unmade, type OP_DEPENDS, flags none
+# unmade-target, unmade, type OP_DEPENDS, flags none
+# unmade-sources, unmade, type none, flags none
+# unmade-silent-source, unmade, type OP_SILENT, flags none
+# unmade-target-no-sources, unmade, type OP_DEPENDS, flags none
+
+
+#
+#   Files that are only sources:
+#	unmade-sources [unmade-sources]
+#	unmade-silent-source [unmade-silent-source] .SILENT
+#*** Global Variables:
+.ALLTARGETS      =  all made-target made-target-no-sources made-source unmade-target unmade-sources unmade-silent-source unmade-target-no-sources
+.CURDIR          = unit-tests
+.INCLUDES        = # (empty)
+.LIBS            = # (empty)
+.MAKE            = bmake.exe
+.MAKE.DEPENDFILE = .depend
+.MAKE.GID        = -1
+.MAKE.JOBS.C     = yes
+.MAKE.LEVEL      = <details omitted>
+.MAKE.MAKEFILES  = opt-debug-graph1.mk
+.MAKE.MAKEFILE_PREFERENCE = makefile Makefile
+.MAKE.OS         = Windows
+.MAKE.PID        = <details omitted>
+.MAKE.PPID       = -1
+.MAKE.UID        = -1
+.MAKEFLAGS       =  -r -k -d g1
+.MAKEOVERRIDES   = # (empty)
+.OBJDIR          = unit-tests
+.PATH            = . unit-tests
+.SYSPATH         = mk
+.TARGETS         = # (empty)
+.newline         = 
+# (ends with space)
+MACHINE          = amd64
+MACHINE_ARCH     = amd64
+MAKE             = bmake.exe
+MAKE_VERSION     = <details omitted>
+MFLAGS           =   -r -k -d g1
+#*** Command-line Variables:
+.MAKE.LEVEL.ENV  = MAKELEVEL
+
+#*** Directory Cache:
+# Stats: 0 hits 2 misses 0 near misses 0 losers (0%)
+#  refs  hits  directory
+#     1     0  unit-tests
+#     1     0  .
+#     2     0  mk
+
+#*** Suffixes:
+#*** Transformations:
+0
