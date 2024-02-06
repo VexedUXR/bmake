@@ -1,0 +1,4 @@
+bmake.exe[2]: "dep-op-missing.tmp" line 1: Invalid line 'target'
+bmake.exe[2]: Fatal errors encountered -- cannot continue
+bmake.exe[2]: stopped in unit-tests
+0

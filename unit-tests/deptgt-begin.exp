@@ -1,0 +1,7 @@
+bmake.exe[1]: "deptgt-begin.mk" line 19: warning: duplicate script for target ".BEGIN" ignored
+bmake.exe[1]: "deptgt-begin.mk" line 9: warning: using previous script for ".BEGIN" defined here
+: parse time 
+: Making before-begin before .BEGIN.
+: .BEGIN
+: all
+0

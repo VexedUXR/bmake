@@ -1,0 +1,4 @@
+bmake.exe[1]: "deptgt-path-suffix.mk" line 8: Suffix '.c' not defined (yet)
+bmake.exe[1]: Fatal errors encountered -- cannot continue
+bmake.exe[1]: stopped in unit-tests
+1

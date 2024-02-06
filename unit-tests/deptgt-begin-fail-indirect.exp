@@ -1,0 +1,6 @@
+exit 1
+*** Error code 1 (continuing)
+
+Stop.
+bmake.exe[1]: stopped in unit-tests
+1

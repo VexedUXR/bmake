@@ -1,0 +1,5 @@
+bmake.exe[1]: "dep.mk" line 11: Inconsistent operator for only-colon
+bmake.exe[1]: "dep.mk" line 13: Inconsistent operator for only-colon
+bmake.exe[1]: Fatal errors encountered -- cannot continue
+bmake.exe[1]: stopped in unit-tests
+1

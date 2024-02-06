@@ -92,6 +92,57 @@ TESTS+=	opt-warnings-as-errors
 TESTS+=	opt-where-am-i
 TESTS+=	opt-x-reduce-exported
 TESTS+=	order
+TESTS+=	dep
+TESTS+=	dep-colon
+TESTS+=	dep-colon-bug-cross-file
+TESTS+=	dep-double-colon
+TESTS+=	dep-double-colon-indep
+TESTS+=	dep-duplicate
+TESTS+=	dep-none
+TESTS+=	dep-op-missing
+TESTS+=	dep-percent
+TESTS+=	depsrc
+TESTS+=	depsrc-end
+TESTS+=	depsrc-exec
+TESTS+=	depsrc-ignore
+TESTS+=	depsrc-made
+TESTS+=	depsrc-make
+TESTS+=	depsrc-meta
+TESTS+=	depsrc-notmain
+TESTS+=	depsrc-optional
+TESTS+=	depsrc-phony
+TESTS+=	depsrc-recursive
+TESTS+=	depsrc-silent
+TESTS+=	depsrc-use
+TESTS+=	depsrc-usebefore
+TESTS+=	depsrc-usebefore-double-colon
+TESTS+=	depsrc-wait
+TESTS+=	deptgt
+TESTS+=	deptgt-begin
+TESTS+=	deptgt-begin-fail
+TESTS+=	deptgt-begin-fail-indirect
+TESTS+=	deptgt-default
+TESTS+=	deptgt-delete_on_error
+TESTS+=	deptgt-end
+TESTS+=	deptgt-end-fail
+TESTS+=	deptgt-end-fail-all
+TESTS+=	deptgt-end-fail-indirect
+TESTS+=	deptgt-end-jobs
+TESTS+=	deptgt-error
+TESTS+=	deptgt-ignore
+TESTS+=	deptgt-interrupt
+TESTS+=	deptgt-main
+TESTS+=	deptgt-makeflags
+TESTS+=	deptgt-notparallel
+TESTS+=	deptgt-order
+TESTS+=	deptgt-path-suffix
+TESTS+=	deptgt-phony
+TESTS+=	deptgt-posix
+TESTS+=	deptgt-silent
+TESTS+=	deptgt-silent-jobs
+TESTS+=	deptgt-suffixes
+TESTS+=	dep-var
+TESTS+=	dep-wildcards
 
 # These override the default -k
 ARGS.cond-func-make=	via-cmdline
@@ -118,6 +169,14 @@ ${CHANGE.opt-debug-graph2}
 CHANGE.opt-debug-hash= \
 numEntries=[1-9][0-9]*;numEntries=<entries>
 
+CHANGE.opt-debug-jobs= \
+\([0-9]{1,}\);(<pid>) \
+'pid [0-9]{1,};pid <pid>' \
+'JobFinish: [0-9]{1,};JobFinish: <pid>' \
+'Process [0-9]{1,};Process <pid>' \
+'${.SHELL:S,\\,\\\\,g};<shell>' \
+'handle [0-9A-F]*;handle <handle>'
+
 CHANGE.opt-no-action-runflags= \
 'echo hide-from-output.*\n;' \
 'hide-from-output ;' \
@@ -129,6 +188,16 @@ CHANGE.opt-where-am-i= \
 CHANGE.opt-tracefile= \
 '[0-9]{10,10}.[0-9]{3,3} ;' \
 ' [0-9]* ${.CURDIR:S,\\,\\\\,g}.*;'
+
+CHANGE.depsrc-wait= \
+'--- .* ---\n'; \
+3a[123];3a 3b[123];3b 3c[123];3c
+
+CHANGE.deptgt-makeflags= \
+${TEST_MAKE:S,\\,/,g};bmake.exe
+
+CHANGE.deptgt-suffixes= \
+'(.|\n)*  \.\.\n\n';
 
 # Enviroment variables for tests
 ENV.opt-env= \
