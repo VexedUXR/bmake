@@ -6,9 +6,6 @@
  *	$Id: util.c,v 1.50 2021/12/21 18:47:24 sjg Exp $
  */
 
-#include <errno.h>
-#include <time.h>
-
 #include "make.h"
 
 int

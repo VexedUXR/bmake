@@ -124,7 +124,6 @@
  */
 
 #include <sys/stat.h>
-#include <sys/types.h>
 
 #include "make.h"
 

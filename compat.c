@@ -77,14 +77,9 @@
  *	Compat_MakeAll	Initialize this module and make the given targets.
  */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#include <errno.h>
 #include <malloc.h>
 
 #include "make.h"
-#include "dir.h"
 #include "job.h"
 
 /*	"@(#)compat.c	8.2 (Berkeley) 3/19/94"	*/

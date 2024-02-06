@@ -89,15 +89,12 @@
  */
 
 #include <errno.h>
-#include <stdarg.h>
 #include <time.h>
 #include <process.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/timeb.h>
 #include <io.h>
 #include <direct.h>
-#include <memory.h>
 
 #include "make.h"
 #include "dir.h"

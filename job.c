@@ -113,10 +113,7 @@
  *	Job_Wait	Wait for all currently-running jobs to finish.
  */
 
-#include <sys/utime.h>
 #include <process.h>
-#include <memory.h>
-#include <io.h>
 
 #include "make.h"
 #include "dir.h"

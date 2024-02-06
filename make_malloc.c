@@ -26,8 +26,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <errno.h>
-
 #include "make.h"
 
 /* die when out of memory. */

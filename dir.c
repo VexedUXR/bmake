@@ -121,9 +121,7 @@
  *			Print stats about the directory cache.
  */
 
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <errno.h>
 #include <malloc.h>
 
 #include "make.h"

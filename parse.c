@@ -94,10 +94,7 @@
  *	Parse_MainName	Populate the list of targets to create.
  */
 
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <errno.h>
-#include <stdarg.h>
 #include <io.h>
 
 #include "make.h"
