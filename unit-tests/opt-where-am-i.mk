@@ -10,5 +10,5 @@
 
 all:
 .if ${.CURDIR} != "${HOMEDRIVE}\\"
-	@set MAKE_OBJDIR_CHECK_WRITABLE=no & ${MAKE} -r -f ${MAKEFILE:tA} -C ${HOMEDRIVE}
+	@set MAKE_OBJDIR_CHECK_WRITABLE=no & ${MAKE} -r -f ${MAKEFILE:tA} -C "${HOMEDRIVE}\\"
 .endif
