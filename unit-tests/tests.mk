@@ -4,7 +4,6 @@
 TESTS+=	cmd-errors
 TESTS+=	cmd-errors-jobs
 TESTS+=	cmd-errors-lint
-TESTS+=	cmd-interrupt
 TESTS+=	ternary
 TESTS+=	varmisc
 TESTS+=	archive-suffix
@@ -130,7 +129,6 @@ TESTS+=	deptgt-end-fail-indirect
 TESTS+=	deptgt-end-jobs
 TESTS+=	deptgt-error
 TESTS+=	deptgt-ignore
-TESTS+=	deptgt-interrupt
 TESTS+=	deptgt-main
 TESTS+=	deptgt-makeflags
 TESTS+=	deptgt-notparallel
@@ -143,6 +141,10 @@ TESTS+=	deptgt-silent-jobs
 TESTS+=	deptgt-suffixes
 TESTS+=	dep-var
 TESTS+=	dep-wildcards
+.if !defined(SSH_CLIENT)
+TESTS+=	cmd-interrupt
+TESTS+=	deptgt-interrupt
+.endif
 
 # These override the default -k
 ARGS.cond-func-make=	via-cmdline
