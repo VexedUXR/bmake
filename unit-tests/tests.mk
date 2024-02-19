@@ -171,14 +171,6 @@ ${CHANGE.opt-debug-graph2}
 CHANGE.opt-debug-hash= \
 numEntries=[1-9][0-9]*;numEntries=<entries>
 
-CHANGE.opt-debug-jobs= \
-\([0-9]{1,}\);(<pid>) \
-'pid [0-9]{1,};pid <pid>' \
-'JobFinish: [0-9]{1,};JobFinish: <pid>' \
-'Process [0-9]{1,};Process <pid>' \
-'${.SHELL:S,\\,\\\\,g};<shell>' \
-'handle [0-9A-F]*;handle <handle>'
-
 CHANGE.opt-no-action-runflags= \
 'echo hide-from-output.*\n;' \
 'hide-from-output ;' \
