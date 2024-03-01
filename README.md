@@ -13,7 +13,8 @@ You can build this using the Makefile with bmake itself or manually using msbuil
 - By default, bmake only searches for `sys.mk` in `./mk` (if neither `MAKESYSPATH` or `-m` are used)
 
 ## Status
-The binary itself is functional and can be used as expected, there is still alot of work to be done for the mk files however.  
-`sys.mk` basically does nothing and the rest of the mk collection is yet to be ported.
+The binary itself is functional and can be used as expected.
+Some of the mk files have been ported, though some functionality is missing,
+most notabaly: there is no `install` target and no support for manpages.
 
 Up to date with bmake `20240108`

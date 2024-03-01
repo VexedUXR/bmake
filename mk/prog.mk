@@ -1,26 +1,65 @@
+#	$Id: prog.mk,v 1.40 2023/10/02 21:35:43 sjg Exp $
+
 .if !target(__${.PARSEFILE}__)
 __${.PARSEFILE}__: .NOTMAIN
 
-.SUFFIXES: .c ${CXX_SUFFIXES} .obj
+.include <init.mk>
 
-_PROG=	${PROG_CXX:U${PROG}}
-_CC=	${PROG_CXX:D${CXX}:U${CC}}
-_EXT=	${PROG_CXX:D${CXX_SUFFIXES}:U.c}
-OBJS+=	${SRCS:U${dir /b ${_EXT:@S@${_PROG}$S@}:L:sh}:@O@${O:R}.obj@}
+.SUFFIXES: .obj .c .cc .C .s .exe
 
-CFLAGS+=	/nologo
 CFLAGS+=	${COPTS}
-LDFLAGS+=	/nologo
 
-${_EXT:@S@$S.obj@}:
-	${_CC} /c "${.IMPSRC}" ${CFLAGS} /Fo"${.TARGET}"
+# here is where you can define what LIB* are
+.-include <libnames.mk>
+.if ${MK_DPADD_MK} == "yes"
+# lots of cool magic, but might not suit everyone.
+.include <dpadd.mk> # TODO: port this
+.endif
 
-${_PROG}: ${DPADD} ${_PROG}.exe links .PHONY
-${_PROG}.exe: ${OBJS}
-	${LD} ${OBJS} ${LDFLAGS} /out:"${.TARGET}"
+.if defined(PROG_CXX)
+PROG=		${PROG_CXX}
+.endif
 
-clean: links-clean .PHONY
-	del /q ${OBJS} ${PROG}.exe
+.if defined(PROG)
+SRCS?=	${PROG}.c
+.for s in ${SRCS:N*.h:M*/*}
+${s:T:R}.obj: $s
+.endfor
+.if !empty(SRCS:N*.h)
+OBJS+=	${SRCS:T:N*.h:R:S/$/.obj/g}
+.endif
 
-.include <links.mk>
+
+.if defined(OBJS) && !empty(OBJS)
+.NOPATH: ${OBJS} ${PROG}
+
+.c.obj:
+	${COMPILE.c} ${.IMPSRC} -o ${.TARGET}
+
+${CXX_SUFFIXES:%=%.obj}:
+	${COMPILE.cc} ${.IMPSRC} -o ${.TARGET}
+
+${PROG}.exe: ${OBJS} ${DPADD}
+	${_CCLINK} ${LDFLAGS} ${LDSTATIC} -o ${.TARGET} ${_PROGLDOPTS} ${OBJS} ${LDADD}
+.else
+.c.exe:
+	${LINK.c} -o ${.TARGET} ${.IMPSRC} ${LDLIBS}
+
+.endif	# defined(OBJS) && !empty(OBJS)
+.endif	# defined(PROG)
+
+.if !defined(_SKIP_BUILD)
+realbuild: ${PROG}.exe
+.endif
+
+.if !target(clean)
+cleanprog:
+	del /q \
+	    ${PROG}.exe ${OBJS} ${CLEANFILES}
+
+clean: cleanprog
+cleandir: cleanprog
+.else
+cleandir: clean
+.endif
 .endif
