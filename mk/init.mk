@@ -57,6 +57,17 @@ $V += ${$V.$Q:U} ${$V.$Q.${COMPILER_TYPE}:U}
 .endfor
 .endfor
 
+.if ${COMPILER_TYPE} == "msvc"
+# cl.exe wants us to pass some arguments
+# to the linker instead of to it.
+CC_OUT?=	/link /out:${.TARGET}
+
+CFLAGS+=	/nologo
+LDFLAGS+=	/nologo
+.else
+CC_OUT?=	-o ${.TARGET}
+.endif
+
 .if ${.MAKE.LEVEL:U1} == 0 && ${MK_DIRDEPS_BUILD:Uno} == "yes"
 .if ${RELDIR} == "."
 # top-level targets that are ok at level 0

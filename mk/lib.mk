@@ -19,7 +19,12 @@ META_NOECHO?= echo
 # we simplify life by letting the toolchain do most of the work
 # _CCLINK is set by init.mk based on whether we are doing C++ or not
 SHLIB_LD ?= ${_CCLINK}
+
+.if ${COMPILER_TYPE} == "msvc"
+LD_shared ?= /dll
+.else
 LD_shared ?= -shared
+.endif
 
 .if ${MK_LINKLIB} != "no" && !empty(SHLIB_MAJOR) && empty(SHLIB_LINKS)
 SHLIB_LINKS = ${LIB}.${SHLIB_MAJOR}.dll
@@ -29,10 +34,10 @@ SHLIB_LINKS += ${LIB}.${SHLIB_FULLVERSION}.dll
 .endif
 
 .c.obj:
-	${COMPILE.c} ${.IMPSRC} -o ${.TARGET}
+	${COMPILE.c} ${.IMPSRC} ${CC_OUT}
 
 ${CXX_SUFFIXES:%=%.obj}:
-	${COMPILE.cc} ${.IMPSRC} -o ${.TARGET}
+	${COMPILE.cc} ${.IMPSRC} ${CC_OUT}
 
 .S.obj .s.obj:
 	${COMPILE.S} ${CFLAGS:M-[ID]*} ${AINC} ${.IMPSRC}
@@ -72,11 +77,14 @@ ${LIB}.lib: ${OBJS}
 	@del /q ${.TARGET} 2> nul
 	lib /nologo /OUT:${.TARGET} ${OBJS}
 
+# cl uses the /link argument to pass arguments to the linker
+# *everything* after it is passed to the linker.
+_ := ${${COMPILER_TYPE} == "msvc":?/link:}
 ${LIB}.dll: ${LIB}.lib ${DPADD}
 	@${META_NOECHO} building shared ${LIB} library (version ${SHLIB_FULLVERSION})
 	@del /q ${.TARGET} 2> nul
-	${SHLIB_LD} ${OBJS} ${LDFLAGS} -o ${.TARGET} \
-	    ${LD_shared} ${LDADD} ${SHLIB_LDADD}
+	${SHLIB_LD} ${OBJS} ${LDADD} ${SHLIB_LDADD} \
+	    $_ ${LDFLAGS:N$_} ${LD_shared} ${CC_OUT:N$_}
 .if !empty(SHLIB_LINKS)
 	del /q ${SHLIB_LINKS} & ${SHLIB_LINKS:O:u:@x@mklink $x ${.TARGET}&@}
 .endif

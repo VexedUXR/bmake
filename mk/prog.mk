@@ -29,21 +29,26 @@ ${s:T:R}.obj: $s
 OBJS+=	${SRCS:T:N*.h:R:S/$/.obj/g}
 .endif
 
+# cl.exe insists on creating intermediate object files,
+# so just add them to OBJS to get them cleaned up.
+.if ${COMPILER_TYPE} == "msvc" && empty(OBJS)
+OBJS=   ${PROG}.obj
+.endif
 
 .if defined(OBJS) && !empty(OBJS)
 .NOPATH: ${OBJS} ${PROG}
 
 .c.obj:
-	${COMPILE.c} ${.IMPSRC} -o ${.TARGET}
+	${COMPILE.c} ${.IMPSRC} ${CC_OUT}
 
 ${CXX_SUFFIXES:%=%.obj}:
-	${COMPILE.cc} ${.IMPSRC} -o ${.TARGET}
+	${COMPILE.cc} ${.IMPSRC} ${CC_OUT}
 
 ${PROG}.exe: ${OBJS} ${DPADD}
-	${_CCLINK} ${LDFLAGS} ${LDSTATIC} -o ${.TARGET} ${_PROGLDOPTS} ${OBJS} ${LDADD}
+	${_CCLINK} ${LDFLAGS} ${LDSTATIC} ${_PROGLDOPTS} ${OBJS} ${LDADD} ${CC_OUT}
 .else
 .c.exe:
-	${LINK.c} -o ${.TARGET} ${.IMPSRC} ${LDLIBS}
+	${LINK.c} ${.IMPSRC} ${LDLIBS} ${CC_OUT}
 
 .endif	# defined(OBJS) && !empty(OBJS)
 .endif	# defined(PROG)

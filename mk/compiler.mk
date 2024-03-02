@@ -16,14 +16,18 @@
 .if !target(__${.PARSEFILE}__)
 __${.PARSEFILE}__: .NOTMAIN
 
-# TODO: Make MSVC the default
-CC?=	clang
-CXX?=	clang
+CC?=	cl
+CXX?=	${CC}
 
 .if empty(COMPILER_TYPE) || empty(COMPILER_VERSION)
+.if ${CC:R} == "cl"
+_v != cl 2>&1
+COMPILER_TYPE = msvc
+.else
 # gcc does not always say gcc
 _v != (${CC} --version) 2> nul | \
 	findstr /i "clang gcc Free^ Software^ Foundation"
+.endif
 .if empty(COMPILER_TYPE)
 .if ${_v:Mclang} != ""
 COMPILER_TYPE = clang
