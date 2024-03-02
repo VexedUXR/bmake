@@ -59,8 +59,7 @@ realbuild: ${PROG}.exe
 
 .if !target(clean)
 cleanprog:
-	del /q \
-	    ${PROG}.exe ${OBJS} ${CLEANFILES}
+	${RM} ${PROG}.exe ${OBJS} ${CLEANFILES}
 
 clean: cleanprog
 cleandir: cleanprog

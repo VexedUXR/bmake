@@ -57,6 +57,10 @@ $V += ${$V.$Q:U} ${$V.$Q.${COMPILER_TYPE}:U}
 .endfor
 .endfor
 
+# del is unnecessarily verbose for
+# what we need.
+RM?=	del /q > nul 2>&1
+
 .if ${COMPILER_TYPE} == "msvc"
 # cl.exe wants us to pass some arguments
 # to the linker instead of to it.

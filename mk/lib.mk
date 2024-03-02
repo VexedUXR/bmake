@@ -74,7 +74,7 @@ OBJS+=	${SRCS:T:N*.h:R:S/$/.obj/g}
 
 ${LIB}.lib: ${OBJS}
 	@${META_NOECHO} building standard ${LIB} library
-	@del /q ${.TARGET} 2> nul
+	@${RM} ${.TARGET}
 	lib /nologo /OUT:${.TARGET} ${OBJS}
 
 # cl uses the /link argument to pass arguments to the linker
@@ -82,20 +82,20 @@ ${LIB}.lib: ${OBJS}
 _ := ${${COMPILER_TYPE} == "msvc":?/link:}
 ${LIB}.dll: ${LIB}.lib ${DPADD}
 	@${META_NOECHO} building shared ${LIB} library (version ${SHLIB_FULLVERSION})
-	@del /q ${.TARGET} 2> nul
+	@${RM} ${.TARGET}
 	${SHLIB_LD} ${OBJS} ${LDADD} ${SHLIB_LDADD} \
 	    $_ ${LDFLAGS:N$_} ${LD_shared} ${CC_OUT:N$_}
 .if !empty(SHLIB_LINKS)
-	del /q ${SHLIB_LINKS} & ${SHLIB_LINKS:O:u:@x@mklink $x ${.TARGET}&@}
+	${RM} ${SHLIB_LINKS} & ${SHLIB_LINKS:O:u:@x@mklink $x ${.TARGET}&@}
 .endif
 
 .if !target(clean)
 cleanlib: .PHONY
-	-del /q ${CLEANFILES}
-	-del /q ${LIB}.lib ${OBJS}
-	-del /q ${LIB}.dll
+	-${RM} ${CLEANFILES}
+	${RM} ${LIB}.lib ${OBJS}
+	${RM} ${LIB}.dll
 .if !empty(SHLIB_LINKS)
-	-del /q ${SHLIB_LINKS}
+	${RM} ${SHLIB_LINKS}
 .endif
 
 clean: cleanlib
