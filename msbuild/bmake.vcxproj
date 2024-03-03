@@ -147,6 +147,7 @@
       <AdditionalOptions>/DMAKE_VERSION=\"20240108\" %(AdditionalOptions)</AdditionalOptions>
       <CompileAs>CompileAsC</CompileAs>
       <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -166,6 +167,7 @@
       <AdditionalOptions>/DMAKE_VERSION=\"20240108\" %(AdditionalOptions)</AdditionalOptions>
       <CompileAs>CompileAsC</CompileAs>
       <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
