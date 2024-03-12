@@ -103,12 +103,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);USE_META;CLEANUP</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);USE_META;HAVE_REGEX_H;CLEANUP</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <DisableSpecificWarnings>6255;4820;4996;4668;4061;4774;5045;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalOptions>/DMAKE_VERSION=\"20240108\" /fsanitize=address %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/DMAKE_VERSION=\"20240301\" /fsanitize=address %(AdditionalOptions)</AdditionalOptions>
       <CompileAs>CompileAsC</CompileAs>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <ExceptionHandling>false</ExceptionHandling>
@@ -121,12 +121,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);USE_META;CLEANUP</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);USE_META;HAVE_REGEX_H;CLEANUP</PreprocessorDefinitions>
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <DisableSpecificWarnings>6255;4820;4996;4668;4061;4774;5045;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalOptions>/DMAKE_VERSION=\"20240108\" /fsanitize=address %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/DMAKE_VERSION=\"20240301\" /fsanitize=address %(AdditionalOptions)</AdditionalOptions>
       <CompileAs>CompileAsC</CompileAs>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <ExceptionHandling>false</ExceptionHandling>
@@ -139,12 +139,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);USE_META</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);USE_META;HAVE_REGEX_H</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>6255;4820;4996;4668;4061;4774;5045;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalOptions>/DMAKE_VERSION=\"20240108\" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/DMAKE_VERSION=\"20240301\" %(AdditionalOptions)</AdditionalOptions>
       <CompileAs>CompileAsC</CompileAs>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -159,12 +159,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);USE_META</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);USE_META;HAVE_REGEX_H</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>6255;4820;4996;4668;4061;4774;5045;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalOptions>/DMAKE_VERSION=\"20240108\" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/DMAKE_VERSION=\"20240301\" %(AdditionalOptions)</AdditionalOptions>
       <CompileAs>CompileAsC</CompileAs>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

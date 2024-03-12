@@ -1,5 +1,6 @@
-# $Id: init.mk,v 1.30 2023/10/03 16:25:01 sjg Exp $
+# SPDX-License-Identifier: BSD-2-Clause
 #
+# $Id: init.mk,v 1.37 2024/02/25 19:12:13 sjg Exp $
 #	@(#) Copyright (c) 2002, Simon J. Gerraty
 #
 #	This file is provided in the hope that it will
@@ -13,8 +14,11 @@
 #	sjg@crufty.net
 #
 
-.if !target(__${.PARSEFILE}__)
-__${.PARSEFILE}__: .NOTMAIN
+# should be set properly in sys.mk
+_this ?= ${.PARSEFILE:S,bsd.,,}
+
+.if !target(__${_this}__)
+__${_this}__: .NOTMAIN
 
 _this_mk_dir := ${.PARSEDIR:tA}
 
@@ -26,7 +30,11 @@ _this_mk_dir := ${.PARSEDIR:tA}
 .MAIN:		all
 
 # should have been set by sys.mk
-CXX_SUFFIXES?= .cc .cpp .cxx .C
+CXX_SUFFIXES ?= .cc .cpp .cxx .C
+
+# SRCS which do not end up in OBJS
+NO_OBJS_SRCS_SUFFIXES ?= .h
+OBJS_SRCS_FILTER += ${NO_OBJS_SRCS_SUFFIXES:@x@N*$x@:ts:}
 
 .if defined(PROG_CXX) || ${SRCS:Uno:${CXX_SUFFIXES:S,^,N*,:ts:}} != ${SRCS:Uno}
 _CCLINK ?=	${CXX}

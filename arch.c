@@ -927,11 +927,7 @@ Arch_FindLib(GNode *gn, SearchPath *path)
 	gn->path = Dir_FindFile(libName, path);
 	free(libName);
 
-#ifdef LIBRARIES
 	Var_Set(gn, TARGET, gn->name);
-#else
-	Var_Set(gn, TARGET, GNode_Path(gn));
-#endif
 }
 
 /*

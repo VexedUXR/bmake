@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: BSD-2-Clause
+#
 # $Id: libnames.mk,v 1.9 2020/08/19 17:51:53 sjg Exp $
 #
 #	@(#) Copyright (c) 2007-2009, Simon J. Gerraty

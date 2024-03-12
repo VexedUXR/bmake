@@ -1,7 +1,10 @@
 # $Id: own.mk,v 1.45 2023/12/30 02:10:38 sjg Exp $
 
-.if !target(__${.PARSEFILE}__)
-__${.PARSEFILE}__: .NOTMAIN
+# should be set properly in sys.mk
+_this ?= ${.PARSEFILE:S,bsd.,,}
+
+.if !target(__${_this}__)
+__${_this}__: .NOTMAIN
 
 .if !target(__init.mk__)
 .include "init.mk"
@@ -23,8 +26,6 @@ TARGET_HOST?= ${HOST_TARGET}
 .-include <${TARGET_HOST}.mk>
 .-include <config.mk>
 
-# FreeBSD at least does not set this
-MACHINE_ARCH?=	${MACHINE}
 # we need to make sure these are defined too in case sys.mk fails to.
 COMPILE.s?=	${CC} ${AFLAGS} -c
 LINK.s?=	${CC} ${AFLAGS} ${LDFLAGS}

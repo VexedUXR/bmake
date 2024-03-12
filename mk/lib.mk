@@ -1,7 +1,10 @@
 # $Id: lib.mk,v 1.81 2023/10/03 18:18:57 sjg Exp $
 
-.if !target(__${.PARSEFILE}__)
-__${.PARSEFILE}__: .NOTMAIN
+# should be set properly in sys.mk
+_this ?= ${.PARSEFILE:S,bsd.,,}
+
+.if !target(__${_this}__)
+__${_this}__: .NOTMAIN
 
 .include <init.mk>
 
@@ -10,7 +13,7 @@ SHLIB_FULLVERSION := ${SHLIB_FULLVERSION}
 
 # add additional suffixes not exported.
 # .po is used for profiling object files.
-.SUFFIXES: .out .lib .obj .s .S .c .cc .C .h
+.SUFFIXES: .out .lib .obj .s .S .c .h ${CXX_SUFFIXES}
 
 CFLAGS+=	${COPTS}
 
@@ -65,11 +68,13 @@ _LIBS=
 realbuild: ${_LIBS}
 .endif
 
+OBJS_SRCS = ${SRCS:${OBJS_SRCS_FILTER}}
+
 .for s in ${SRCS:N*.h:M*/*}
 ${s:T:R}.obj: $s
 .endfor
 
-OBJS+=	${SRCS:T:N*.h:R:S/$/.obj/g}
+OBJS+=	${OBJS_SRCS:T:R:S/$/.obj/g}
 .NOPATH:	${OBJS}
 
 ${LIB}.lib: ${OBJS}

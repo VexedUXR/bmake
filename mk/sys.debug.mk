@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: BSD-2-Clause
+#
 # $Id: sys.debug.mk,v 1.2 2020/08/19 17:51:53 sjg Exp $
 #
 #	@(#) Copyright (c) 2009, Simon J. Gerraty

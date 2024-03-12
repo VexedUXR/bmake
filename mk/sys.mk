@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: BSD-2-Clause
+#
 # $Id: sys.mk,v 1.57 2023/07/14 16:30:37 sjg Exp $
 #
 #	@(#) Copyright (c) 2003-2023, Simon J. Gerraty
@@ -120,15 +122,6 @@ MACHINE_ARCH.${MACHINE} ?= ${MACHINE}
 
 MAKE_SHELL ?= ${.SHELL:Ucmd.exe}
 SHELL := ${MAKE_SHELL}
-
-# this often helps with debugging
-.SUFFIXES:      .cpp-out
-
-.c.cpp-out: .NOTMAIN
-	@${COMPILE.c:N-c} -E ${.IMPSRC}
-
-${CXX_SUFFIXES:%=%.cpp-out}: .NOTMAIN
-	@${COMPILE.cc:N-c} -E ${.IMPSRC}
 
 # late customizations
 .-include <local.sys.mk>

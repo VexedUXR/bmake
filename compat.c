@@ -1,4 +1,4 @@
-/*	$NetBSD: compat.c,v 1.252 2024/01/05 23:22:06 rillig Exp $	*/
+/*	$NetBSD: compat.c,v 1.253 2024/03/01 16:41:42 sjg Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990 The Regents of the University of California.
@@ -283,7 +283,7 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 		meta_compat_start();
 #endif
 
-	Var_ReexportVars();
+	Var_ReexportVars(gn);
 
 #ifdef USE_META
 	if (useMeta) {

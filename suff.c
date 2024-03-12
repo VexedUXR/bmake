@@ -855,15 +855,11 @@ Suff_ExtendPaths(void)
 	for (ln = sufflist.first; ln != NULL; ln = ln->next) {
 		Suffix *suff = ln->datum;
 		if (!Lst_IsEmpty(&suff->searchPath->dirs)) {
-#ifdef INCLUDES
 			if (suff->include)
 				SearchPath_AddAll(includesPath,
 				    suff->searchPath);
-#endif
-#ifdef LIBRARIES
 			if (suff->library)
 				SearchPath_AddAll(libsPath, suff->searchPath);
-#endif
 			SearchPath_AddAll(suff->searchPath, &dirSearchPath);
 		} else {
 			SearchPath_Free(suff->searchPath);

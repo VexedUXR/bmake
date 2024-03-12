@@ -1,4 +1,4 @@
-/*	$NetBSD: job.c,v 1.465 2024/01/07 11:39:04 rillig Exp $	*/
+/*	$NetBSD: job.c,v 1.466 2024/03/01 16:41:42 sjg Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990 The Regents of the University of California.
@@ -1060,7 +1060,7 @@ JobExec(Job *job, char *args)
 	/* Pre-emptively mark job running, pid still zero though */
 	job->status = JOB_ST_RUNNING;
 
-	Var_ReexportVars();
+	Var_ReexportVars(job->node);
 
 	si.dwFlags = STARTF_USESTDHANDLES;
 	si.hStdOutput = si.hStdError = job->outPipe;

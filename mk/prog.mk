@@ -1,11 +1,14 @@
 #	$Id: prog.mk,v 1.40 2023/10/02 21:35:43 sjg Exp $
 
-.if !target(__${.PARSEFILE}__)
-__${.PARSEFILE}__: .NOTMAIN
+# should be set properly in sys.mk
+_this ?= ${.PARSEFILE:S,bsd.,,}
+
+.if !target(__${_this}__)
+__${_this}__: .NOTMAIN
 
 .include <init.mk>
 
-.SUFFIXES: .obj .c .cc .C .s .exe
+.SUFFIXES: .obj .c ${CXX_SUFFIXES} .s .exe
 
 CFLAGS+=	${COPTS}
 
@@ -21,12 +24,19 @@ PROG=		${PROG_CXX}
 .endif
 
 .if defined(PROG)
-SRCS?=	${PROG}.c
-.for s in ${SRCS:N*.h:M*/*}
+.if empty(SRCS)
+# init.mk handling of QUALIFIED_VAR_LIST means
+# SRCS will be defined - even if empty.
+SRCS = ${PROG}.c
+.endif
+
+SRCS ?=	${PROG}.c
+OBJS_SRCS = ${SRCS:${OBJS_SRCS_FILTER}}
+.for s in ${OBJS_SRCS:M*/*}
 ${s:T:R}.obj: $s
 .endfor
-.if !empty(SRCS:N*.h)
-OBJS+=	${SRCS:T:N*.h:R:S/$/.obj/g}
+.if !empty(OBJS_SRCS)
+OBJS+=	${OBJS_SRCS:T:R:S/$/.obj/g}
 .endif
 
 # cl.exe insists on creating intermediate object files,

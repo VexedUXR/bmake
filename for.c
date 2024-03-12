@@ -432,7 +432,7 @@ static void
 ForLoop_SubstVarShort(ForLoop *f, unsigned int firstItem, Buffer *body,
 		      const char *p, const char **inout_mark)
 {
-	const char ch = *p;
+	char ch = *p;
 	const char **vars;
 	size_t i;
 

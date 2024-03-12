@@ -684,20 +684,6 @@ Main_ParseArgLine(const char *line)
 	if (p[0] == '\0')
 		return;
 
-#ifndef POSIX
-	{
-		/*
-		 * $MAKE may simply be naming the make(1) binary
-		 */
-		char *cp;
-
-		if (!(cp = strrchr(line, '/')))
-			cp = line;
-		if ((cp = strstr(cp, "make")) &&
-		    strcmp(cp, "make") == 0)
-			return;
-	}
-#endif
 	{
 		FStr argv0 = Var_Value(SCOPE_GLOBAL, ".MAKE");
 		size_t len = strlen(argv0.str) + 1;
@@ -1319,20 +1305,11 @@ main_Init(int argc, char **argv)
 
 	Dir_Init();
 
-#ifdef POSIX
 	{
 		char *makeflags = explode(getenv("MAKEFLAGS"));
 		Main_ParseArgLine(makeflags);
 		free(makeflags);
 	}
-#else
-	/*
-	 * First snag any flags out of the MAKE environment variable.
-	 * (Note this is *not* MAKEFLAGS since /bin/make uses that and it's
-	 * in a different format).
-	 */
-	Main_ParseArgLine(getenv("MAKE"));
-#endif
 
 	if (_getcwd(curdir, MAXPATHLEN) == NULL) {
 		(void)fprintf(stderr, "%s: getcwd: %s.\n",
@@ -1630,7 +1607,7 @@ Cmd_Exec(const char *cmd, char **error)
 		HANDLE_FLAG_INHERIT) == 0)
 		Punt("failed to set pipe attributes: %s", strerr(GetLastError()));
 
-	Var_ReexportVars();
+	Var_ReexportVars(SCOPE_GLOBAL);
 
 	si.dwFlags = STARTF_USESTDHANDLES;
 	si.hStdOutput = write;
@@ -1991,13 +1968,8 @@ Main_ExportMAKEFLAGS(bool first)
 	    "${.MAKEFLAGS} ${.MAKEOVERRIDES:O:u:@v@$v=${$v:Q}@}",
 	    SCOPE_CMDLINE, VARE_WANTRES);
 	/* TODO: handle errors */
-	if (flags[0] != '\0') {
-#ifdef POSIX
+	if (flags[0] != '\0')
 		setenv("MAKEFLAGS", flags, 1);
-#else
-		setenv("MAKE", flags, 1);
-#endif
-	}
 }
 
 char*

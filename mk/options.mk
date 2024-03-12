@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: BSD-2-Clause
+#
 # $Id: options.mk,v 1.19 2021/10/03 16:29:51 sjg Exp $
 #
 #	@(#) Copyright (c) 2012, Simon J. Gerraty

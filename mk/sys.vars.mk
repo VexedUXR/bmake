@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: BSD-2-Clause
+#
 # $Id: sys.vars.mk,v 1.15 2023/05/16 16:41:52 sjg Exp $
 #
 #	@(#) Copyright (c) 2003-2023, Simon J. Gerraty
@@ -22,7 +24,7 @@
 # __${_this}__: .NOTMAIN
 #
 
-_this = ${.PARSEDIR:tA}/${.PARSEFILE}
+_this = ${.PARSEDIR:tA:S,:,,W}\${.PARSEFILE}
 
 # some useful modifiers
 

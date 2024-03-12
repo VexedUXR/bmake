@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: BSD-2-Clause
+#
 # $Id: links.mk,v 1.7 2020/08/19 17:51:53 sjg Exp $
 #
 #	@(#) Copyright (c) 2005, Simon J. Gerraty
