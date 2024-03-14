@@ -95,16 +95,16 @@ OPTIONS_SHOW ?= ${.set_options:O:u:@o@${OPTION_PREFIX}$o=${${OPTION_PREFIX}$o}@}
 OPTION_DESCRIPTION_PREFIX ?= DESCRIPTION_
 OPTION_DESCRIPTION_SEPARATOR ?= ==
 
-OPTIONS_DESCRIBE ?= ${.set_options:O:u:@o@${OPTION_PREFIX}$o=${${OPTION_PREFIX}$o}${${OPTION_DESCRIPTION_PREFIX}$o:S,^, ${OPTION_DESCRIPTION_SEPARATOR} ,1}${.newline}@}
+OPTIONS_DESCRIBE ?= ${.set_options:O:u:@o@${OPTION_PREFIX}$o=${${OPTION_PREFIX}$o}${${OPTION_DESCRIPTION_PREFIX}$o:S,^, ${OPTION_DESCRIPTION_SEPARATOR} ,1}@}
 
 .if !commands(show-options)
 show-options: .NOTMAIN .PHONY
-	@echo; echo "${OPTIONS_SHOW:ts\n}"; echo
+	@echo: ${OPTIONS_SHOW:@o@&echo $o@} &echo:
 .endif
 
 .if !commands(describe-options)
 describe-options: .NOTMAIN .PHONY
-	@echo; echo "${OPTIONS_DESCRIBE}"; echo
+	@echo: ${OPTIONS_DESCRIBE:@o@&echo $o@} &echo:
 .endif
 
 # we expect to be included more than once
