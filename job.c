@@ -418,11 +418,10 @@ JobCreatePipe(Job *job)
 	 * race for the token when a new one becomes available, so the read
 	 * from the pipe should not block.
 	 */
-	if (SetNamedPipeHandleState(job->inPipe, &(DWORD){PIPE_NOWAIT},
-		NULL, NULL) == 0)
+	if (SetNamedPipeHandleState(job->inPipe, &(DWORD){PIPE_NOWAIT}, NULL, NULL) == 0)
 		Punt("failed to set pipe handle state: %s", strerr(GetLastError()));
 	if (SetHandleInformation(job->outPipe, HANDLE_FLAG_INHERIT,
-		HANDLE_FLAG_INHERIT) == 0)
+			HANDLE_FLAG_INHERIT) == 0)
 		Punt("failed to set pipe attributes: %s", strerr(GetLastError()));
 }
 
@@ -904,12 +903,11 @@ TouchRegular(GNode *gn)
 	ft.dwHighDateTime = t.HighPart;
 
 	if ((fh = CreateFileA(file, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS,
-		FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE ||
-		SetFileTime(fh, NULL, &ft, &ft) == 0) {
+			FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE ||
+			SetFileTime(fh, NULL, &ft, &ft) == 0) {
 		(void)fprintf(stderr, "*** couldn't touch %s: %s\n",
 			file, strerr(GetLastError()));
 		(void)fflush(stderr);
-		return;
 	}
 
 	CloseHandle(fh);
@@ -1066,8 +1064,7 @@ JobExec(Job *job, char *args)
 	si.hStdOutput = si.hStdError = job->outPipe;
 	si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 	
-	if (CreateProcessA(shellPath, args, NULL, NULL, TRUE,
-		0, NULL, NULL, &si, &pi) == 0)
+	if (CreateProcessA(shellPath, args, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi) == 0)
 		Punt("could not create process: %s", strerr(GetLastError()));
 	CloseHandle(pi.hThread);
 
@@ -1105,8 +1102,8 @@ JobMakeArgs(Job *job)
 {
 	char *args;
 
-	args = bmake_malloc((size_t)snprintf(NULL, 0, cmdFmt,
-		shellPath, shell->args, job->cmdBuffer->data) + 1);
+	args = bmake_malloc((size_t)snprintf(NULL, 0, cmdFmt, shellPath, shell->args,
+		job->cmdBuffer->data) + 1);
 	sprintf(args, cmdFmt, shellPath, shell->args, job->cmdBuffer->data);
 
 	return args;
@@ -1148,13 +1145,11 @@ JobWriteShellCommands(Job *job, GNode *gn, bool *out_run)
 		tmp[6] = '\0';
 
 		tmpdir = getTmpdir();
-		tfile = _alloca((size_t)snprintf(NULL, 0, "%s%s%s", tmpdir,
-			"make", tmp) + 1);
+		tfile = _alloca((size_t)snprintf(NULL, 0, "%s%s%s", tmpdir, "make", tmp) + 1);
 		sprintf(tfile, "%s%s%s", tmpdir, "make", tmp);
 
 		if ((fp = fopen(tfile, "w+")) == NULL)
-			Punt("could not create temporary file %s: %s", tfile,
-				strerror(errno));
+			Punt("could not create temporary file %s: %s", tfile, strerror(errno));
 
 		fprintf(fp, "%s", job->cmdBuffer->data);
 		fclose(fp);
@@ -1526,9 +1521,8 @@ InitShellNameAndPath(void)
 #ifdef DEFSHELL_PATH
 	shellPath = DEFSHELL_PATH;
 #else
-	if ((shellPath = getenv("COMSPEC")) == NULL ||
-		shellPath[0] == '\0' ||
-		strcmp(shellName, str_basename(shellPath)) != 0)
+	if ((shellPath = getenv("COMSPEC")) == NULL || shellPath[0] == '\0' ||
+			strcmp(shellName, str_basename(shellPath)) != 0)
 		Punt("could not find %s's path via ComSpec", shellName);
 #endif
 }
@@ -2108,7 +2102,7 @@ Job_TokenWithdraw(void)
 		return false;
 
 	if (ReadFile(tokenWaitJob.inPipe, &tok, 1, NULL, NULL) == 0 &&
-		(ret = GetLastError()) != ERROR_NO_DATA)
+			(ret = GetLastError()) != ERROR_NO_DATA)
 		Fatal("Failed to read from pipe: %s", strerr(ret));
 
 	if (ret == ERROR_NO_DATA && jobTokensRunning != 0) {

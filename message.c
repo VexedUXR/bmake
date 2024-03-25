@@ -27,18 +27,12 @@ MsgConsoleH(DWORD ev)
 		return FALSE;
 	}
 
-	/*
-	 * Avoid possible deadlock caused by the
-	 * suspended thread holding a mutex.
-	 */
 	Job_WaitMutex();
 	if (SuspendThread(thread) == -1)
-		Punt("failed to suspend main thread: %s",
-			strerr(GetLastError()));
+		Punt("failed to suspend main thread: %s", strerr(GetLastError()));
 	proc();
 	if (ResumeThread(thread) == -1)
-		Punt("failed to resume main thread: %s",
-			strerr(GetLastError()));
+		Punt("failed to resume main thread: %s", strerr(GetLastError()));
 	Job_ReleaseMutex();
 
 	return TRUE;
@@ -75,12 +69,11 @@ MsgLoop(LPVOID ready)
 
 	if (RegisterClassA(&wClass) == 0)
 		Punt("failed to register class: %s", strerr(GetLastError()));
-	if ((window = CreateWindowExA(0, progname, NULL, 0, 0, 0, 0, 0,
-		HWND_MESSAGE, NULL, wClass.hInstance, NULL)) == NULL)
+	if ((window = CreateWindowExA(0, progname, NULL, 0, 0, 0, 0, 0, HWND_MESSAGE,
+			NULL, wClass.hInstance, NULL)) == NULL)
 		Punt("failed to create window: %s", strerr(GetLastError()));
 
 	*(bool *)ready = true;
-
 	while ((ret = GetMessageA(&msg, window, 0, 0)) != 0) {
 		if (ret == -1)
 			Punt("failed to get message: %s", strerr(GetLastError()));
@@ -104,19 +97,14 @@ void
 Msg_Init(void (*intProc)(void), void (*termProc)(void))
 {
 	volatile bool ready = false;
+	HANDLE process = GetCurrentProcess();
 
 	IntProc = intProc;
 	TermProc = termProc;
 
-	{
-		HANDLE process = GetCurrentProcess();
-
-		if (DuplicateHandle(process, GetCurrentThread(), process,
-			&thread, 0, FALSE, DUPLICATE_SAME_ACCESS) == 0)
-			Punt("failed to duplicate thread handle: %s",
-				strerr(GetLastError()));
-	}
-
+	if (DuplicateHandle(process, GetCurrentThread(), process, &thread, 0, FALSE,
+			DUPLICATE_SAME_ACCESS) == 0)
+		Punt("failed to duplicate thread handle: %s", strerr(GetLastError()));
 	if (SetConsoleCtrlHandler(MsgConsoleH, TRUE) == 0)
 		Punt("failed to set console ctrl handler: %s", strerr(GetLastError()));
 	if ((msgThread = CreateThread(NULL, 0, MsgLoop, &ready, 0, NULL)) == NULL)

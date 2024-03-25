@@ -1600,11 +1600,9 @@ Cmd_Exec(const char *cmd, char **error)
 
 	if (CreatePipe(&read, &write, NULL, PIPESZ) == 0)
 		Punt("failed to create pipe: %s", strerr(GetLastError()));
-	if (SetNamedPipeHandleState(read, &(DWORD){PIPE_NOWAIT},
-		NULL, NULL) == 0)
+	if (SetNamedPipeHandleState(read, &(DWORD){PIPE_NOWAIT}, NULL, NULL) == 0)
 		Punt("failed to set pipe handle state: %s", strerr(GetLastError()));
-	if (SetHandleInformation(write, HANDLE_FLAG_INHERIT,
-		HANDLE_FLAG_INHERIT) == 0)
+	if (SetHandleInformation(write, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT) == 0)
 		Punt("failed to set pipe attributes: %s", strerr(GetLastError()));
 
 	Var_ReexportVars(SCOPE_GLOBAL);
@@ -1614,13 +1612,11 @@ Cmd_Exec(const char *cmd, char **error)
 	si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
 	si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 
-	if (CreateProcessA(shellPath, output, NULL, NULL, TRUE, 0, NULL,
-		NULL, &si, &pi) == 0)
-		Punt("could not create process: %s",
-			strerr(GetLastError()));
+	if (CreateProcessA(shellPath, output, NULL, NULL, TRUE, 0, NULL, NULL,
+			&si, &pi) == 0)
+		Punt("could not create process: %s", strerr(GetLastError()));
 
-	while ((status = WaitForSingleObject(pi.hProcess, PROCESSWAIT))
-		== WAIT_TIMEOUT) {
+	while ((status = WaitForSingleObject(pi.hProcess, PROCESSWAIT)) == WAIT_TIMEOUT) {
 		DWORD avail;
 
 		if (PeekNamedPipe(read, NULL, 0, NULL, &avail, NULL) == 0)
@@ -1630,8 +1626,7 @@ Cmd_Exec(const char *cmd, char **error)
 			if (buf.cap == 0)
 				Buf_InitSize(&buf, avail);
 
-			while (ReadFile(read, result, sizeof result, &bytes_read,
-				NULL) != 0)
+			while (ReadFile(read, result, sizeof result, &bytes_read, NULL) != 0)
 				Buf_AddBytes(&buf, result, (size_t)bytes_read);
 
 			if ((status = GetLastError()) != ERROR_NO_DATA)
@@ -1640,11 +1635,9 @@ Cmd_Exec(const char *cmd, char **error)
 	}
 
 	if (status == WAIT_FAILED)
-		Punt("failed to wait for process: %s",
-			strerr(GetLastError()));
+		Punt("failed to wait for process: %s", strerr(GetLastError()));
 	if (GetExitCodeProcess(pi.hProcess, &status) == 0)
-		Punt("failed to get exit code for process: %s",
-			strerr(GetLastError()));
+		Punt("failed to get exit code for process: %s", strerr(GetLastError()));
 
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
@@ -1667,11 +1660,12 @@ Cmd_Exec(const char *cmd, char **error)
 	}
 
 	output = Buf_DoneData(&buf);
+	
+	/*
+	 * XXX: This makes it so that there are
+	 * two spaces in the case of \r\n.
+	 */
 	for (p = output; *p != '\0'; p++)
-		/*
-		 * XXX: This makes it so that there are
-		 * two spaces in the case of \r\n.
-		 */
 		if (*p == '\n' || *p == '\r')
 			*p = ' ';
 
@@ -2011,8 +2005,7 @@ strerr(DWORD e)
 {
 	char *buf;
 
-	if (FormatMessageA(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+	if (FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
 			FORMAT_MESSAGE_MAX_WIDTH_MASK | FORMAT_MESSAGE_IGNORE_INSERTS,
 			NULL, e, 0, &buf, 30, NULL) == 0)
 		Punt("failed to format error message");

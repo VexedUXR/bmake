@@ -270,11 +270,10 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 
 	{
 		const char *args = Shell_GetArgs();
-		char *tmp = _alloca((size_t)snprintf(NULL, 0,
-			cmdFmt, shellPath, args, cmd) + 1);
+		char *tmp = _alloca((size_t)
+			snprintf(NULL, 0, cmdFmt, shellPath, args, cmd) + 1);
 
 		sprintf(tmp, cmdFmt, shellPath, args, cmd);
-		
 		cmd = tmp;
 	}
 
@@ -292,14 +291,12 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 		si.hStdOutput = si.hStdError = meta_compat_pipe()[1];
 		si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 
-		if (CreateProcessA(shellPath, cmd, NULL, NULL, TRUE, 0, NULL,
-			NULL, &si, &pi) == 0)
+		if (CreateProcessA(shellPath, cmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi) == 0)
 			Punt("could not create process: %s", strerr(GetLastError()));
-	}
-	else
+	} else
 #endif
-	if (CreateProcessA(shellPath, cmd, NULL, NULL, FALSE, 0, NULL,
-		NULL, &(STARTUPINFOA){sizeof (STARTUPINFOA), 0}, &pi) == 0)
+	if (CreateProcessA(shellPath, cmd, NULL, NULL, FALSE, 0, NULL, NULL,
+			&(STARTUPINFOA){sizeof (STARTUPINFOA), 0}, &pi) == 0)
 		Punt("could not create process: %s", strerr(GetLastError()));
 
 	compatChild = pi.hProcess;
@@ -311,12 +308,10 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 	/* The child is off and running. Now all we can do is wait... */
 #ifdef USE_META
 	if (useMeta) {
-		while ((status = WaitForSingleObject(pi.hProcess, PROCESSWAIT))
-			== WAIT_TIMEOUT) {
+		while ((status = WaitForSingleObject(pi.hProcess, PROCESSWAIT)) == WAIT_TIMEOUT) {
 			DWORD avail;
 
-			if (PeekNamedPipe(meta_compat_pipe()[0], NULL, 0, NULL, &avail, NULL)
-				== 0)
+			if (PeekNamedPipe(meta_compat_pipe()[0], NULL, 0, NULL, &avail, NULL) == 0)
 				Punt("failed to peek pipe: %s", strerr(GetLastError()));
 
 			if (avail >= PIPESZ)
