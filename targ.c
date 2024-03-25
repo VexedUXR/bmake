@@ -200,6 +200,7 @@ GNode_New(const char *name)
 	gn->suffix = NULL;
 	gn->fname = NULL;
 	gn->lineno = 0;
+	gn->exit_status = 0;
 
 #ifdef CLEANUP
 	Lst_Append(&allNodes, gn);

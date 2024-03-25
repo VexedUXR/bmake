@@ -1891,10 +1891,13 @@ static void
 SetErrorVars(GNode *gn)
 {
 	StringListNode *ln;
+	char sts[16];
 
 	/*
 	 * We can print this even if there is no .ERROR target.
 	 */
+	snprintf(sts, sizeof(sts), "%ld", gn->exit_status);
+	Global_Set(".ERROR_EXIT", sts);
 	Global_Set(".ERROR_TARGET", gn->name);
 	Global_Delete(".ERROR_CMD");
 

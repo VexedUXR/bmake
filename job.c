@@ -1488,6 +1488,7 @@ Job_CatchChildren(void)
 
 			job->status = JOB_ST_FINISHED;
 			job->exit_status = status;
+			job->node->exit_status = status;
 
 			JobFinish(job, status);
 			break;

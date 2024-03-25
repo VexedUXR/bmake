@@ -444,6 +444,7 @@ typedef struct GNode {
 	const char *fname;
 	/* Line number where the GNode got defined, 1-based */
 	unsigned lineno;
+	DWORD exit_status;
 } GNode;
 
 /*

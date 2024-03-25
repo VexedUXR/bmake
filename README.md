@@ -17,4 +17,4 @@ The binary itself is functional and can be used as expected.
 Some of the mk files have been ported, though some functionality is missing,
 most notabaly: there is no `install` target and no support for manpages.
 
-Up to date with bmake `20240301`
+Up to date with bmake `20240314`

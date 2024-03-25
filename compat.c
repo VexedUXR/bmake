@@ -348,6 +348,7 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 				meta_job_error(NULL, gn, false, status);
 #endif
 			gn->made = ERROR;
+			gn->exit_status = status;
 			if (opts.keepgoing) {
 				/*
 				 * Abort the current target,
