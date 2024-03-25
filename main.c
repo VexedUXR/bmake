@@ -103,10 +103,6 @@
 
 /*	"@(#)main.c	8.3 (Berkeley) 3/19/94"	*/
 
-#ifndef __arraycount
-# define __arraycount(__x)	(sizeof(__x) / sizeof(__x[0]))
-#endif
-
 CmdOpts opts;
 time_t now;			/* Time at start of make */
 GNode *defaultNode;		/* .DEFAULT node */
