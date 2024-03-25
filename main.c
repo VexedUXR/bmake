@@ -1616,6 +1616,7 @@ Cmd_Exec(const char *cmd, char **error)
 			&si, &pi) == 0)
 		Punt("could not create process: %s", strerr(GetLastError()));
 
+	Buf_Init(&buf);
 	while ((status = WaitForSingleObject(pi.hProcess, PROCESSWAIT)) == WAIT_TIMEOUT) {
 		DWORD avail;
 
@@ -1623,9 +1624,6 @@ Cmd_Exec(const char *cmd, char **error)
 			Punt("failed to peek pipe: %s", strerr(GetLastError()));
 
 		if (avail >= PIPESZ) {
-			if (buf.cap == 0)
-				Buf_InitSize(&buf, avail);
-
 			while (ReadFile(read, result, sizeof result, &bytes_read, NULL) != 0)
 				Buf_AddBytes(&buf, result, (size_t)bytes_read);
 
