@@ -87,6 +87,12 @@
 # include "meta.h"
 #endif
 
+/*
+ * Format for executing shells.
+ * "shellPath" args cmd
+ */
+#define cmdFmt "\"%s\" %s %s"
+
 typedef enum JobStatus {
 	JOB_ST_FREE	= 0,	/* Job is available */
 	JOB_ST_SET_UP	= 1,	/* Job is allocated but otherwise invalid */
@@ -165,7 +171,6 @@ typedef struct ShellInfo {
 
 extern const char *shellPath;
 extern const char *shellName;
-extern const char *cmdFmt;
 
 extern int jobTokensRunning;	/* tokens currently "out" */
 

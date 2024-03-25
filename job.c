@@ -339,12 +339,6 @@ static Job tokenWaitJob;	/* token wait pseudo-job */
 
 static HANDLE job_mutex = NULL;
 
-/*
- * Format for executing shells.
- * "shellPath" args cmd
- */
-const char *cmdFmt = "\"%s\" %s %s";
-
 static void CollectOutput(Job *, bool);
 static void MAKE_ATTR_DEAD JobInterrupt(bool);
 
