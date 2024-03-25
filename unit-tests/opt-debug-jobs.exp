@@ -1,0 +1,24 @@
+job_pipe 0 0, maxjobs 1, tokens 1, compat 0
+Job_TokenWithdraw(<pid>): aborting 0, running 0
+(<pid>) withdrew token
+echo echo expanded expression&echo expanded expression||exit&echo echo  variable&echo  variable||exit&echo echo 'single' and "double" quotes&echo 'single' and "double" quotes||exit&timeout /nobreak 1||exit&
+Running all
+	Command: "<shell>" /c echo echo expanded expression&echo expanded expression||exit&echo echo  variable&echo  variable||exit&echo echo 'single' and "double" quotes&echo 'single' and "double" quotes||exit&timeout /nobreak 1||exit
+JobExec(all): handle <handle> added to jobs table
+job table @ job started
+job 0, status 3, flags ---, pid <pid>
+echo expanded expression
+expanded expression
+echo  variable
+ variable
+echo 'single' and "double" quotes
+'single' and "double" quotes
+
+Waiting for 1 seconds, press CTRL+C to quit ...0
+Process <pid> exited/stopped status 0.
+JobFinish: <pid> [all], status 0
+Process <pid> [all] exited.
+*** [all] Completed successfully
+Job_TokenWithdraw(<pid>): aborting 0, running 0
+(<pid>) withdrew token
+0

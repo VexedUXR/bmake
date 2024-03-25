@@ -141,6 +141,7 @@ TESTS+=	deptgt-silent-jobs
 TESTS+=	deptgt-suffixes
 TESTS+=	dep-var
 TESTS+=	dep-wildcards
+TESTS+=	opt-debug-jobs
 .if !defined(SSH_CLIENT)
 TESTS+=	cmd-interrupt
 TESTS+=	deptgt-interrupt
@@ -192,6 +193,14 @@ ${TEST_MAKE:S,\\,/,g};bmake.exe
 
 CHANGE.deptgt-suffixes= \
 '(.|\n)*  \.\.\n\n';
+
+CHANGE.opt-debug-jobs= \
+\([0-9]*\);(<pid>) \
+'pid [0-9]*;pid <pid>' \
+'Process [0-9]*;Process <pid>' \
+'JobFinish: [0-9]*;JobFinish: <pid>' \
+'${.SHELL:S,\\,\\\\,g};<shell>' \
+'handle [0-9A-F]*;handle <handle>'
 
 # Enviroment variables for tests
 ENV.opt-env= \
