@@ -65,7 +65,7 @@ _LIBS=
 .endif
 
 .if !defined(_SKIP_BUILD)
-realbuild: ${_LIBS}
+realbuild: ${SUBDIR} ${_LIBS}
 .endif
 
 OBJS_SRCS = ${SRCS:${OBJS_SRCS_FILTER}}
@@ -103,9 +103,10 @@ cleanlib: .PHONY
 	${RM} ${SHLIB_LINKS}
 .endif
 
-clean: cleanlib
-cleandir: cleanlib
+clean:  _SUBDIRUSE cleanlib
+cleandir: _SUBDIRUSE cleanlib
 .else
-cleandir: clean
+cleandir: _SUBDIRUSE clean
 .endif
+.include <subdir.mk>
 .endif

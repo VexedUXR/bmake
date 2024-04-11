@@ -64,16 +64,17 @@ ${PROG}.exe: ${OBJS} ${DPADD}
 .endif	# defined(PROG)
 
 .if !defined(_SKIP_BUILD)
-realbuild: ${PROG}.exe
+realbuild: ${SUBDIR} ${PROG}.exe
 .endif
 
 .if !target(clean)
 cleanprog:
 	${RM} ${PROG}.exe ${OBJS} ${CLEANFILES}
 
-clean: cleanprog
-cleandir: cleanprog
+clean: _SUBDIRUSE cleanprog
+cleandir: _SUBDIRUSE cleanprog
 .else
-cleandir: clean
+cleandir: _SUBDIRUSE clean
 .endif
+.include <subdir.mk>
 .endif
