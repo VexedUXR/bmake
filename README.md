@@ -2,7 +2,7 @@
 # bmake for Windows
 
 ## Building
-You can build this using the Makefile with bmake itself or manually using msbuild.
+You can build this by running `bmake`.
 
 ## Notable Changes
 - Arguments can be supplied with either `-` or `/`
