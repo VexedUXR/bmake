@@ -49,7 +49,7 @@ _SUBDIRUSE: .USE
 	)
 
 ${SUBDIR}::
-	( \
+	@( \
 		if exist ${.CURDIR}\${.TARGET}.${MACHINE} ( \
 			set "_newdir_=${.TARGET}.${MACHINE}" \
 		) \
