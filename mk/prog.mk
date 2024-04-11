@@ -55,7 +55,7 @@ ${CXX_SUFFIXES:%=%.obj}:
 	${COMPILE.cc} ${.IMPSRC} ${CC_OUT}
 
 ${PROG}.exe: ${OBJS} ${DPADD}
-	${_CCLINK} ${LDFLAGS} ${LDSTATIC} ${_PROGLDOPTS} ${OBJS} ${LDADD} ${CC_OUT}
+	${_CCLINK} ${LDSTATIC} ${_PROGLDOPTS} ${OBJS} ${LDADD} ${CC_OUT} ${LDFLAGS}
 .else
 .c.exe:
 	${LINK.c} ${.IMPSRC} ${LDLIBS} ${CC_OUT}
