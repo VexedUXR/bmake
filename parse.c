@@ -2368,7 +2368,7 @@ ParseRawLine(IncludedFile *curFile, char **out_line, char **out_line_end,
 		ch = *p;
 		if (ch == '\0' || (ch == '\\' && p[1] == '\0')) {
 			Parse_Error(PARSE_FATAL, "Zero byte read from file");
-			return PRLR_ERROR;
+			exit(2);
 		}
 
 		/* Treat next character after '\' as literal. */

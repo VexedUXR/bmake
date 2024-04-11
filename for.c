@@ -194,11 +194,7 @@ ForLoop_ParseItems(ForLoop *f, const char *p)
 	cpp_skip_whitespace(&p);
 
 	items = Var_Subst(p, SCOPE_GLOBAL, VARE_WANTRES);
-	if (items == var_Error) {
-		/* TODO: Make this part of the code reachable. */
-		Parse_Error(PARSE_FATAL, "Error in .for loop items");
-		return false;
-	}
+	/* TODO: handle errors */
 
 	f->items = Substring_Words(items, false);
 	free(items);
@@ -488,12 +484,11 @@ ForLoop_SubstBody(ForLoop *f, unsigned int firstItem, Buffer *body)
 			p += 2;
 			ForLoop_SubstVarLong(f, firstItem, body,
 			    &p, endc, &mark);
-		} else if (p[1] != '\0') {
+		} else {
 			ForLoop_SubstVarShort(f, firstItem, body,
 			    p + 1, &mark);
 			p += 2;
-		} else
-			break;
+		}
 	}
 
 	Buf_AddRange(body, mark, end);
