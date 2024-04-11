@@ -49,16 +49,22 @@ _SUBDIRUSE: .USE
 	)
 
 ${SUBDIR}::
-	@( \
-		if exist ${.CURDIR}\${.TARGET}.${MACHINE} ( \
-			set "_newdir_=${.TARGET}.${MACHINE}" \
+	@set "_r=${.CURDIR}\"& \
+	( \
+		if [${.TARGET:M*\:*}] == [] ( \
+			if exist ${.CURDIR}\${.TARGET}.${MACHINE} ( \
+				set "_newdir_=${.TARGET}.${MACHINE}" \
+			) \
+			else ( \
+				set "_newdir_=${.TARGET}" \
+			) \
 		) \
 		else ( \
-			set "_newdir_=${.TARGET}" \
+			set "_r= " & set "_newdir_=${.TARGET}" \
 		) \
 	)& \
 	${ECHO_DIR} ===^> !_newdir_!& \
-	cd ${.CURDIR}\!_newdir_!&& \
+	cd !_r!!_newdir_!&& \
 	${.MAKE} _THISDIR_="!_newdir_!" all
 .endif
 
