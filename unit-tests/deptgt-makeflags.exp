@@ -6,5 +6,5 @@ Var_Parse: ${DOLLAR} != "\$\$" (eval-defined)
 Comparing "$$" != "$$"
 Global: .MAKEFLAGS =  -r -k -D VAR -D VAR -d cv -d
 Global: .MAKEFLAGS =  -r -k -D VAR -D VAR -d cv -d 0
-bmake.exe[1]: Unterminated quoted string [bmake.exe VAR=initial UNBALANCED=']
+bmake[1]: Unterminated quoted string [bmake VAR=initial UNBALANCED=']
 0

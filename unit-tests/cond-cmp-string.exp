@@ -1,11 +1,11 @@
-bmake.exe[1]: "cond-cmp-string.mk" line 19: Malformed conditional (str != str)
-bmake.exe[1]: "cond-cmp-string.mk" line 44: Malformed conditional ("string" != "str""ing")
-bmake.exe[1]: "cond-cmp-string.mk" line 52: Malformed conditional (!("value" = "value"))
-bmake.exe[1]: "cond-cmp-string.mk" line 60: Malformed conditional (!("value" === "value"))
-bmake.exe[1]: "cond-cmp-string.mk" line 118: Comparison with '<' requires both operands 'string' and 'string' to be numeric
-bmake.exe[1]: "cond-cmp-string.mk" line 126: Comparison with '<=' requires both operands 'string' and 'string' to be numeric
-bmake.exe[1]: "cond-cmp-string.mk" line 134: Comparison with '>' requires both operands 'string' and 'string' to be numeric
-bmake.exe[1]: "cond-cmp-string.mk" line 142: Comparison with '>=' requires both operands 'string' and 'string' to be numeric
-bmake.exe[1]: Fatal errors encountered -- cannot continue
-bmake.exe[1]: stopped in unit-tests
+bmake[1]: "cond-cmp-string.mk" line 19: Malformed conditional (str != str)
+bmake[1]: "cond-cmp-string.mk" line 44: Malformed conditional ("string" != "str""ing")
+bmake[1]: "cond-cmp-string.mk" line 52: Malformed conditional (!("value" = "value"))
+bmake[1]: "cond-cmp-string.mk" line 60: Malformed conditional (!("value" === "value"))
+bmake[1]: "cond-cmp-string.mk" line 118: Comparison with '<' requires both operands 'string' and 'string' to be numeric
+bmake[1]: "cond-cmp-string.mk" line 126: Comparison with '<=' requires both operands 'string' and 'string' to be numeric
+bmake[1]: "cond-cmp-string.mk" line 134: Comparison with '>' requires both operands 'string' and 'string' to be numeric
+bmake[1]: "cond-cmp-string.mk" line 142: Comparison with '>=' requires both operands 'string' and 'string' to be numeric
+bmake[1]: Fatal errors encountered -- cannot continue
+bmake[1]: stopped in unit-tests
 1

@@ -47,26 +47,26 @@ parse-dynamic: parse-dynamic  parse-dynamic  before
 parse-dynamic: parse-dynamic  parse-dynamic  after
 parse-dynamic: parse-dynamic  parse-dynamic  after
 varerror-unclosed:begin
-bmake.exe[1]: Unclosed variable ""
+bmake[1]: Unclosed variable ""
 ECHO is on.
-bmake.exe[1]: Unclosed variable "UNCLOSED"
+bmake[1]: Unclosed variable "UNCLOSED"
 ECHO is on.
-bmake.exe[1]: Unclosed variable "UNCLOSED"
+bmake[1]: Unclosed variable "UNCLOSED"
 ECHO is on.
-bmake.exe[1]: Unclosed variable "PATTERN"
-bmake.exe[1]: Unclosed expression, expecting '}' for modifier "M${PATTERN" of variable "UNCLOSED" with value ""
+bmake[1]: Unclosed variable "PATTERN"
+bmake[1]: Unclosed expression, expecting '}' for modifier "M${PATTERN" of variable "UNCLOSED" with value ""
 ECHO is on.
-bmake.exe[1]: Unclosed variable "param"
-bmake.exe[1]: Unclosed variable "UNCLOSED."
+bmake[1]: Unclosed variable "param"
+bmake[1]: Unclosed variable "UNCLOSED."
 ECHO is on.
 ECHO is on.
-bmake.exe[1]: Unclosed variable "UNCLOSED.1"
+bmake[1]: Unclosed variable "UNCLOSED.1"
 ECHO is on.
-bmake.exe[1]: Unclosed variable "UNCLOSED.2"
+bmake[1]: Unclosed variable "UNCLOSED.2"
 ECHO is on.
-bmake.exe[1]: Unclosed variable "UNCLOSED.3"
+bmake[1]: Unclosed variable "UNCLOSED.3"
 ECHO is on.
-bmake.exe[1]: Unclosed variable "UNCLOSED_ORIG"
+bmake[1]: Unclosed variable "UNCLOSED_ORIG"
 ECHO is on.
 varerror-unclosed:end
 target1-flags: we have: one two 

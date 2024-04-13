@@ -9,7 +9,7 @@ exit 1 'fail2' '${.TARGET}' '$${.TARGET}'
 : Making success3 out of nothing.
 
 Stop.
-bmake.exe[1]: stopped in unit-tests
+bmake[1]: stopped in unit-tests
 .ERROR target: <fail1>
 .ERROR command: <>
 1

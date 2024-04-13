@@ -191,7 +191,7 @@ CHANGE.depsrc-wait= \
 3a[123];3a 3b[123];3b 3c[123];3c
 
 CHANGE.deptgt-makeflags= \
-${TEST_MAKE:S,\\,/,g};bmake.exe
+${TEST_MAKE:S,\\,/,g};bmake
 
 CHANGE.deptgt-suffixes= \
 '(.|\n)*  \.\.\n\n';

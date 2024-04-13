@@ -1,4 +1,4 @@
-bmake.exe[1]: "dep-colon-bug-cross-file.mk" line 32: warning: duplicate script for target "all" ignored
-bmake.exe[1]: "dep-colon-bug-cross-file.mk" line 42: warning: using previous script for "all" defined here
+bmake[1]: "dep-colon-bug-cross-file.mk" line 32: warning: duplicate script for target "all" ignored
+bmake[1]: "dep-colon-bug-cross-file.mk" line 42: warning: using previous script for "all" defined here
 : pass 1
 0

@@ -1,5 +1,5 @@
-bmake.exe[1]: internal error -- J option malformed (garbage)
-usage: bmake.exe [-BeikNnqrSstWwX]
+bmake[1]: internal error -- J option malformed (garbage)
+usage: bmake [-BeikNnqrSstWwX]
             [-C directory] [-D variable] [-d flags] [-f makefile]
             [-I directory] [-J private] [-j max_jobs] [-m directory] [-T file]
             [-V variable] [-v variable] [variable=value] [target ...]

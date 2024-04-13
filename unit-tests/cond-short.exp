@@ -7,7 +7,7 @@ expected M pattern
 expected or 
 expected or exists 
 expected or empty 
-bmake.exe[1]: "cond-short.mk" line 231: Comparison with '<' requires both operands '' and '42' to be numeric
-bmake.exe[1]: Fatal errors encountered -- cannot continue
-bmake.exe[1]: stopped in unit-tests
+bmake[1]: "cond-short.mk" line 231: Comparison with '<' requires both operands '' and '42' to be numeric
+bmake[1]: Fatal errors encountered -- cannot continue
+bmake[1]: stopped in unit-tests
 1

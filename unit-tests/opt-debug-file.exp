@@ -1,11 +1,11 @@
-bmake.exe[1]: "opt-debug-file.mk" line 44: This goes to stderr only, once.
-bmake.exe[1]: "opt-debug-file.mk" line 47: This goes to stderr only, once.
-bmake.exe[1]: "opt-debug-file.mk" line 50: This goes to stderr, and in addition to the debug log.
+bmake[1]: "opt-debug-file.mk" line 44: This goes to stderr only, once.
+bmake[1]: "opt-debug-file.mk" line 47: This goes to stderr only, once.
+bmake[1]: "opt-debug-file.mk" line 50: This goes to stderr, and in addition to the debug log.
 CondParser_Eval: ${:!type opt-debug-file.debuglog!:Maddition:[#]} != 1
 Comparing 1.000000 != 1.000000
-bmake.exe[1]: Missing delimiter for modifier ':S'
-bmake.exe[1]: Missing delimiter for modifier ':S'
-bmake.exe[1]: Missing delimiter for modifier ':S'
+bmake[1]: Missing delimiter for modifier ':S'
+bmake[1]: Missing delimiter for modifier ':S'
+bmake[1]: Missing delimiter for modifier ':S'
 CondParser_Eval: ${:!type opt-debug-file.debuglog!:Mdelimiter:[#]} != 1
 Comparing 1.000000 != 1.000000
 Cannot open debug file "/nonexistent-6f21c672-a22d-4ef7/opt-debug-file.debuglog"

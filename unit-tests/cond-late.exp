@@ -1,4 +1,4 @@
-bmake.exe[1]: Bad conditional expression ' != "no"' before '?:'
+bmake[1]: Bad conditional expression ' != "no"' before '?:'
 yes
 no
 0

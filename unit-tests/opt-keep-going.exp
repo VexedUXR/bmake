@@ -5,5 +5,5 @@ other 1
 `all' not remade because of errors.
 
 Stop.
-bmake.exe[1]: stopped in unit-tests
+bmake[1]: stopped in unit-tests
 1

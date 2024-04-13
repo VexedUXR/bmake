@@ -27,37 +27,37 @@ Comparing "var&&name" != "var&&name"
 CondParser_Eval: ${:Uvar}||name != "var||name"
 Comparing "var||name" != "var||name"
 CondParser_Eval: bare
-bmake.exe[1]: "cond-token-plain.mk" line 106: A bare word is treated like defined(...), and the variable 'bare' is not defined.
+bmake[1]: "cond-token-plain.mk" line 106: A bare word is treated like defined(...), and the variable 'bare' is not defined.
 CondParser_Eval: VAR
-bmake.exe[1]: "cond-token-plain.mk" line 113: A bare word is treated like defined(...).
+bmake[1]: "cond-token-plain.mk" line 113: A bare word is treated like defined(...).
 CondParser_Eval: V${:UA}R
-bmake.exe[1]: "cond-token-plain.mk" line 121: ok
+bmake[1]: "cond-token-plain.mk" line 121: ok
 CondParser_Eval: V${UNDEF}AR
-bmake.exe[1]: "cond-token-plain.mk" line 130: Undefined variables in bare words expand to an empty string.
+bmake[1]: "cond-token-plain.mk" line 130: Undefined variables in bare words expand to an empty string.
 CondParser_Eval: 0${:Ux00}
-bmake.exe[1]: "cond-token-plain.mk" line 139: Numbers can be composed from literals and expressions.
+bmake[1]: "cond-token-plain.mk" line 139: Numbers can be composed from literals and expressions.
 CondParser_Eval: 0${:Ux01}
-bmake.exe[1]: "cond-token-plain.mk" line 144: Numbers can be composed from literals and expressions.
+bmake[1]: "cond-token-plain.mk" line 144: Numbers can be composed from literals and expressions.
 CondParser_Eval: "" ==
-bmake.exe[1]: "cond-token-plain.mk" line 151: Missing right-hand side of operator '=='
+bmake[1]: "cond-token-plain.mk" line 151: Missing right-hand side of operator '=='
 CondParser_Eval: == ""
-bmake.exe[1]: "cond-token-plain.mk" line 160: Malformed conditional (== "")
+bmake[1]: "cond-token-plain.mk" line 160: Malformed conditional (== "")
 CondParser_Eval: \\
-bmake.exe[1]: "cond-token-plain.mk" line 176: The variable '\\' is not defined.
+bmake[1]: "cond-token-plain.mk" line 176: The variable '\\' is not defined.
 CondParser_Eval: \\
-bmake.exe[1]: "cond-token-plain.mk" line 182: Now the variable '\\' is defined.
+bmake[1]: "cond-token-plain.mk" line 182: Now the variable '\\' is defined.
 CondParser_Eval: "unquoted\"quoted" != unquoted"quoted
 Comparing "unquoted"quoted" != "unquoted"quoted"
 CondParser_Eval: $$$$$$$$ != ""
-bmake.exe[1]: "cond-token-plain.mk" line 197: Malformed conditional ($$$$$$$$ != "")
+bmake[1]: "cond-token-plain.mk" line 197: Malformed conditional ($$$$$$$$ != "")
 CondParser_Eval: left == right
-bmake.exe[1]: "cond-token-plain.mk" line 206: Malformed conditional (left == right)
+bmake[1]: "cond-token-plain.mk" line 206: Malformed conditional (left == right)
 CondParser_Eval: ${0:?:} || left == right
 CondParser_Eval: 0
-bmake.exe[1]: "cond-token-plain.mk" line 212: Malformed conditional (${0:?:} || left == right)
+bmake[1]: "cond-token-plain.mk" line 212: Malformed conditional (${0:?:} || left == right)
 CondParser_Eval: left == right || ${0:?:}
-bmake.exe[1]: "cond-token-plain.mk" line 217: Malformed conditional (left == right || ${0:?:})
-bmake.exe[1]: "cond-token-plain.mk" line 236: Malformed conditional (VAR.${IF_COUNT::+=1} != "")
-bmake.exe[1]: Fatal errors encountered -- cannot continue
-bmake.exe[1]: stopped in unit-tests
+bmake[1]: "cond-token-plain.mk" line 217: Malformed conditional (left == right || ${0:?:})
+bmake[1]: "cond-token-plain.mk" line 236: Malformed conditional (VAR.${IF_COUNT::+=1} != "")
+bmake[1]: Fatal errors encountered -- cannot continue
+bmake[1]: stopped in unit-tests
 1

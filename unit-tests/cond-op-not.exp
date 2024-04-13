@@ -1,9 +1,9 @@
-bmake.exe[1]: "cond-op-not.mk" line 30: Not empty evaluates to true.
-bmake.exe[1]: "cond-op-not.mk" line 39: Not space evaluates to false.
-bmake.exe[1]: "cond-op-not.mk" line 44: Not 0 evaluates to true.
-bmake.exe[1]: "cond-op-not.mk" line 53: Not 1 evaluates to false.
-bmake.exe[1]: "cond-op-not.mk" line 60: Not word evaluates to false.
-bmake.exe[1]: "cond-op-not.mk" line 65: Malformed conditional (!)
-bmake.exe[1]: Fatal errors encountered -- cannot continue
-bmake.exe[1]: stopped in unit-tests
+bmake[1]: "cond-op-not.mk" line 30: Not empty evaluates to true.
+bmake[1]: "cond-op-not.mk" line 39: Not space evaluates to false.
+bmake[1]: "cond-op-not.mk" line 44: Not 0 evaluates to true.
+bmake[1]: "cond-op-not.mk" line 53: Not 1 evaluates to false.
+bmake[1]: "cond-op-not.mk" line 60: Not word evaluates to false.
+bmake[1]: "cond-op-not.mk" line 65: Malformed conditional (!)
+bmake[1]: Fatal errors encountered -- cannot continue
+bmake[1]: stopped in unit-tests
 1

@@ -1,15 +1,15 @@
-bmake.exe -f jobs-error-nested.mk nested
+bmake -f jobs-error-nested.mk nested
 exit 1
 *** [nested] Error code 1
 
-bmake.exe[2]: stopped in unit-tests
-bmake.exe[2]: 1 error
+bmake[2]: stopped in unit-tests
+bmake[2]: 1 error
 
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 *** [all] Error code 2
 
-bmake.exe[1]: stopped in unit-tests
-bmake.exe[1]: 1 error
+bmake[1]: stopped in unit-tests
+bmake[1]: 1 error
 
-bmake.exe[1]: stopped in unit-tests
+bmake[1]: stopped in unit-tests
 2

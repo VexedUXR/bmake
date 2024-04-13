@@ -1,21 +1,21 @@
-bmake.exe[1]: "cond-token-string.mk" line 15: Unknown modifier "Z"
-bmake.exe[1]: "cond-token-string.mk" line 15: Malformed conditional ("" != "${:Uvalue:Z}")
-bmake.exe[1]: "cond-token-string.mk" line 25: xvalue is not defined.
-bmake.exe[1]: "cond-token-string.mk" line 32: Malformed conditional (x${:Uvalue} == "")
-bmake.exe[1]: "cond-token-string.mk" line 42: Expected.
+bmake[1]: "cond-token-string.mk" line 15: Unknown modifier "Z"
+bmake[1]: "cond-token-string.mk" line 15: Malformed conditional ("" != "${:Uvalue:Z}")
+bmake[1]: "cond-token-string.mk" line 25: xvalue is not defined.
+bmake[1]: "cond-token-string.mk" line 32: Malformed conditional (x${:Uvalue} == "")
+bmake[1]: "cond-token-string.mk" line 42: Expected.
 CondParser_Eval: "UNDEF"
-bmake.exe[1]: "cond-token-string.mk" line 52: The string literal "UNDEF" is not empty.
+bmake[1]: "cond-token-string.mk" line 52: The string literal "UNDEF" is not empty.
 CondParser_Eval: " "
-bmake.exe[1]: "cond-token-string.mk" line 61: The string literal " " is not empty, even though it consists of whitespace only.
+bmake[1]: "cond-token-string.mk" line 61: The string literal " " is not empty, even though it consists of whitespace only.
 CondParser_Eval: "${UNDEF}"
-bmake.exe[1]: "cond-token-string.mk" line 71: An undefined variable in quotes expands to an empty string, which then evaluates to false.
+bmake[1]: "cond-token-string.mk" line 71: An undefined variable in quotes expands to an empty string, which then evaluates to false.
 CondParser_Eval: "${:Uvalue}"
-bmake.exe[1]: "cond-token-string.mk" line 77: A nonempty expression evaluates to true.
+bmake[1]: "cond-token-string.mk" line 77: A nonempty expression evaluates to true.
 CondParser_Eval: "${:U}"
-bmake.exe[1]: "cond-token-string.mk" line 86: An empty variable evaluates to false.
+bmake[1]: "cond-token-string.mk" line 86: An empty variable evaluates to false.
 CondParser_Eval: ("${VAR}")
 CondParser_Eval: "quoted" == quoted
 Comparing "quoted" == "quoted"
-bmake.exe[1]: Fatal errors encountered -- cannot continue
-bmake.exe[1]: stopped in unit-tests
+bmake[1]: Fatal errors encountered -- cannot continue
+bmake[1]: stopped in unit-tests
 1

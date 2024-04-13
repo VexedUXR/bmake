@@ -1,6 +1,6 @@
-bmake.exe[1]: don't know how to make dep-percent.o (continuing)
+bmake[1]: don't know how to make dep-percent.o (continuing)
 `all' not remade because of errors.
 
 Stop.
-bmake.exe[1]: stopped in unit-tests
+bmake[1]: stopped in unit-tests
 1

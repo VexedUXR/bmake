@@ -1,4 +1,4 @@
-bmake.exe[2]: "dep-duplicate.inc" line 2: warning: duplicate script for target "all" ignored
-bmake.exe[2]: "dep-duplicate.main" line 4: warning: using previous script for "all" defined here
+bmake[2]: "dep-duplicate.inc" line 2: warning: duplicate script for target "all" ignored
+bmake[2]: "dep-duplicate.main" line 4: warning: using previous script for "all" defined here
 main-output
 0

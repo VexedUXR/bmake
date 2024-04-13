@@ -52,7 +52,7 @@ all             : made-target error-target aborted-target
 .CURDIR          = unit-tests
 .INCLUDES        = # (empty)
 .LIBS            = # (empty)
-.MAKE            = bmake.exe
+.MAKE            = bmake
 .MAKE.DEPENDFILE = .depend
 .MAKE.GID        = -1
 .MAKE.JOBS.C     = yes
@@ -73,7 +73,7 @@ all             : made-target error-target aborted-target
 # (ends with space)
 MACHINE          = amd64
 MACHINE_ARCH     = amd64
-MAKE             = bmake.exe
+MAKE             = bmake
 MAKE_VERSION     = <details omitted>
 MFLAGS           =   -r -k -d g3
 #*** Command-line Variables:
@@ -91,5 +91,5 @@ MFLAGS           =   -r -k -d g3
 #*** Transformations:
 
 Stop.
-bmake.exe[1]: stopped in unit-tests
+bmake[1]: stopped in unit-tests
 1

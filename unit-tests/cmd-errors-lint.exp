@@ -1,9 +1,9 @@
 : undefined 
-bmake.exe[1]: Unclosed variable "UNCLOSED"
+bmake[1]: Unclosed variable "UNCLOSED"
 : unclosed-variable 
-bmake.exe[1]: Unclosed expression, expecting '}' for "UNCLOSED"
+bmake[1]: Unclosed expression, expecting '}' for "UNCLOSED"
 : unclosed-modifier 
-bmake.exe[1]: Unknown modifier "Z"
+bmake[1]: Unknown modifier "Z"
 : unknown-modifier 
 : end
 2

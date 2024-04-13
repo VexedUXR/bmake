@@ -1,10 +1,10 @@
 Compatibility mode
 type nul > deptgt-delete_on_error-regular& exit 1
 *** Error code 1 (continuing)
-bmake.exe[2]: *** deptgt-delete_on_error-regular removed
+bmake[2]: *** deptgt-delete_on_error-regular removed
 type nul > deptgt-delete_on_error-regular-delete& exit 1
 *** Error code 1 (continuing)
-bmake.exe[2]: *** deptgt-delete_on_error-regular-delete removed
+bmake[2]: *** deptgt-delete_on_error-regular-delete removed
 type nul > deptgt-delete_on_error-phony& exit 1
 *** Error code 1 (continuing)
 type nul > deptgt-delete_on_error-phony-delete& exit 1
@@ -15,35 +15,35 @@ type nul > deptgt-delete_on_error-precious-delete& exit 1
 *** Error code 1 (continuing)
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 *** Error code 1 (ignored)
 
 Parallel mode
 type nul > deptgt-delete_on_error-regular& exit 1
 *** [deptgt-delete_on_error-regular] Error code 1
-bmake.exe[2]: *** deptgt-delete_on_error-regular removed
+bmake[2]: *** deptgt-delete_on_error-regular removed
 
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 type nul > deptgt-delete_on_error-regular-delete& exit 1
 *** [deptgt-delete_on_error-regular-delete] Error code 1
-bmake.exe[2]: *** deptgt-delete_on_error-regular-delete removed
+bmake[2]: *** deptgt-delete_on_error-regular-delete removed
 
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 type nul > deptgt-delete_on_error-phony& exit 1
 *** [deptgt-delete_on_error-phony] Error code 1
 
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 type nul > deptgt-delete_on_error-phony-delete& exit 1
 *** [deptgt-delete_on_error-phony-delete] Error code 1
 
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 type nul > deptgt-delete_on_error-precious& exit 1
 *** [deptgt-delete_on_error-precious] Error code 1
 
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 type nul > deptgt-delete_on_error-precious-delete& exit 1
 *** [deptgt-delete_on_error-precious-delete] Error code 1
 
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 *** Error code 1 (ignored)
 0

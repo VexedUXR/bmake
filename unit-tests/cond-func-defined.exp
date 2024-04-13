@@ -1,8 +1,8 @@
-bmake.exe[1]: "cond-func-defined.mk" line 24: Missing closing parenthesis for defined()
-bmake.exe[1]: "cond-func-defined.mk" line 34: Missing closing parenthesis for defined()
-bmake.exe[1]: "cond-func-defined.mk" line 47: In .for loops, expressions for the loop variables are
-bmake.exe[1]: "cond-func-defined.mk" line 49: substituted at evaluation time.  There is no actual variable
-bmake.exe[1]: "cond-func-defined.mk" line 51: involved, even if it feels like it.
-bmake.exe[1]: Fatal errors encountered -- cannot continue
-bmake.exe[1]: stopped in unit-tests
+bmake[1]: "cond-func-defined.mk" line 24: Missing closing parenthesis for defined()
+bmake[1]: "cond-func-defined.mk" line 34: Missing closing parenthesis for defined()
+bmake[1]: "cond-func-defined.mk" line 47: In .for loops, expressions for the loop variables are
+bmake[1]: "cond-func-defined.mk" line 49: substituted at evaluation time.  There is no actual variable
+bmake[1]: "cond-func-defined.mk" line 51: involved, even if it feels like it.
+bmake[1]: Fatal errors encountered -- cannot continue
+bmake[1]: stopped in unit-tests
 1

@@ -18,7 +18,7 @@
 .CURDIR          = unit-tests
 .INCLUDES        = # (empty)
 .LIBS            = # (empty)
-.MAKE            = bmake.exe
+.MAKE            = bmake
 .MAKE.DEPENDFILE = .depend
 .MAKE.GID        = -1
 .MAKE.JOBS.C     = yes
@@ -39,7 +39,7 @@
 # (ends with space)
 MACHINE          = amd64
 MACHINE_ARCH     = amd64
-MAKE             = bmake.exe
+MAKE             = bmake
 MAKE_VERSION     = <details omitted>
 MFLAGS           =   -r -k -d g1
 #*** Command-line Variables:

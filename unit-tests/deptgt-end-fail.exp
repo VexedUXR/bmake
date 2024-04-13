@@ -13,7 +13,7 @@ Making end-dep out of nothing.
 *** Error code 1 (continuing)
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -25,7 +25,7 @@ Making .END from end-dep.
 *** Error code 1 (continuing)
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -36,7 +36,7 @@ Making end-dep out of nothing.
 *** Error code 1 (continuing)
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -46,7 +46,7 @@ Making all-dep out of nothing.
 `all' not remade because of errors.
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -56,7 +56,7 @@ Making all-dep out of nothing.
 `all' not remade because of errors.
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -66,7 +66,7 @@ Making all-dep out of nothing.
 `all' not remade because of errors.
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -76,7 +76,7 @@ Making all-dep out of nothing.
 `all' not remade because of errors.
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -86,7 +86,7 @@ Making all from all-dep.
 *** Error code 1 (continuing)
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -96,7 +96,7 @@ Making all from all-dep.
 *** Error code 1 (continuing)
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -106,7 +106,7 @@ Making all from all-dep.
 *** Error code 1 (continuing)
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -116,7 +116,7 @@ Making all from all-dep.
 *** Error code 1 (continuing)
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -126,7 +126,7 @@ Making all-dep out of nothing.
 `all' not remade because of errors.
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -136,7 +136,7 @@ Making all-dep out of nothing.
 `all' not remade because of errors.
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -146,7 +146,7 @@ Making all-dep out of nothing.
 `all' not remade because of errors.
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 
@@ -156,7 +156,7 @@ Making all-dep out of nothing.
 `all' not remade because of errors.
 
 Stop.
-bmake.exe[2]: stopped in unit-tests
+bmake[2]: stopped in unit-tests
 exit status 1
 
 

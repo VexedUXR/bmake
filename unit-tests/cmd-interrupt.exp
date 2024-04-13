@@ -1,5 +1,5 @@
 type nul > cmd-interrupt-ordinary
-bmake.exe[2]: *** cmd-interrupt-ordinary removed
+bmake[2]: *** cmd-interrupt-ordinary removed
 *** Error code 2 (ignored)
 interrupt-ordinary:  ok 
 type nul > cmd-interrupt-phony

@@ -1,7 +1,7 @@
-bmake.exe[1]: "cond-op-or.mk" line 47: Malformed conditional (1 && (!${DEF} || ${UNDEF}))
-bmake.exe[1]: "cond-op-or.mk" line 50: Malformed conditional (1 && (${UNDEF} || ${UNDEF}))
-bmake.exe[1]: "cond-op-or.mk" line 53: Malformed conditional (1 && (!${UNDEF} || ${UNDEF}))
-bmake.exe[1]: "cond-op-or.mk" line 75: Malformed conditional (0 ||| 0)
-bmake.exe[1]: Fatal errors encountered -- cannot continue
-bmake.exe[1]: stopped in unit-tests
+bmake[1]: "cond-op-or.mk" line 47: Malformed conditional (1 && (!${DEF} || ${UNDEF}))
+bmake[1]: "cond-op-or.mk" line 50: Malformed conditional (1 && (${UNDEF} || ${UNDEF}))
+bmake[1]: "cond-op-or.mk" line 53: Malformed conditional (1 && (!${UNDEF} || ${UNDEF}))
+bmake[1]: "cond-op-or.mk" line 75: Malformed conditional (0 ||| 0)
+bmake[1]: Fatal errors encountered -- cannot continue
+bmake[1]: stopped in unit-tests
 1

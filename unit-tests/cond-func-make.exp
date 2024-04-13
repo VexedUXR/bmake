@@ -1,4 +1,4 @@
-bmake.exe[1]: "cond-func-make.mk" line 24: warning: Unfinished character list in pattern argument '[' to function 'make'
+bmake[1]: "cond-func-make.mk" line 24: warning: Unfinished character list in pattern argument '[' to function 'make'
 : via-cmdline
 : via-dot-makeflags
 0

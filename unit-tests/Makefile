@@ -43,12 +43,14 @@ TEST_MAKE?=	${.MAKE}
 # CHANGE.test. See tests.mk.
 
 # We dont want absolute paths in the results.
-CHANGE+=	'${TEST_MAKE:S,\\,\\\\,g};bmake.exe'
-CHANGE+=	'${.CURDIR:S,\\,\\\\,g}\\;'
-CHANGE+=	'${.CURDIR:S,\\,\\\\,g};unit-tests'
-CHANGE+=	'${.SYSPATH:S,\\,\\\\,g};mk'
-CHANGE+=	'${TMPDIR:S,\\,\\\\,g};<tmpdir>'
-CHANGE+=	${HOMEDRIVE};<home>
+CHANGE+= \
+'${TEST_MAKE:S,\\,\\\\,g};bmake'	\
+'${TEST_MAKE:T};bmake'			\
+'${.CURDIR:S,\\,\\\\,g}\\;'		\
+'${.CURDIR:S,\\,\\\\,g};unit-tests'	\
+'${.SYSPATH:S,\\,\\\\,g};mk'		\
+'${TMPDIR:S,\\,\\\\,g};<tmpdir>'	\
+${HOMEDRIVE};<home>
 
 # Default arguments for tests, can be overwritten
 # with ARGS.test.
