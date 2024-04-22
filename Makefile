@@ -4,23 +4,33 @@ SUBDIR+=	tre
 LDADD+=		user32.lib tre.lib
 LDFLAGS+=	/libpath:tre
 
+# Version
+CFLAGS+=	/D MAKE_VERSION=\"20240404\"
+
+# Disable some warnings
+
+# Disable warning when size_t is converted to a smaller type.
+# arguably we can avoid this using a cast.
+# Used in LoadFile in parse.c
+NOWARN+= 4267
+# This disables a warning we get when using the '-' operator on an
+# unsigned type.
+# Used in TryParseNumber in parse.c
+NOWARN+= 4146
+# Disable the deprecated function warning, which triggers on alot
+# of the standard libc functions.
+# Used all over the place.
+NOWARN+= 4996
+
+CFLAGS+=	${NOWARN:@w@/wd$w@}
+
 CFLAGS+=	\
 /D USE_META	\
 /D HAVE_REGEX_H	\
-/D MAKE_VERSION=\"20240404\" \
 /MT \
-/W3 \
-/wd4996 \
-/wd4267 \
-/wd4146
+/W3
 
-.if !make(deploy)
-CFLAGS+=	-Od
-.else
-CFLAGS+=	-O2 -Ot
 
-deploy: realbuild
-.endif
 SRCS=		\
 arch.c		\
 buf.c		\
@@ -45,6 +55,14 @@ suff.c		\
 targ.c		\
 trace.c		\
 util.c		\
-var.c		\
+var.c
+
+.if !make(release)
+CFLAGS+=	/Od
+.else
+CFLAGS+=	/O2 /Ot
+
+release: realbuild
+.endif
 
 .include <prog.mk>
