@@ -947,20 +947,7 @@ InitVarMachine(void)
 
 	numCpus = info.dwNumberOfProcessors;
 
-	switch (info.wProcessorArchitecture) {
-	case PROCESSOR_ARCHITECTURE_AMD64:
-		return "amd64";
-	case PROCESSOR_ARCHITECTURE_ARM:
-		return "arm";
-	case PROCESSOR_ARCHITECTURE_ARM64:
-		return "arm64";
-	case PROCESSOR_ARCHITECTURE_IA64:
-		return "ia64";
-	case PROCESSOR_ARCHITECTURE_INTEL:
-		return "x86";
-	default:
-		return "unknown";
-	}
+	return MACHINE;
 }
 
 /*

@@ -7,6 +7,11 @@ LDFLAGS+=	/libpath:tre
 # Version
 CFLAGS+=	/D MAKE_VERSION=\"20240414\"
 
+.if empty(TARGET)
+.warning TARGET not set, MACHINE and MACHINE_ARCH will be empty.
+.endif
+CFLAGS+=	/D MACHINE=\"${TARGET}\"
+
 # Disable some warnings
 
 # Disable warning when size_t is converted to a smaller type.
