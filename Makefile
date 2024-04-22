@@ -5,7 +5,7 @@ LDADD+=		user32.lib tre.lib
 LDFLAGS+=	/libpath:tre
 
 # Version
-CFLAGS+=	/D MAKE_VERSION=\"20240404\"
+CFLAGS+=	/D MAKE_VERSION=\"20240414\"
 
 # Disable some warnings
 

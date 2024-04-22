@@ -2607,6 +2607,7 @@ ReadHighLevelLine(void)
 		if (line == NULL)
 			return NULL;
 
+		DEBUG2(PARSE, "Parsing line %u: %s\n", curFile->lineno, line);
 		if (curFile->guardState != GS_NO
 			&& ((curFile->guardState == GS_START && line[0] != '.')
 			|| curFile->guardState == GS_DONE))
