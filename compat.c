@@ -291,11 +291,11 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 		si.hStdOutput = si.hStdError = meta_compat_pipe()[1];
 		si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 
-		if (CreateProcessA(shellPath, cmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi) == 0)
+		if (CreateProcessA(shellPath, (LPSTR)cmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi) == 0)
 			Punt("could not create process: %s", strerr(GetLastError()));
 	} else
 #endif
-	if (CreateProcessA(shellPath, cmd, NULL, NULL, FALSE, 0, NULL, NULL,
+	if (CreateProcessA(shellPath, (LPSTR)cmd, NULL, NULL, FALSE, 0, NULL, NULL,
 			&(STARTUPINFOA){sizeof (STARTUPINFOA), 0}, &pi) == 0)
 		Punt("could not create process: %s", strerr(GetLastError()));
 

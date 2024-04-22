@@ -107,7 +107,7 @@ Msg_Init(void (*intProc)(void), void (*termProc)(void))
 		Punt("failed to duplicate thread handle: %s", strerr(GetLastError()));
 	if (SetConsoleCtrlHandler(MsgConsoleH, TRUE) == 0)
 		Punt("failed to set console ctrl handler: %s", strerr(GetLastError()));
-	if ((msgThread = CreateThread(NULL, 0, MsgLoop, &ready, 0, NULL)) == NULL)
+	if ((msgThread = CreateThread(NULL, 0, MsgLoop, (LPVOID)&ready, 0, NULL)) == NULL)
 		Punt("failed to start msg thread: %s", strerr(GetLastError()));
 
 	while (!ready);

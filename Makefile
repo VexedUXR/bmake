@@ -10,7 +10,9 @@ CFLAGS+=	\
 /D MAKE_VERSION=\"20240404\" \
 /MT \
 /W3 \
-/wd4996
+/wd4996 \
+/wd4267 \
+/wd4146
 
 .if !make(deploy)
 CFLAGS+=	-Od

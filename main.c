@@ -1588,7 +1588,7 @@ Cmd_Exec(const char *cmd, char **error)
 	if (shellPath == NULL)
 		Shell_Init();
 
-	p = Shell_GetArgs();
+	p = (char *)Shell_GetArgs();
 	output = _alloca((size_t)snprintf(NULL, 0, cmdFmt, shellPath, p, cmd) + 1);
 	sprintf(output, cmdFmt, shellPath, p, cmd);
 
@@ -2001,7 +2001,7 @@ strerr(DWORD e)
 
 	if (FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
 			FORMAT_MESSAGE_MAX_WIDTH_MASK | FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL, e, 0, &buf, 30, NULL) == 0)
+			NULL, e, 0, (LPSTR)&buf, 30, NULL) == 0)
 		Punt("failed to format error message");
 
 	return buf;
