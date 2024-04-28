@@ -7,9 +7,7 @@ LDFLAGS+=	/libpath:tre
 # Version
 CFLAGS+=	/D MAKE_VERSION=\"20240414\"
 
-.if empty(TARGET)
-.warning TARGET not set, MACHINE and MACHINE_ARCH will be empty.
-.endif
+TARGET?=	${VSCMD_ARG_TGT_ARCH:U${PROCESSOR_ARCHITECTURE}:tl:S,x64,amd64,1:S,x86,i386,1}
 CFLAGS+=	/D MACHINE=\"${TARGET}\"
 
 # Disable some warnings
