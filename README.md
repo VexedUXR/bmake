@@ -1,6 +1,10 @@
 
 # bmake for Windows
 
+## Installing
+bmake is now on chocolatey:
+https://community.chocolatey.org/packages/bmake
+
 ## Building
 You can build this by running `bmake`
 
