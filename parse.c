@@ -2930,8 +2930,6 @@ Parse_File(const char *name, int fd)
 
 	do {
 		while ((line = ReadHighLevelLine()) != NULL) {
-			DEBUG2(PARSE, "Parsing line %u: %s\n",
-				CurFile()->lineno, line);
 			ParseLine(line);
 		}
 	} while (ParseEOF());
