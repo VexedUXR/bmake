@@ -1,6 +1,7 @@
 PROG=	bmake
 
 SUBDIR+=	tre
+DPADD+=		tre
 LDADD+=		user32.lib tre.lib
 LDFLAGS+=	/libpath:tre
 
