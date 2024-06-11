@@ -203,7 +203,9 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 	errCheck = !(gn->type & OP_IGNORE);
 	doIt = false;
 
-	cmdStart = Var_Subst(cmd, gn, VARE_WANTRES);
+	EvalStack_Push(gn->name, NULL, NULL);
+	cmdStart = Var_Subst(cmd, gn, VARE_EVAL);
+	EvalStack_Pop();
 	/* TODO: handle errors */
 
 	if (cmdStart[0] == '\0') {
@@ -228,11 +230,13 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 			 * usual '$$'.
 			 */
 			Lst_Append(&endNode->commands, cmdStart);
-			return true;
+			goto register_command;
 		}
 	}
 	if (strcmp(cmdStart, "...") == 0) {
 		gn->type |= OP_SAVE_CMDS;
+	register_command:
+		Parse_RegisterCommand(cmdStart);
 		return true;
 	}
 
@@ -253,7 +257,7 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 		cmd++;
 
 	if (cmd[0] == '\0')
-		return true;
+		goto register_command;
 
 	if (!silent || !GNode_ShouldExecute(gn)) {
 		printf("%s\n", cmd);
@@ -261,7 +265,7 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 	}
 
 	if (!doIt && !GNode_ShouldExecute(gn))
-		return true;
+		goto register_command;
 
 	DEBUG1(JOB, "Execute: '%s'\n", cmd);
 

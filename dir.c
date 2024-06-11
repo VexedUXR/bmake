@@ -1,4 +1,4 @@
-/*	$NetBSD: dir.c,v 1.282 2023/06/23 04:56:54 rillig Exp $	*/
+/*	$NetBSD: dir.c,v 1.294 2024/05/31 05:50:11 rillig Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990 The Regents of the University of California.
@@ -487,6 +487,18 @@ Dir_InitDot(void)
 	Dir_SetPATH();		/* initialize */
 }
 
+#ifdef CLEANUP
+static void
+FreeCachedTable(HashTable *tbl)
+{
+	HashIter hi;
+	HashIter_Init(&hi, tbl);
+	while (HashIter_Next(&hi))
+		free(hi.entry->value);
+	HashTable_Done(tbl);
+}
+#endif
+
 /* Clean up the directories module. */
 void
 Dir_End(void)
@@ -497,7 +509,7 @@ Dir_End(void)
 	CachedDir_Assign(&dotLast, NULL);
 	SearchPath_Clear(&dirSearchPath);
 	OpenDirs_Done(&openDirs);
-	HashTable_Done(&mtimes);
+	FreeCachedTable(&mtimes);
 #endif
 }
 
@@ -551,10 +563,12 @@ void
 Dir_SetSYSPATH(void)
 {
 	CachedDirListNode *ln;
+	SearchPath *path = Lst_IsEmpty(&sysIncPath->dirs)
+		? defSysIncPath : sysIncPath;
 
 	Var_ReadOnly(".SYSPATH", false);
 	Global_Delete(".SYSPATH");
-	for (ln = sysIncPath->dirs.first; ln != NULL; ln = ln->next) {
+	for (ln = path->dirs.first; ln != NULL; ln = ln->next) {
 		CachedDir *dir = ln->datum;
 		Global_Append(".SYSPATH", dir->name);
 	}
@@ -627,7 +641,7 @@ DirMatchFiles(const char *pattern, CachedDir *dir, StringList *expansions)
 	 */
 
 	HashIter_InitSet(&hi, &dir->files);
-	while (HashIter_Next(&hi) != NULL) {
+	while (HashIter_Next(&hi)) {
 		const char *base = hi.entry->key;
 		StrMatchResult res = Str_Match(base, pattern);
 		/* TODO: handle errors from res.error */
@@ -847,6 +861,7 @@ SearchPath_ExpandMiddle(SearchPath *path, const char *pattern,
 	(void)SearchPath_Add(partPath, dirpath);
 	DirExpandPath(wildcardComponent + 1, partPath, expansions);
 	SearchPath_Free(partPath);
+	free(dirpath);
 }
 
 /*
@@ -1127,15 +1142,16 @@ found:
  * Input:
  *	name		the file to find
  *	path		the directories to search, or NULL
+ *	isinclude	if true, do not search .CURDIR at all
  *
  * Results:
  *	The freshly allocated path to the file, or NULL.
  */
-char *
-Dir_FindFile(const char *name, SearchPath *path)
+static char *
+FindFile(const char *name, SearchPath *path, bool isinclude)
 {
 	char *file;		/* the current filename to check */
-	bool seenDotLast = false; /* true if we should search dot last */
+	bool seenDotLast = isinclude; /* true if we should search dot last */
 	struct cached_stat cst;
 	const char *trailing_dot = ".";
 	const char *base = str_basename(name);
@@ -1148,7 +1164,7 @@ Dir_FindFile(const char *name, SearchPath *path)
 		return NULL;
 	}
 
-	if (path->dirs.first != NULL) {
+	if (!seenDotLast && path->dirs.first != NULL) {
 		CachedDir *dir = path->dirs.first->datum;
 		if (dir == dotLast) {
 			seenDotLast = true;
@@ -1227,6 +1243,38 @@ Dir_FindFile(const char *name, SearchPath *path)
 
 	DEBUG0(DIR, "   failed. Returning NULL\n");
 	return NULL;
+}
+
+/*
+ * Find the file with the given name along the given search path.
+ *
+ * Input:
+ *	name		the file to find
+ *	path		the directories to search, or NULL
+ *
+ * Results:
+ *	The freshly allocated path to the file, or NULL.
+ */
+char *
+Dir_FindFile(const char *name, SearchPath *path)
+{
+	return FindFile(name, path, false);
+}
+
+/*
+ * Find the include file with the given name along the given search path.
+ *
+ * Input:
+ *	name		the file to find
+ *	path		the directories to search, or NULL
+ *
+ * Results:
+ *	The freshly allocated path to the file, or NULL.
+ */
+char *
+Dir_FindInclude(const char *name, SearchPath *path)
+{
+	return FindFile(name, path, true);
 }
 
 

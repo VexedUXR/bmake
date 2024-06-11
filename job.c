@@ -610,7 +610,9 @@ JobWriteCommand(Job *job, ShellWriter *wr, StringListNode *ln, const char *ucmd)
 
 	run = GNode_ShouldExecute(job->node);
 
-	xcmd = Var_Subst(ucmd, job->node, VARE_WANTRES);
+	EvalStack_Push(job->node->name, NULL, NULL);
+	xcmd = Var_Subst(ucmd, job->node, VARE_EVAL);
+	EvalStack_Pop();
 	/* TODO: handle errors */
 	xcmdStart = xcmd;
 
@@ -719,9 +721,12 @@ JobSaveCommands(Job *job)
 		 * variables such as .TARGET, .IMPSRC.  It is not intended to
 		 * expand the other variables as well; see deptgt-end.mk.
 		 */
-		expanded_cmd = Var_Subst(cmd, job->node, VARE_WANTRES);
+		EvalStack_Push(job->node->name, NULL, NULL);
+		expanded_cmd = Var_Subst(cmd, job->node, VARE_EVAL);
+		EvalStack_Pop();
 		/* TODO: handle errors */
 		Lst_Append(&Targ_GetEndNode()->commands, expanded_cmd);
+		Parse_RegisterCommand(expanded_cmd);
 	}
 }
 
@@ -749,13 +754,14 @@ DebugFailedJob(const Job *job)
 
 	debug_printf("\n");
 	debug_printf("*** Failed target: %s\n", job->node->name);
+	debug_printf("*** In directory: %s\n", curdir);
 	debug_printf("*** Failed commands:\n");
 	for (ln = job->node->commands.first; ln != NULL; ln = ln->next) {
 		const char *cmd = ln->datum;
 		debug_printf("\t%s\n", cmd);
 
 		if (strchr(cmd, '$') != NULL) {
-			char *xcmd = Var_Subst(cmd, job->node, VARE_WANTRES);
+			char *xcmd = Var_Subst(cmd, job->node, VARE_EVAL);
 			debug_printf("\t=> %s\n", xcmd);
 			free(xcmd);
 		}
@@ -1583,7 +1589,8 @@ Shell_Init(void)
 		shell->metaChar = shell_freeIt[i] = ch_shell_build(shell->metaChar);
 	}
 
-	Var_SetWithFlags(SCOPE_CMDLINE, ".SHELL", shellPath, VAR_SET_READONLY);
+	Var_SetWithFlags(SCOPE_CMDLINE, ".SHELL", shellPath,
+			 VAR_SET_INTERNAL|VAR_SET_READONLY);
 }
 
 ShellInfo *
@@ -1616,7 +1623,7 @@ Job_SetPrefix(void)
 		Global_Set(".MAKE.JOB.PREFIX", "---");
 
 	targPrefix = Var_Subst("${.MAKE.JOB.PREFIX}",
-		SCOPE_GLOBAL, VARE_WANTRES);
+		SCOPE_GLOBAL, VARE_EVAL);
 	/* TODO: handle errors */
 }
 

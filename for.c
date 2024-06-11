@@ -1,4 +1,4 @@
-/*	$NetBSD: for.c,v 1.176 2023/06/01 09:02:14 rillig Exp $	*/
+/*	$NetBSD: for.c,v 1.181 2024/06/02 15:31:25 rillig Exp $	*/
 
 /*
  * Copyright (c) 1992, The Regents of the University of California.
@@ -154,7 +154,8 @@ ForLoop_ParseVarnames(ForLoop *f, const char **pp)
 		cpp_skip_whitespace(&p);
 		if (*p == '\0') {
 			Parse_Error(PARSE_FATAL, "missing `in' in for");
-			f->vars.len = 0;
+			while (f->vars.len > 0)
+				free(*(char **)Vector_Pop(&f->vars));
 			return;
 		}
 
@@ -164,7 +165,8 @@ ForLoop_ParseVarnames(ForLoop *f, const char **pp)
 				    "invalid character '%c' "
 				    "in .for loop variable name",
 				    p[len]);
-				f->vars.len = 0;
+				while (f->vars.len > 0)
+					free(*(char **)Vector_Pop(&f->vars));
 				return;
 			}
 		}
@@ -193,7 +195,7 @@ ForLoop_ParseItems(ForLoop *f, const char *p)
 
 	cpp_skip_whitespace(&p);
 
-	items = Var_Subst(p, SCOPE_GLOBAL, VARE_WANTRES);
+	items = Var_Subst(p, SCOPE_GLOBAL, VARE_EVAL);
 	/* TODO: handle errors */
 
 	f->items = Substring_Words(items, false);

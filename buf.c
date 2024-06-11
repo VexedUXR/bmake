@@ -1,4 +1,4 @@
-/*	$NetBSD: buf.c,v 1.57 2023/12/19 19:33:39 rillig Exp $	*/
+/*	$NetBSD: buf.c,v 1.58 2024/04/28 15:10:19 rillig Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990 The Regents of the University of California.
@@ -184,31 +184,4 @@ Buf_DoneData(Buffer *buf)
 #endif
 
 	return data;
-}
-
-#ifndef BUF_COMPACT_LIMIT
-# define BUF_COMPACT_LIMIT 128	/* worthwhile saving */
-#endif
-
-/*
- * Return the data from the buffer.
- * Leave the buffer itself in an indeterminate state.
- *
- * If the buffer size is much greater than its content,
- * a new buffer will be allocated and the old one freed.
- */
-char *
-Buf_DoneDataCompact(Buffer *buf)
-{
-#if BUF_COMPACT_LIMIT > 0
-	if (buf->cap - buf->len >= BUF_COMPACT_LIMIT) {
-		/* We trust realloc to be smart */
-		char *data = bmake_realloc(buf->data, buf->len + 1);
-		buf->data = NULL;
-		data[buf->len] = '\0';	/* XXX: unnecessary */
-		Buf_Done(buf);
-		return data;
-	}
-#endif
-	return Buf_DoneData(buf);
 }

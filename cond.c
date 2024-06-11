@@ -1,4 +1,4 @@
-/*	$NetBSD: cond.c,v 1.354 2023/08/11 04:56:31 rillig Exp $	*/
+/*	$NetBSD: cond.c,v 1.365 2024/06/02 15:31:25 rillig Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990 The Regents of the University of California.
@@ -221,8 +221,8 @@ ParseWord(const char **pp, bool doEval)
 			break;
 		if (ch == '$') {
 			VarEvalMode emode = doEval
-			    ? VARE_UNDEFERR
-			    : VARE_PARSE_ONLY;
+			    ? VARE_EVAL_DEFINED
+			    : VARE_PARSE;
 			/*
 			 * TODO: make Var_Parse complain about undefined
 			 * variables.
@@ -395,9 +395,9 @@ CondParser_StringExpr(CondParser *par, const char *start,
 	const char *p;
 	bool atStart;		/* true means an expression outside quotes */
 
-	emode = doEval && quoted ? VARE_WANTRES
-	    : doEval ? VARE_UNDEFERR
-	    : VARE_PARSE_ONLY;
+	emode = doEval && quoted ? VARE_EVAL
+	    : doEval ? VARE_EVAL_DEFINED
+	    : VARE_PARSE;
 
 	p = par->p;
 	atStart = p == start;
@@ -423,13 +423,12 @@ CondParser_StringExpr(CondParser *par, const char *start,
  * Parse a string from an expression or an optionally quoted string,
  * on the left-hand and right-hand sides of comparisons.
  *
- * Results:
- *	Returns the string without any enclosing quotes, or NULL on error.
- *	Sets out_quoted if the leaf was a quoted string literal.
+ * Return the string without any enclosing quotes, or NULL on error.
+ * Sets out_quoted if the leaf was a quoted string literal.
  */
-static void
+static FStr
 CondParser_Leaf(CondParser *par, bool doEval, bool unquotedOK,
-		  FStr *out_str, bool *out_quoted)
+		bool *out_quoted)
 {
 	Buffer buf;
 	FStr str;
@@ -491,7 +490,7 @@ return_buf:
 	buf.data = NULL;
 return_str:
 	Buf_Done(&buf);
-	*out_str = str;
+	return str;
 }
 
 /*
@@ -601,7 +600,7 @@ CondParser_Comparison(CondParser *par, bool doEval)
 	ComparisonOp op;
 	bool lhsQuoted, rhsQuoted;
 
-	CondParser_Leaf(par, doEval, par->leftUnquotedOK, &lhs, &lhsQuoted);
+	lhs = CondParser_Leaf(par, doEval, par->leftUnquotedOK, &lhsQuoted);
 	if (lhs.str == NULL)
 		goto done_lhs;
 
@@ -621,7 +620,7 @@ CondParser_Comparison(CondParser *par, bool doEval)
 		goto done_lhs;
 	}
 
-	CondParser_Leaf(par, doEval, true, &rhs, &rhsQuoted);
+	rhs = CondParser_Leaf(par, doEval, true, &rhsQuoted);
 	t = rhs.str == NULL ? TOK_ERROR
 	    : !doEval ? TOK_FALSE
 	    : EvalCompare(par, lhs.str, lhsQuoted, op, rhs.str, rhsQuoted);
@@ -651,8 +650,7 @@ CondParser_FuncCallEmpty(CondParser *par, bool doEval, Token *out_token)
 		return false;
 
 	p--;			/* Make p[1] point to the '('. */
-	val = Var_Parse(&p, SCOPE_CMDLINE,
-	    doEval ? VARE_WANTRES : VARE_PARSE_ONLY);
+	val = Var_Parse(&p, SCOPE_CMDLINE, doEval ? VARE_EVAL : VARE_PARSE);
 	/* TODO: handle errors */
 
 	if (val.str == var_Error)
@@ -736,8 +734,10 @@ CondParser_ComparisonOrLeaf(CondParser *par, bool doEval)
 	arg = ParseWord(&p, doEval);
 	assert(arg[0] != '\0');
 
-	if (*p == '=' || *p == '!' || *p == '<' || *p == '>')
+	if (*p == '=' || *p == '!' || *p == '<' || *p == '>') {
+		free(arg);
 		return CondParser_Comparison(par, doEval);
+	}
 	par->p = p;
 
 	/*

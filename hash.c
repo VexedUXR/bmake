@@ -1,4 +1,4 @@
-/*	$NetBSD: hash.c,v 1.74 2023/12/19 19:33:39 rillig Exp $	*/
+/*	$NetBSD: hash.c,v 1.77 2024/05/31 07:11:12 rillig Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990 The Regents of the University of California.
@@ -287,24 +287,19 @@ void
 HashTable_DeleteEntry(HashTable *t, HashEntry *he)
 {
 	HashEntry **ref = &t->buckets[he->hash & t->bucketsMask];
-	HashEntry *p;
 
-	for (; (p = *ref) != NULL; ref = &p->next) {
-		if (p == he) {
-			*ref = p->next;
-			free(p);
-			t->numEntries--;
-			return;
-		}
-	}
-	abort();
+	for (; *ref != he; ref = &(*ref)->next)
+		continue;
+	*ref = he->next;
+	free(he);
+	t->numEntries--;
 }
 
 /*
  * Return the next entry in the hash table, or NULL if the end of the table
  * is reached.
  */
-HashEntry *
+bool
 HashIter_Next(HashIter *hi)
 {
 	HashTable *t = hi->table;
@@ -317,11 +312,11 @@ HashIter_Next(HashIter *hi)
 
 	while (he == NULL) {	/* find the next nonempty chain */
 		if (hi->nextBucket >= bucketsSize)
-			return NULL;
+			return false;
 		he = buckets[hi->nextBucket++];
 	}
 	hi->entry = he;
-	return he;
+	return true;
 }
 
 void
