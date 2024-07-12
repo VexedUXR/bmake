@@ -1,4 +1,4 @@
-/*	$NetBSD: var.c,v 1.1119 2024/06/02 15:31:26 rillig Exp $	*/
+/*	$NetBSD: var.c,v 1.1121 2024/06/15 22:06:30 rillig Exp $	*/
 
 /*
  * Copyright (c) 1988, 1989, 1990, 1993
@@ -192,6 +192,12 @@ typedef struct Var {
 	bool readOnly:1;
 
 	/*
+	 * The variable is read-only and immune to the .NOREADONLY special
+	 * target.  Any attempt to modify it results in an error.
+	 */
+	bool readOnlyLoud:1;
+
+	/*
 	 * The variable is currently being accessed by Var_Parse or Var_Subst.
 	 * This temporary marker is used to avoid endless recursion.
 	 */
@@ -253,10 +259,15 @@ typedef struct SepBuf {
 	char sep;
 } SepBuf;
 
+typedef enum {
+	VSK_TARGET,
+	VSK_VARNAME,
+	VSK_EXPR
+} EvalStackElementKind;
+
 typedef struct {
-	const char *target;
-	const char *varname;
-	const char *expr;
+	EvalStackElementKind kind;
+	const char *str;
 } EvalStackElement;
  
 typedef struct {
@@ -331,21 +342,20 @@ static const char VarEvalMode_Name[][32] = {
 
 static EvalStack evalStack;
 
-void
-EvalStack_Push(const char *target, const char *expr, const char *varname)
+static void
+EvalStack_Push(EvalStackElementKind kind, const char *str)
 {
 	if (evalStack.len >= evalStack.cap) {
 		evalStack.cap = 16 + 2 * evalStack.cap;
 		evalStack.elems = bmake_realloc(evalStack.elems,
 		    evalStack.cap * sizeof(*evalStack.elems));
 	}
-	evalStack.elems[evalStack.len].target = target;
-	evalStack.elems[evalStack.len].expr = expr;
-	evalStack.elems[evalStack.len].varname = varname;
+	evalStack.elems[evalStack.len].kind = kind;
+	evalStack.elems[evalStack.len].str = str;
 	evalStack.len++;
 }
 
-void
+static void
 EvalStack_Pop(void)
 {
 	assert(evalStack.len > 0);
@@ -362,21 +372,12 @@ EvalStack_Details(void)
 	buf->len = 0;
 	for (i = 0; i < evalStack.len; i++) {
 		EvalStackElement *elem = evalStack.elems + i;
-		if (elem->target != NULL) {
-			Buf_AddStr(buf, "in target \"");
-			Buf_AddStr(buf, elem->target);
-			Buf_AddStr(buf, "\": ");
-		}
-		if (elem->expr != NULL) {
-			Buf_AddStr(buf, "while evaluating \"");
-			Buf_AddStr(buf, elem->expr);
-			Buf_AddStr(buf, "\": ");
-		}
-		if (elem->varname != NULL) {
-			Buf_AddStr(buf, "while evaluating variable \"");
-			Buf_AddStr(buf, elem->varname);
-			Buf_AddStr(buf, "\": ");
-		}
+		Buf_AddStr(buf,
+		    elem->kind == VSK_TARGET ? "in target \"" :
+		    elem->kind == VSK_EXPR ? "while evaluating \"" :
+		    "while evaluating variable \"");
+		Buf_AddStr(buf, elem->str);
+		Buf_AddStr(buf, "\": ");
 	}
 	return buf->len > 0 ? buf->data : "";
 }
@@ -394,6 +395,7 @@ VarNew(FStr name, const char *value,
 	var->shortLived = shortLived;
 	var->fromEnvironment = fromEnvironment;
 	var->readOnly = readOnly;
+	var->readOnlyLoud = false;
 	var->inUse = false;
 	var->exported = false;
 	var->reexport = false;
@@ -553,6 +555,12 @@ Var_Delete(GNode *scope, const char *varname)
 	}
 
 	v = he->value;
+	if (v->readOnlyLoud) {
+		Parse_Error(PARSE_FATAL,
+			"Cannot delete \"%s\" as it is read-only",
+			v->name.str);
+		return;
+	}
 	if (v->readOnly) {
 		DEBUG2(VAR, "%s: ignoring delete '%s' as it is read-only\n",
 			scope->name, varname);
@@ -1024,6 +1032,12 @@ Var_SetWithFlags(GNode *scope, const char *name, const char *val,
 		}
 		v = VarAddS(name, val, scope, flags);
 	} else {
+		if (v->readOnlyLoud) {
+			Parse_Error(PARSE_FATAL,
+				"Cannot overwrite \"%s\" as it is read-only",
+				v->name.str);
+			return;
+		}
 		if (v->readOnly && !(flags & VAR_SET_READONLY)) {
 			DEBUG3(VAR,
 				"%s: ignoring '%s = %s' as it is read-only\n",
@@ -1116,7 +1130,8 @@ Global_Delete(const char *name)
 void
 Global_Set_ReadOnly(const char *name, const char *value)
 {
-	Var_SetWithFlags(SCOPE_GLOBAL, name, value, VAR_SET_READONLY);
+	Var_SetWithFlags(SCOPE_GLOBAL, name, value, VAR_SET_NONE);
+	VarFind(name, SCOPE_GLOBAL, false)->readOnlyLoud = true;
 }
 
 /*
@@ -1134,6 +1149,10 @@ Var_Append(GNode *scope, const char *name, const char *val)
 
 	if (v == NULL) {
 		Var_SetWithFlags(scope, name, val, VAR_SET_NONE);
+	} else if (v->readOnlyLoud) {
+		Parse_Error(PARSE_FATAL,
+			"Cannot append to \"%s\" as it is read-only", name);
+		return;
 	} else if (v->readOnly) {
 		DEBUG3(VAR, "%s: ignoring '%s += %s' as it is read-only\n",
 			scope->name, name, val);
@@ -4580,9 +4599,9 @@ Var_Parse(const char **pp, GNode *scope, VarEvalMode emode)
 	expr.value = FStr_InitRefer(v->val.data);
 
 	if (expr.name[0] != '\0')
-		EvalStack_Push(NULL, NULL, expr.name);
+		EvalStack_Push(VSK_VARNAME, expr.name);
 	else
-		EvalStack_Push(NULL, start, NULL);
+		EvalStack_Push(VSK_EXPR, start);
 
 	/*
 	 * Before applying any modifiers, expand any nested expressions from
@@ -4758,6 +4777,16 @@ Var_Subst(const char *str, GNode *scope, VarEvalMode emode)
 	}
 
 	return Buf_DoneData(&res);
+}
+
+char *
+Var_SubstInTarget(const char *str, GNode *scope)
+{
+	char *res;
+	EvalStack_Push(VSK_TARGET, scope->name);
+	res = Var_Subst(str, scope, VARE_EVAL);
+	EvalStack_Pop();
+	return res;
 }
 
 void

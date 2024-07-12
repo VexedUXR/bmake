@@ -203,9 +203,7 @@ Compat_RunCommand(const char *cmdp, GNode *gn, StringListNode *ln)
 	errCheck = !(gn->type & OP_IGNORE);
 	doIt = false;
 
-	EvalStack_Push(gn->name, NULL, NULL);
-	cmdStart = Var_Subst(cmd, gn, VARE_EVAL);
-	EvalStack_Pop();
+	cmdStart = Var_SubstInTarget(cmd, gn);
 	/* TODO: handle errors */
 
 	if (cmdStart[0] == '\0') {

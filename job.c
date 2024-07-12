@@ -610,9 +610,7 @@ JobWriteCommand(Job *job, ShellWriter *wr, StringListNode *ln, const char *ucmd)
 
 	run = GNode_ShouldExecute(job->node);
 
-	EvalStack_Push(job->node->name, NULL, NULL);
-	xcmd = Var_Subst(ucmd, job->node, VARE_EVAL);
-	EvalStack_Pop();
+	xcmd = Var_SubstInTarget(ucmd, job->node);
 	/* TODO: handle errors */
 	xcmdStart = xcmd;
 
@@ -721,9 +719,7 @@ JobSaveCommands(Job *job)
 		 * variables such as .TARGET, .IMPSRC.  It is not intended to
 		 * expand the other variables as well; see deptgt-end.mk.
 		 */
-		EvalStack_Push(job->node->name, NULL, NULL);
-		expanded_cmd = Var_Subst(cmd, job->node, VARE_EVAL);
-		EvalStack_Pop();
+		expanded_cmd = Var_SubstInTarget(cmd, job->node);
 		/* TODO: handle errors */
 		Lst_Append(&Targ_GetEndNode()->commands, expanded_cmd);
 		Parse_RegisterCommand(expanded_cmd);
@@ -1512,7 +1508,7 @@ InitShellNameAndPath(void)
 	shellName = shell->name;
 
 #ifdef DEFSHELL_CUSTOM
-	if (isAbs(shellName[0])) {
+	if (isAbs(shellName)) {
 		shellPath = shellName;
 		shellName = str_basename(shellPath);
 		return;
